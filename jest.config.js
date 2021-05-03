@@ -1,6 +1,6 @@
 const config = {
     rootDir: "src",
-    testRegex: "__tests__.*(_tests\\.(ts|tsx))$",
+    testRegex: "__tests__.*(\\.tests\\.(ts|tsx))$",
     moduleFileExtensions: ["ts", "tsx", "js"],
     testEnvironment: "node",
     transform: {
