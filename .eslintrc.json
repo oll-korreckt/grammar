@@ -1,0 +1,29 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2020,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "react-hooks"
+    ],
+    "extends": [
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "no-trailing-spaces": "warn",
+        "semi": "warn",
+        "arrow-parens": "warn",
+        "comma-dangle": "warn",
+        "quotes": ["warn", "double"],
+        "no-shadow": "warn",
+        "no-tabs": "warn"
+    }
+}
