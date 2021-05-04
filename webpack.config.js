@@ -4,7 +4,7 @@ const webpack = require("webpack");
 const ErrorOverlayPlugin = require("error-overlay-webpack-plugin");
 
 module.exports = {
-    entry: "./src/app/index.tsx",
+    entry: "./src/app/pages/index.tsx",
     mode: "development",
     module: {
         rules: [
