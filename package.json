@@ -18,5 +18,8 @@
     },
     "scripts": {
         "test": "jest"
+    },
+    "dependencies": {
+        "xstate": "^4.19.0"
     }
 }
