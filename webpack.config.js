@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
 const webpack = require("webpack");
+const ErrorOverlayPlugin = require("error-overlay-webpack-plugin");
 
 module.exports = {
     entry: "./src/app/index.tsx",
@@ -33,5 +34,8 @@ module.exports = {
         port: 9000,
         clientLogLevel: "none"
     },
-    plugins: [new webpack.HotModuleReplacementPlugin()]
+    plugins: [
+        new webpack.HotModuleReplacementPlugin(),
+        new ErrorOverlayPlugin()
+    ]
 };
