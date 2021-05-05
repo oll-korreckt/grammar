@@ -14,7 +14,7 @@ module.exports = {
                 use: {
                     loader: "@sucrase/webpack-loader",
                     options: {
-                        transforms: ["jsx"]
+                        transforms: ["jsx", "typescript", "imports"]
                     }
                 }
             },
