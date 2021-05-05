@@ -22,8 +22,15 @@
         "semi": "warn",
         "arrow-parens": "warn",
         "comma-dangle": "warn",
-        "quotes": ["warn", "double"],
+        "quotes": [
+            "warn",
+            "double"
+        ],
         "no-shadow": "warn",
-        "no-tabs": "warn"
+        "no-tabs": "warn",
+        "indent": [
+            "warn",
+            4
+        ]
     }
 }
