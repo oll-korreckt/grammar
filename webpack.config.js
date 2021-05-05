@@ -19,13 +19,25 @@ module.exports = {
                 }
             },
             {
-                test: /\.scss/,
-                use: ["style-loader", "css-loader", "sass-loader"]
+                test: /\.scss$/,
+                exclude: /node_modules/,
+                use: [
+                    "style-loader",
+                    {
+                        loader: "css-loader",
+                        options: {
+                            modules: true
+                        }
+                    },
+                    {
+                        loader: "sass-loader"
+                    }
+                ]
             }
         ]
     },
     resolve: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"]
+        extensions: [".js", ".jsx", ".ts", ".tsx", ".scss"]
     },
     output: {
         path: path.resolve(__dirname, "dist"),
