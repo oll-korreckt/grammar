@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "../globals.scss";
+import "./_globals.scss";
 
 const App = () => {
     return <>React App</>;
