@@ -29,9 +29,6 @@
         ],
         "no-shadow": "warn",
         "no-tabs": "warn",
-        "indent": [
-            "warn",
-            4
-        ]
+        "indent": ["warn", 4, { "SwitchCase": 1 }]
     }
 }
