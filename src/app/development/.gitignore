@@ -1,0 +1,4 @@
+# Put files in here for doing troubleshooting/experimentation/exploration during
+# development so that they will not be accidentally added to the repo.
+*
+!.gitignore
