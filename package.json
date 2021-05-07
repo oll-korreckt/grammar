@@ -4,12 +4,14 @@
     "devDependencies": {
         "@sucrase/jest-plugin": "^2.1.0",
         "@sucrase/webpack-loader": "^2.0.0",
+        "@testing-library/react": "^11.2.6",
         "@types/chai": "^4.2.17",
         "@types/jest": "^26.0.23",
         "@types/react": "^17.0.4",
         "@types/react-dom": "^17.0.3",
         "@typescript-eslint/eslint-plugin": "^4.22.0",
         "@typescript-eslint/parser": "^4.22.0",
+        "@xstate/test": "^0.4.2",
         "chai": "^4.3.4",
         "css-loader": "^5.2.4",
         "error-overlay-webpack-plugin": "^0.4.2",
@@ -31,6 +33,7 @@
         "start": "webpack serve --open"
     },
     "dependencies": {
+        "@xstate/react": "^1.3.3",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-icons": "^4.2.0",
