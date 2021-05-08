@@ -1,11 +1,8 @@
 const config = {
     rootDir: "src",
-    testRegex: "__tests__.*(\\.tests\\.(ts|tsx))$",
+    testRegex: "(\\.tests\\.(ts|tsx))$",
     moduleFileExtensions: ["ts", "tsx", "js"],
-    testEnvironment: "node",
-    transform: {
-        "(\\.(ts|tsx))$": "@sucrase/jest-plugin"
-    }
+    testEnvironment: "jsdom"
 };
 
 module.exports = config;
