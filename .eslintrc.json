@@ -19,8 +19,21 @@
     "rules": {
         "react/prop-types": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "no-trailing-spaces": "warn",
         "semi": "warn",
+        "@typescript-eslint/member-delimiter-style": [
+            "warn",
+            {
+                "multiline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                },
+                "singleline": {
+                    "delimiter": "semi",
+                    "requireLast": true
+                }
+            }
+        ],
+        "no-trailing-spaces": "warn",
         "arrow-parens": "warn",
         "comma-dangle": "warn",
         "quotes": [
