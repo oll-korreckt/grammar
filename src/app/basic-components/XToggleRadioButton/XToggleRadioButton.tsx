@@ -18,7 +18,7 @@ export type Event = {
     type: "SELECT";
     selectedItem: string;
 } | {
-    type: "CANCEL"
+    type: "CANCEL";
 };
 
 export interface Context {
@@ -29,7 +29,7 @@ export interface Schema {
     states: {
         selected: SimpleObject;
         notSelected: SimpleObject;
-    }
+    };
 }
 
 function checkProps(props: XToggleRadioButtonProps) {
