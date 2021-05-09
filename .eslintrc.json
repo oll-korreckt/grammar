@@ -33,6 +33,12 @@
                 }
             }
         ],
+        "@typescript-eslint/explicit-module-boundary-types": [
+            "warn",
+            {
+                "allowArgumentsExplicitlyTypedAsAny": true
+            }
+        ],
         "no-trailing-spaces": "warn",
         "arrow-parens": "warn",
         "comma-dangle": "warn",
