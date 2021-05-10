@@ -1,2 +1,3 @@
 export * from "./XToggleButton/XToggleButton";
-export type { XToggleRadioButton, XToggleRadioButtonProps, XToggleRadioButtonChild } from "./XToggleRadioButton/XToggleRadioButton";
+export { XToggleRadioButton } from "./XToggleRadioButton/XToggleRadioButton";
+export type { XToggleRadioButtonProps, XToggleRadioButtonChild } from "./XToggleRadioButton/XToggleRadioButton";
