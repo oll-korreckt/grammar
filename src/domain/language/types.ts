@@ -5,9 +5,11 @@ export interface Token {
     tokenType: TokenType;
 }
 
+export type PartOfSpeechType = undefined | "noun" | "verb";
+
 export interface WordTag {
     lexeme: string;
-    posType?: "noun" | "verb";
+    posType?: PartOfSpeechType;
 }
 
 export function isWordTag(x: any): x is WordTag {
