@@ -7,12 +7,12 @@ import styles from "./_styles.scss";
 
 export interface XToggleRadioButtonProps {
     initialItem?: string;
-    children: XToggleButtonData[];
+    children: XToggleRadioButtonChild[];
     onItemSelect?: (item: string) => void;
     onItemCancel?: () => void;
 }
 
-export type XToggleButtonData = [typeof XToggleButton, string]
+export type XToggleRadioButtonChild = [typeof XToggleButton, string]
 
 export type Event = {
     type: "SELECT";
@@ -106,8 +106,8 @@ export const XToggleRadioButton: React.VFC<XToggleRadioButtonProps> = (props) =>
 
     function renderChildren() {
         if (state.context.selectedItem) {
-            let Component: XToggleButtonData[0] | undefined = undefined;
-            let text: XToggleButtonData[1] | undefined = undefined;
+            let Component: XToggleRadioButtonChild[0] | undefined = undefined;
+            let text: XToggleRadioButtonChild[1] | undefined = undefined;
             for (let i = 0; i < props.children.length; i++) {
                 const [childComponent, childText] = props.children[i];
                 if (childText === state.context.selectedItem) {
