@@ -1,3 +1,5 @@
+import { ElementId } from "./element-id";
+
 export type TokenType = "word" | "whitespace" | "end";
 
 export interface Token {
@@ -8,6 +10,7 @@ export interface Token {
 export type PartOfSpeechType = undefined | "noun" | "verb";
 
 export interface WordTag {
+    id: ElementId;
     lexeme: string;
     posType?: PartOfSpeechType;
 }
