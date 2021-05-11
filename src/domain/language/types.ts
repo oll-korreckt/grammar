@@ -26,7 +26,6 @@ export function isWordTag(x: any): x is WordTag {
 }
 
 export interface BlankWordTag extends WordTag {
-    lexeme: string;
     posType?: undefined;
 }
 
