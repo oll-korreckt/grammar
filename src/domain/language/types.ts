@@ -43,6 +43,10 @@ export function isNounTag(x: any): x is NounTag {
     return isWordTag(x) && x.posType === "noun";
 }
 
+export interface BlankNounTag extends NounTag {
+    nounType?: undefined;
+}
+
 export interface VerbTag extends WordTag {
     posType: "verb";
     verbSubj?: NounTag;
