@@ -46,7 +46,8 @@
             "warn",
             "double"
         ],
-        "no-shadow": "warn",
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": "warn",
         "no-tabs": "warn",
         "indent": ["warn", 4, { "SwitchCase": 1 }]
     }
