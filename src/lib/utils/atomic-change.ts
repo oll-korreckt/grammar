@@ -94,5 +94,3 @@ export const AtomicChange = {
     apply: apply,
     applyInverse: applyInverse
 };
-
-export type Change = AtomicChange[];
