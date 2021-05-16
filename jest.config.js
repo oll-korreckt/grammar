@@ -4,7 +4,10 @@ const config = {
     moduleFileExtensions: ["ts", "tsx", "js"],
     testEnvironment: "jsdom",
     moduleNameMapper: {
-        "\\.(scss)$": "<rootDir>/__mocks__/styleMock.js"
+        "\\.(scss)$": "<rootDir>/__mocks__/styleMock.js",
+        "@lib/(.*)": "<rootDir>/lib/$1",
+        "@domain/(.*)": "<rootDir>/domain/$1",
+        "@app/(.*)": "<rootDir>/app/$1"
     }
 };
 
