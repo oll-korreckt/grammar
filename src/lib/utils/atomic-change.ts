@@ -14,36 +14,43 @@ export enum LinkType {
 
 export type ChangeKey = string[];
 
-export type AtomicChange = [
-    ChangeKey,
-    ChangeType.Remove,
-    SimpleObjectValue
-] | [
-    ChangeKey,
-    ChangeType.Set,
-    SimpleObjectValue,
-    SimpleObjectValue
-];
+export type AtomicChange = {
+    key: ChangeKey;
+    type: ChangeType.Remove;
+    currVal: SimpleObjectValue;
+} | {
+    key: ChangeKey;
+    type: ChangeType.Set;
+    currVal: SimpleObjectValue;
+    newVal: SimpleObjectValue;
+}
 
 function createSet(key: ChangeKey, currentValue: SimpleObjectValue, newValue: SimpleObjectValue): AtomicChange {
-    return [key, ChangeType.Set, currentValue, newValue];
+    return {
+        key: key,
+        type: ChangeType.Set,
+        currVal: currentValue,
+        newVal: newValue
+    };
 }
 
 function createRemove(key: ChangeKey, currentValue: SimpleObjectValue): AtomicChange {
-    return [key, ChangeType.Remove, currentValue];
+    return {
+        key: key,
+        type: ChangeType.Remove,
+        currVal: currentValue
+    };
 }
 
-function invertChange(atomicChange: AtomicChange): AtomicChange {
-    const [key, chType, ...values] = atomicChange;
-    switch (chType) {
+function invertChange(change: AtomicChange): AtomicChange {
+    switch (change.type) {
         case ChangeType.Set:
-            const [currVal, newVal] = values;
-            if (currVal === undefined) {
-                return [key, ChangeType.Remove, newVal];
+            if (change.currVal === undefined) {
+                return createRemove(change.key, change.newVal);
             }
-            return [key, ChangeType.Set, newVal, currVal];
+            return createSet(change.key, change.newVal, change.currVal);
         case ChangeType.Remove:
-            return [atomicChange[0], ChangeType.Set, , values[0]];
+            return createSet(change.key, undefined, change.currVal);
     }
 }
 
@@ -64,17 +71,15 @@ function applyInverse<T extends SimpleObject>(target: T, ...changes: AtomicChang
     return output;
 }
 
-function applySingle<T extends SimpleObject>(output: T, [key, type, ...values]: AtomicChange) {
-    const [endObj, endKey] = getEndObject(key, output);
-    switch (type) {
+function applySingle<T extends SimpleObject>(output: T, change: AtomicChange) {
+    const [endObj, endKey] = getEndObject(change.key, output);
+    switch (change.type) {
         case ChangeType.Remove:
             delete endObj[endKey];
             break;
         case ChangeType.Set:
-            endObj[endKey] = values[1];
+            endObj[endKey] = change.newVal;
             break;
-        default:
-            throw `Unexpected ChangeType ${type}`;
     }
 }
 
