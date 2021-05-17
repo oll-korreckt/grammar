@@ -88,7 +88,7 @@ describe("ChangeMap", () => {
                     "bob smith"
                 )
             ];
-            const result = ChangeMap.getChanges(base, curr, map);
+            const result = ChangeMap.getChanges(map, base, curr);
             assert.deepEqual(result, expected);
         });
 
@@ -103,7 +103,7 @@ describe("ChangeMap", () => {
             const expected = [
                 AtomicChange.createSet(["name"], "bob", "jim")
             ];
-            const result = ChangeMap.getChanges(base, curr, map);
+            const result = ChangeMap.getChanges(map, base, curr);
             assert.deepEqual(result, expected);
         });
 
@@ -116,7 +116,7 @@ describe("ChangeMap", () => {
                     age: { type: ChangeType.Remove }
                 }
             };
-            const result = ChangeMap.getChanges(base, curr, map);
+            const result = ChangeMap.getChanges(map, base, curr);
             assert.deepEqual(result, []);
         });
     });

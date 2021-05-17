@@ -41,7 +41,7 @@ function _getEndObject(map: ChangeMap, key: ChangeKey): ChangeMap {
     return output;
 }
 
-function getChanges(base: SimpleObject, curr: SimpleObject, map: ChangeMap): AtomicChange[] {
+function getChanges(map: ChangeMap, base: SimpleObject, curr: SimpleObject): AtomicChange[] {
     const output: AtomicChange[] = [];
     _createCompressedChanges(base, curr, map, [], output);
     return output;
