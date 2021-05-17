@@ -1,3 +1,4 @@
+import { SimpleObject } from "@lib/utils";
 import { ElementId } from "./element-id";
 
 export type TokenType = "word" | "whitespace" | "end";
@@ -9,7 +10,7 @@ export interface Token {
 
 export type PartOfSpeechType = undefined | "noun" | "verb";
 
-export interface WordTag {
+export interface WordTag extends SimpleObject {
     id: ElementId;
     lexeme: string;
     posType?: PartOfSpeechType;
@@ -43,6 +44,11 @@ export interface NounTag extends WordTag {
 
 export function isNounTag(x: any): x is NounTag {
     return isWordTag(x) && x.posType === "noun";
+}
+
+export interface ReferencedNounTag extends NounTag {
+    nounType: Exclude<NounTag["nounType"], undefined>;
+    reference?: ElementId;
 }
 
 export interface BlankNounTag extends NounTag {
