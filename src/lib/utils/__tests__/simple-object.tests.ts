@@ -108,3 +108,31 @@ describe("deepEquals", () => {
         });
     });
 });
+
+describe("clone", () => {
+    test("simple", () => {
+        const expected = {
+            age: 45,
+            firstName: "bob",
+            lastName: "smith"
+        };
+        const result = SimpleObject.clone(expected);
+        assert.notEqual(result, expected);
+        assert.deepEqual(result, expected);
+    });
+
+    test("nested", () => {
+        const obj1 = {
+            age: 25,
+            employed: false,
+            name: {
+                firstName: "bob",
+                lastName: "smith"
+            }
+        };
+        const obj2 = SimpleObject.clone(obj1);
+        assert.deepEqual(obj1, obj2);
+        obj1.name.firstName = "jim";
+        assert.notDeepEqual(obj1, obj2);
+    });
+});

@@ -1,11 +1,11 @@
 export type SimpleObject = {
     [key: string]:
-        | undefined
-        | boolean
-        | number
-        | bigint
-        | string
-        | SimpleObject;
+    | undefined
+    | boolean
+    | number
+    | bigint
+    | string
+    | SimpleObject;
 };
 
 function deepEquals<T extends SimpleObject>(obj1: T, obj2: T): boolean {
@@ -54,6 +54,15 @@ function deepEquals<T extends SimpleObject>(obj1: T, obj2: T): boolean {
     return true;
 }
 
+function clone<T extends SimpleObject>(obj: T): T {
+    const output: any = {};
+    Object.entries(obj).forEach(([key, val]) => {
+        output[key] = typeof val === "object" ? clone(val) : val;
+    });
+    return output;
+}
+
 export const SimpleObject = {
-    deepEquals: deepEquals
+    deepEquals: deepEquals,
+    clone: clone
 };
