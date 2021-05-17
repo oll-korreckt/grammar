@@ -1,8 +1,8 @@
 import { SimpleObject } from "@lib/utils";
 
 export enum LinkType {
-    Target,
-    Reference
+    Target = "target",
+    Reference = "reference"
 }
 
 export type DiagramState<ValueType extends SimpleObject = SimpleObject> = {
