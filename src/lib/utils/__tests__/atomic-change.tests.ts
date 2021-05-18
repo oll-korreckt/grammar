@@ -1,7 +1,6 @@
 import { SimpleObject } from "@lib/utils";
 import { assert } from "chai";
 import { AtomicChange } from "../atomic-change";
-import { SimpleObjectValue } from "../simple-object";
 
 describe("AtomicChange", () => {
     describe("invertChange", () => {
@@ -66,7 +65,7 @@ describe("AtomicChange", () => {
                 };
                 const result = AtomicChange.apply(
                     initialState,
-                    AtomicChange.createRemove(["occupation"], initialState["occupation"] as SimpleObjectValue)
+                    AtomicChange.createRemove(["occupation"], initialState["occupation"])
                 );
                 assert.deepEqual(result, expected);
                 assert.notEqual(result, expected);
@@ -85,7 +84,7 @@ describe("AtomicChange", () => {
                     initialState,
                     AtomicChange.createSet(["name"], "bob", "jim"),
                     AtomicChange.createSet(["age"], 24, 800),
-                    AtomicChange.createRemove(["occupation"], initialState["occupation"] as SimpleObjectValue),
+                    AtomicChange.createRemove(["occupation"], initialState["occupation"]),
                     AtomicChange.createSet(["occupation"], undefined, { title: "bazillionaire", salary: 438904537 })
                 );
                 assert.deepEqual(result, expected);
@@ -106,7 +105,7 @@ describe("AtomicChange", () => {
                 const changes = [
                     AtomicChange.createSet(
                         ["name"],
-                        initialState["name"] as SimpleObjectValue,
+                        initialState["name"],
                         "jim"
                     )
                 ];
@@ -121,16 +120,16 @@ describe("AtomicChange", () => {
                 const changes = [
                     AtomicChange.createRemove(
                         ["name"],
-                        initialState["name"] as SimpleObjectValue
+                        initialState["name"]
                     ),
                     AtomicChange.createSet(
                         ["age"],
-                        initialState["age"] as SimpleObjectValue,
+                        initialState["age"],
                         30
                     ),
                     AtomicChange.createRemove(
                         ["occupation"],
-                        initialState["occupation"] as SimpleObjectValue
+                        initialState["occupation"]
                     )
                 ];
                 let result = AtomicChange.apply(initialState, ...changes);

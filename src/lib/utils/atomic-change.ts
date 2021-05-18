@@ -86,7 +86,7 @@ function getEndObject(key: ChangeKey, state: SimpleObject): [SimpleObject, strin
     let output: SimpleObject = state;
     for (let i = 0; i < key.length - 1; i++) {
         const subKey = key[i];
-        output = output[subKey] as SimpleObject;
+        output = output[subKey];
     }
     return [output, key[key.length - 1]];
 }
