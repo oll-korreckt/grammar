@@ -1,6 +1,12 @@
 import { PrimitiveType } from "./types";
 
 export type SimpleObject = Record<string, unknown>;
+export type SimpleObjectValue =
+    | undefined
+    | string
+    | number
+    | boolean
+    | SimpleObject;
 
 function deepEquals<T extends Record<string, unknown>>(obj1: T, obj2: T): boolean {
     function getEntries(obj: T) {
