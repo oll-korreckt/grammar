@@ -1,4 +1,3 @@
-import { SimpleObject } from "@lib/utils";
 import { ElementId } from "./element-id";
 
 export type TokenType = "word" | "whitespace" | "end";
@@ -10,14 +9,14 @@ export interface Token {
 
 export type PartOfSpeechType = undefined | "noun" | "verb";
 
-export interface WordTag extends SimpleObject {
+export interface WordTag {
     id: ElementId;
     lexeme: string;
     posType?: PartOfSpeechType;
 }
 
 export function isWordTag(x: any): x is WordTag {
-    if(typeof x === "object"
+    if (typeof x === "object"
         && (x as WordTag).lexeme !== undefined) {
         switch ((x as WordTag).posType) {
             case undefined:
