@@ -1,6 +1,7 @@
 import { SimpleObject } from "@lib/utils";
 import { assert } from "chai";
 import { AtomicChange } from "../atomic-change";
+import { SimpleObjectValue } from "../simple-object";
 
 describe("AtomicChange", () => {
     describe("invertChange", () => {
@@ -65,7 +66,7 @@ describe("AtomicChange", () => {
                 };
                 const result = AtomicChange.apply(
                     initialState,
-                    AtomicChange.createRemove(["occupation"], initialState["occupation"])
+                    AtomicChange.createRemove(["occupation"], initialState["occupation"] as SimpleObjectValue)
                 );
                 assert.deepEqual(result, expected);
                 assert.notEqual(result, expected);
@@ -84,7 +85,7 @@ describe("AtomicChange", () => {
                     initialState,
                     AtomicChange.createSet(["name"], "bob", "jim"),
                     AtomicChange.createSet(["age"], 24, 800),
-                    AtomicChange.createRemove(["occupation"], initialState["occupation"]),
+                    AtomicChange.createRemove(["occupation"], initialState["occupation"] as SimpleObjectValue),
                     AtomicChange.createSet(["occupation"], undefined, { title: "bazillionaire", salary: 438904537 })
                 );
                 assert.deepEqual(result, expected);
@@ -103,7 +104,11 @@ describe("AtomicChange", () => {
 
             test("1", () => {
                 const changes = [
-                    AtomicChange.createSet(["name"], initialState["name"], "jim")
+                    AtomicChange.createSet(
+                        ["name"],
+                        initialState["name"] as SimpleObjectValue,
+                        "jim"
+                    )
                 ];
                 let result = AtomicChange.apply(initialState, ...changes);
                 assert.notDeepEqual(result, initialState);
@@ -114,9 +119,19 @@ describe("AtomicChange", () => {
 
             test("multiple", () => {
                 const changes = [
-                    AtomicChange.createRemove(["name"], initialState["name"]),
-                    AtomicChange.createSet(["age"], initialState["age"], 30),
-                    AtomicChange.createRemove(["occupation"], initialState["occupation"])
+                    AtomicChange.createRemove(
+                        ["name"],
+                        initialState["name"] as SimpleObjectValue
+                    ),
+                    AtomicChange.createSet(
+                        ["age"],
+                        initialState["age"] as SimpleObjectValue,
+                        30
+                    ),
+                    AtomicChange.createRemove(
+                        ["occupation"],
+                        initialState["occupation"] as SimpleObjectValue
+                    )
                 ];
                 let result = AtomicChange.apply(initialState, ...changes);
                 assert.notDeepEqual(result, initialState);

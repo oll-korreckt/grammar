@@ -1,5 +1,5 @@
 import { AtomicChange, ChangeKey, ChangeType } from "./atomic-change";
-import { SimpleObject } from "./simple-object";
+import { SimpleObject, SimpleObjectValue } from "./simple-object";
 
 export type ChangeMap = {
     type?: ChangeType;
@@ -7,8 +7,6 @@ export type ChangeMap = {
         [key: string]: ChangeMap;
     };
 };
-
-type SimpleObjectValue = SimpleObject[keyof SimpleObject];
 
 function update(map: ChangeMap, ...changes: AtomicChange[]): ChangeMap {
     const output = Object.assign({}, map);
@@ -52,8 +50,8 @@ function _createCompressedChanges(base: SimpleObjectValue, curr: SimpleObjectVal
         case undefined:
             for (const subKey in map.keys) {
                 const subMap = map.keys[subKey];
-                const subBase = (base as SimpleObject)[subKey];
-                const subCurr = (curr as SimpleObject)[subKey];
+                const subBase = (base as SimpleObject)[subKey] as SimpleObject;
+                const subCurr = (curr as SimpleObject)[subKey] as SimpleObject;
                 _createCompressedChanges(subBase, subCurr, subMap, [...key, subKey], output);
             }
             break;

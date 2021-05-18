@@ -1,6 +1,5 @@
-import { SimpleObject } from "@lib/utils";
+import { SimpleObject, SimpleObjectValue } from "@lib/utils";
 
-type SimpleObjectValue = SimpleObject[keyof SimpleObject];
 
 export enum ChangeType {
     Remove = -1,
