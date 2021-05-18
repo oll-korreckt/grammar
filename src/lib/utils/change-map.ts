@@ -77,7 +77,6 @@ function _equals(x: SimpleObjectValue, y: SimpleObjectValue): boolean {
     switch (xType) {
         case "string":
         case "number":
-        case "bigint":
         case "boolean":
         case "undefined":
             return x === y;
