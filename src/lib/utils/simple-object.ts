@@ -1,6 +1,6 @@
 import { PrimitiveType } from "./types";
 
-export type SimpleObject = Record<string, unknown>;
+export type SimpleObject = Record<string, any>;
 export type SimpleObjectValue =
     | undefined
     | string
@@ -8,7 +8,7 @@ export type SimpleObjectValue =
     | boolean
     | SimpleObject;
 
-function deepEquals<T extends Record<string, unknown>>(obj1: T, obj2: T): boolean {
+function deepEquals<T extends SimpleObject>(obj1: T, obj2: T): boolean {
     function getEntries(obj: T) {
         return Object.entries(obj)
             .map<[string, unknown, PrimitiveType]>(([key, value]) => [key, value, typeof value])
