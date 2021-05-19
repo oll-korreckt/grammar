@@ -3,18 +3,21 @@ import { AtomicChange, ChangeMap, SimpleObject } from "@lib/utils";
 import { scan } from "@domain/language";
 import { DiagramState, LinkType } from "@app/utils";
 
+const links: keyof DiagramState[keyof DiagramState] = "links";
+const value: keyof DiagramState[keyof DiagramState] = "value";
+
 export class Diagram {
     static fromSentence(sentence: string): Diagram {
         const baseState: DiagramState<WordTag> = {};
         let wordCnt = 0;
         scan(sentence).forEach(({ lexeme, tokenType }) => {
             if (tokenType === "word") {
-                const value: WordTag = {
+                const newValue: WordTag = {
                     id: `1.${wordCnt}`,
                     lexeme: lexeme
                 };
-                baseState[value.id] = {
-                    value: value,
+                baseState[newValue.id] = {
+                    value: newValue,
                     links: {}
                 };
                 wordCnt++;
@@ -32,7 +35,7 @@ export class Diagram {
         this.baseState = baseState;
     }
 
-    getCurrentElement(id: ElementId): DiagramState<WordTag>[keyof DiagramState<WordTag>] {
+    getElement(id: ElementId): DiagramState<WordTag>[keyof DiagramState<WordTag>] {
         return this.newState[id] ? this.newState[id] : this.baseState[id];
     }
 
@@ -55,32 +58,41 @@ export class Diagram {
         });
     }
 
-    addLink(reference: ElementId, target: ElementId): void {
+    createAddLink(reference: ElementId, target: ElementId): AtomicChange[] {
         this.transferData(reference, target);
         const referenceChange = AtomicChange.createSet(
-            [reference, "links", target],
+            [reference, links, target],
             this.newState[reference].links[target],
             LinkType.Target
         );
         const targetChange = AtomicChange.createSet(
-            [target, "links", reference],
+            [target, links, reference],
             this.newState[target].links[reference],
             LinkType.Reference
         );
-        this.stageChange(referenceChange, targetChange);
+        return [referenceChange, targetChange];
     }
 
-    removeLink(reference: ElementId, target: ElementId): void {
+    createValueOverwrite(newValue: WordTag): AtomicChange {
+        this.transferData(newValue.id);
+        return AtomicChange.createSet(
+            [newValue.id, value],
+            this.getElement(newValue.id).value,
+            newValue
+        );
+    }
+
+    createRemoveLink(reference: ElementId, target: ElementId): AtomicChange[] {
         this.transferData(reference, target);
         const removeRef = AtomicChange.createRemove(
-            [reference, "links", target],
+            [reference, links, target],
             this.newState[reference].links[target]
         );
         const removeTarget = AtomicChange.createRemove(
-            [target, "links", reference],
+            [target, links, reference],
             this.newState[target].links[reference]
         );
-        this.stageChange(removeRef, removeTarget);
+        return [removeRef, removeTarget];
     }
 
     undoChange(): void {
