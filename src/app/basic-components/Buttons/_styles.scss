@@ -1,0 +1,11 @@
+%button {
+    font-size: 2rem;
+}
+
+.okButton {
+    @extend %button;
+}
+
+.cancelButton {
+    @extend %button;
+}
