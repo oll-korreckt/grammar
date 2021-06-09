@@ -1,42 +1,23 @@
-import { ElementId, WordTag } from "@domain/language";
+import { DiagramState } from "@app/utils";
+import { Identifiable } from "@domain/language";
+import { ElementId } from "@domain/language/element-id";
 import { AtomicChange, ChangeMap, SimpleObject } from "@lib/utils";
-import { scan } from "@domain/language";
-import { DiagramState, LinkType } from "@app/utils";
-
-const links: keyof DiagramState[keyof DiagramState] = "links";
-const value: keyof DiagramState[keyof DiagramState] = "value";
 
 export class Diagram {
-    static fromSentence(sentence: string): Diagram {
-        const baseState: DiagramState<WordTag> = {};
-        let wordCnt = 0;
-        scan(sentence).forEach(({ lexeme, tokenType }) => {
-            if (tokenType === "word") {
-                const newValue: WordTag = {
-                    id: `1.${wordCnt}`,
-                    lexeme: lexeme
-                };
-                baseState[newValue.id] = {
-                    value: newValue,
-                    links: {}
-                };
-                wordCnt++;
-            }
-        });
-        return new Diagram(baseState);
-    }
-
-    private baseState: DiagramState<WordTag>;
-    private newState: DiagramState<WordTag> = {};
-    private changes: AtomicChange[][] = [[]];
+    private baseState: DiagramState<Identifiable>;
+    private newState: DiagramState<Identifiable> = {};
+    private changes: AtomicChange[][] = [];
     private currentChange = 0;
 
-    private constructor(baseState: DiagramState<WordTag>) {
+    private constructor(baseState: DiagramState<Identifiable>) {
         this.baseState = baseState;
     }
 
-    getElement(id: ElementId): DiagramState<WordTag>[keyof DiagramState<WordTag>] {
-        return this.newState[id] ? this.newState[id] : this.baseState[id];
+    getCurrentItemState(id: ElementId): DiagramState<Identifiable>[keyof DiagramState<Identifiable>] {
+        return {
+            ...this.baseState[id],
+            ...this.newState[id]
+        };
     }
 
     stageChange(...change: AtomicChange[]): void {
@@ -56,43 +37,6 @@ export class Diagram {
                 this.newState[id] = SimpleObject.clone(this.baseState[id]);
             }
         });
-    }
-
-    createAddLink(reference: ElementId, target: ElementId): AtomicChange[] {
-        this.transferData(reference, target);
-        const referenceChange = AtomicChange.createSet(
-            [reference, links, target],
-            this.newState[reference].links[target],
-            LinkType.Target
-        );
-        const targetChange = AtomicChange.createSet(
-            [target, links, reference],
-            this.newState[target].links[reference],
-            LinkType.Reference
-        );
-        return [referenceChange, targetChange];
-    }
-
-    createValueOverwrite(newValue: WordTag): AtomicChange {
-        this.transferData(newValue.id);
-        return AtomicChange.createSet(
-            [newValue.id, value],
-            this.getElement(newValue.id).value,
-            newValue
-        );
-    }
-
-    createRemoveLink(reference: ElementId, target: ElementId): AtomicChange[] {
-        this.transferData(reference, target);
-        const removeRef = AtomicChange.createRemove(
-            [reference, links, target],
-            this.newState[reference].links[target]
-        );
-        const removeTarget = AtomicChange.createRemove(
-            [target, links, reference],
-            this.newState[target].links[reference]
-        );
-        return [removeRef, removeTarget];
     }
 
     undoChange(): void {
@@ -122,12 +66,8 @@ export class Diagram {
             && this.currentChange < this.changes.length - 1;
     }
 
-    private getCurrentState(): DiagramState<WordTag> {
-        return { ...this.baseState, ...this.newState };
-    }
-
     createChild(): Diagram {
-        return new Diagram(this.getCurrentState());
+        return new Diagram({ ...this.baseState, ...this.newState });
     }
 
     importState(state: Diagram): void {

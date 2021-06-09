@@ -1,3 +1,10 @@
+export type TokenType = "whitespace" | "word" | "end";
+
+export interface Token {
+    lexeme: string;
+    tokenType: string;
+}
+
 //#region PartOfSpeech
 export type PartOfSpeechType =
     | "noun"
