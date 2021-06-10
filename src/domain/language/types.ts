@@ -2,7 +2,7 @@ export type TokenType = "whitespace" | "word" | "end";
 
 export interface Token {
     lexeme: string;
-    tokenType: string;
+    tokenType: TokenType;
 }
 
 //#region PartOfSpeech
