@@ -6,11 +6,6 @@ export enum ChangeType {
     Set = 1
 }
 
-export enum LinkType {
-    Target,
-    Reference
-}
-
 export type ChangeKey = string[];
 
 export type AtomicChange = {
