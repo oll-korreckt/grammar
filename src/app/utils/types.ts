@@ -1,15 +1,10 @@
-import { SimpleObject } from "@lib/utils";
+import { ElementType, Identifiable } from "@domain/language";
 
-export enum LinkType {
-    Target = "target",
-    Reference = "reference"
-}
-
-export type DiagramState<ValueType extends SimpleObject = SimpleObject> = {
+export type DiagramState = {
     [key: string]: {
-        value: ValueType;
-        links: {
-            [key: string]: LinkType;
+        value: Identifiable;
+        refs: {
+            [key: string]: ElementType;
         };
     };
 }
