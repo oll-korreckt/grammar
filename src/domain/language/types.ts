@@ -38,7 +38,7 @@ export type ElementType =
     | BaseClauseType
     | CoordinatedClauseType;
 
-export interface ElementReference<TElementType extends ElementType> {
+export interface ElementReference<TElementType extends ElementType = ElementType> {
     id: ElementId;
     type: TElementType;
 }
