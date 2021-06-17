@@ -1,3 +1,2 @@
-export * from "./types";
+export * from "./_types";
 export { scan } from "./scanner";
-export * from "./element-id";

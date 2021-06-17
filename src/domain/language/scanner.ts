@@ -1,4 +1,4 @@
-import { Token, TokenType } from "./types";
+import { Token, TokenType } from "./_types";
 
 export function scan(target: string): Token[] {
     return new EnglishScanner().scan(target);
