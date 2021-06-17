@@ -5,7 +5,8 @@ type Values =
     | number
     | boolean
     | SimpleObject;
-export type SimpleObjectValue = Values | Values[];
+export type SimpleArray = Values[];
+export type SimpleObjectValue = Values | SimpleArray;
 
 export type SimpleObjectValueType =
     | "undefined"
