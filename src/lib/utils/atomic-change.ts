@@ -26,7 +26,7 @@ export type AtomicChange = {
 } | {
     key: ChangeKey;
     type: ChangeType.Insert;
-    currVal: SimpleObjectValue;
+    newVal: SimpleObjectValue;
 }
 
 function createSet(key: ChangeKey, currentValue: SimpleObjectValue, newValue: SimpleObjectValue): AtomicChange {
@@ -54,11 +54,11 @@ function createRemove(key: ChangeKey, currentValue: SimpleObjectValue): AtomicCh
     };
 }
 
-function createInsert(key: ChangeKey, currentValue: SimpleObjectValue): AtomicChange {
+function createInsert(key: ChangeKey, newValue: SimpleObjectValue): AtomicChange {
     return {
         key: key,
         type: ChangeType.Insert,
-        currVal: currentValue
+        newVal: newValue
     };
 }
 
@@ -72,7 +72,7 @@ function invertChange(change: AtomicChange): AtomicChange {
         case ChangeType.Delete:
             return createSet(change.key, undefined, change.currVal);
         case ChangeType.Insert:
-            return createRemove(change.key, change.currVal);
+            return createRemove(change.key, change.newVal);
         case ChangeType.Remove:
             return createInsert(change.key, change.currVal);
         default:
@@ -130,7 +130,7 @@ function applySingle<T extends SimpleObject | SimpleArray>(output: T, change: At
             (endObj as SimpleObject)[endKey as string] = change.newVal;
             break;
         case ChangeType.Insert:
-            (endObj as SimpleArray).splice(endKey as number, 0, change.currVal);
+            (endObj as SimpleArray).splice(endKey as number, 0, change.newVal);
             break;
         case ChangeType.Remove:
             (endObj as SimpleArray).splice(endKey as number, 1);

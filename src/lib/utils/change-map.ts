@@ -55,9 +55,9 @@ function _createCompressedChanges(base: SimpleObjectValue, curr: SimpleObjectVal
                 _createCompressedChanges(subBase, subCurr, subMap, [...key, subKey], output);
             }
             break;
-        case ChangeType.Remove:
+        case ChangeType.Delete:
             if (base !== undefined) {
-                output.push(AtomicChange.createRemove(key, base));
+                output.push(AtomicChange.createDelete(key, base));
             }
             break;
         case ChangeType.Set:
