@@ -268,4 +268,26 @@ describe("SimpleObject", () => {
             assert.notDeepEqual(result, expected);
         });
     });
+
+    test("getSortedEntries", () => {
+        const input = {
+            a: "a",
+            b: undefined,
+            c: true,
+            d: [],
+            e: 3,
+            f: {
+                g: "g"
+            }
+        };
+        const result = SimpleObject.getSortedEntries(input);
+        const expected: typeof result = [
+            ["a", "a"],
+            ["c", true],
+            ["d", []],
+            ["e", 3],
+            ["f", { g: "g" }]
+        ];
+        assert.deepEqual(result, expected);
+    });
 });

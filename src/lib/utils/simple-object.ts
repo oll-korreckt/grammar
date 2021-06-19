@@ -73,24 +73,24 @@ function deepEqualsArray(array1: Values[], array2: Values[]): boolean {
     return true;
 }
 
-function deepEqualsObject(obj1: SimpleObject, obj2: SimpleObject): boolean {
-    function getEntries(obj: SimpleObject) {
-        return Object.entries(obj)
-            .map<[string, unknown]>(([key, value]) => [key, value])
-            .filter(([, value]) => typeof value !== "undefined")
-            .sort(([key1], [key2]) => {
-                if (key1 < key2) {
-                    return -1;
-                }
-                if (key1 > key2) {
-                    return 1;
-                }
-                return 0;
-            });
-    }
+function getSortedEntries(obj: SimpleObject): [string, Exclude<SimpleObjectValue, undefined>][] {
+    const output = Object.entries(obj)
+        .filter(([, value]) => value !== undefined)
+        .sort(([key1], [key2]) => {
+            if (key1 < key2) {
+                return -1;
+            }
+            if (key1 > key2) {
+                return 1;
+            }
+            return 0;
+        }) as [string, Exclude<SimpleObjectValue, undefined>][];
+    return output;
+}
 
-    const obj1Entries = getEntries(obj1);
-    const obj2Entries = getEntries(obj2);
+function deepEqualsObject(obj1: SimpleObject, obj2: SimpleObject): boolean {
+    const obj1Entries = getSortedEntries(obj1);
+    const obj2Entries = getSortedEntries(obj2);
     if (obj1Entries.length !== obj2Entries.length) {
         return false;
     }
@@ -143,5 +143,6 @@ function cloneArray(arr: Values[]): Values[] {
 export const SimpleObject = {
     deepEquals: deepEquals,
     clone: clone,
-    getValueType: getValueType
+    getValueType: getValueType,
+    getSortedEntries
 };
