@@ -1,7 +1,7 @@
-import { ChangeType, ChangeKey, SimpleObject } from "@lib/utils";
+import { ChangeType, ChangeKey, SimpleObject, AtomicChange } from "@lib/utils";
 
 export type ChangeMap = {
-    [key: string]: ChangeMap | ChangeType;
+    [key: string]: ChangeMap | ChangeType.Set | ChangeType.Delete;
 }
 
 function updateChangeMap(map: ChangeMap, key: ChangeKey, chgType: ChangeType): ChangeMap {
@@ -34,7 +34,14 @@ function updateChangeMap(map: ChangeMap, key: ChangeKey, chgType: ChangeType): C
         }
     }
     if (subKey !== undefined) {
-        subMap[subKey] = subChgType;
+        switch (subChgType) {
+            case ChangeType.Delete:
+            case ChangeType.Set:
+                subMap[subKey] = subChgType;
+                break;
+            default:
+                throw `Unsupported ChangeType ${subChgType}`;
+        }
     }
     return output;
 }
@@ -49,6 +56,54 @@ function terminalArray(map: ChangeMap, keys: string[]): void {
     subMap[lastSubKey] = ChangeType.Set;
 }
 
+function extractChanges(map: ChangeMap, currVal: SimpleObject, newVal: SimpleObject): AtomicChange[] {
+    const output: AtomicChange[] = [];
+    _extractChanges(
+        map,
+        currVal,
+        newVal,
+        [],
+        output
+    );
+    return output;
+}
+
+function _extractChanges(subMap: ChangeMap, subCurrVal: SimpleObject, subNewVal: SimpleObject, path: string[], output: AtomicChange[]): void {
+    for (const [key, value] of Object.entries(subMap)) {
+        const fullKey = [...path, key];
+        if (typeof value === "object") {
+            _extractChanges(
+                value,
+                subCurrVal[key],
+                subNewVal[key],
+                fullKey,
+                output
+            );
+        } else {
+            let change: AtomicChange;
+            switch (value) {
+                case ChangeType.Set:
+                    change = AtomicChange.createSet(
+                        fullKey,
+                        subCurrVal[key],
+                        subNewVal[key]
+                    );
+                    break;
+                case ChangeType.Delete:
+                    change = AtomicChange.createDelete(
+                        fullKey,
+                        subCurrVal[key]
+                    );
+                    break;
+                default:
+                    throw `Unsupported change type: ${value}`;
+            }
+            output.push(change);
+        }
+    }
+}
+
 export const ChangeMap = {
-    update: updateChangeMap
+    update: updateChangeMap,
+    extractChanges: extractChanges
 };
