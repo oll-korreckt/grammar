@@ -9,6 +9,42 @@ export enum ChangeType {
 }
 
 export type ChangeKey = (string | number)[];
+export const ChangeKey = {
+    sort: sortChangeKeys
+};
+
+function sortChangeKeys(key1: ChangeKey, key2: ChangeKey): number {
+    const length = Math.min(key1.length, key2.length);
+    return _sortChangeKeys(key1, key2, 0, length);
+}
+
+function _sortChangeKeys(key1: ChangeKey, key2: ChangeKey, index: number, length: number): number {
+    if (!(index < length)) {
+        return _compare(key1.length, key2.length);
+    }
+    const subKey1 = key1[index];
+    const subKeyType1 = typeof subKey1;
+    const subKey2 = key2[index];
+    const subKeyType2 = typeof subKey2;
+    if (subKeyType1 !== subKeyType2) {
+        return _compare(subKeyType1, subKeyType2);
+    }
+    const tempResult = _compare(subKey1, subKey2);
+    if (tempResult !== 0) {
+        return tempResult;
+    }
+    return _sortChangeKeys(key1, key2, index + 1, length);
+}
+
+function _compare<T extends string | number>(value1: T, value2: T): number {
+    if (value1 > value2) {
+        return 1;
+    }
+    if (value1 < value2) {
+        return -1;
+    }
+    return 0;
+}
 
 export type AtomicChange = {
     key: ChangeKey;
