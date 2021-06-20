@@ -38,6 +38,7 @@ export interface Coordinated<T> extends Identifiable {
 
 export interface CoordinatedPartOfSpeech<TPartOfSpeechType extends PartOfSpeechType>
     extends Coordinated<PosMapper<TPartOfSpeechType>>, PartOfSpeech {
+    itemType: TPartOfSpeechType;
     posType: TPartOfSpeechType;
 }
 
