@@ -1,4 +1,4 @@
-import { ElementType, PartOfSpeechType, CoordinatedPartOfSpeechType, Identifiable, WordReference } from "./utils";
+import { ElementType, PartOfSpeechType, CoordinatedPartOfSpeechType, Identifiable, WordReference, ElementReference } from "./utils";
 
 type PosGuard<Type extends PartOfSpeechType> = Type;
 type CoordPosGuard<Type extends CoordinatedPartOfSpeechType> = Type;
@@ -30,14 +30,14 @@ export type CoordPosMapper<Type extends CoordinatedPartOfSpeechType> =
     : Type extends CoordPosGuard<"coordinatedDeterminer"> ? CoordinatedPartOfSpeech<"determiner">
     : never;
 
-export interface Coordinated<T> extends Identifiable {
+export interface Coordinated<T extends ElementType> extends Identifiable {
     itemType: string;
-    items?: T[];
-    coordinator?: Coordinator;
+    items?: ElementReference<T>[];
+    coordinator?: ElementReference<"coordinator">;
 }
 
 export interface CoordinatedPartOfSpeech<TPartOfSpeechType extends PartOfSpeechType>
-    extends Coordinated<PosMapper<TPartOfSpeechType>>, PartOfSpeech {
+    extends Coordinated<TPartOfSpeechType>, PartOfSpeech {
     itemType: TPartOfSpeechType;
     posType: TPartOfSpeechType;
 }

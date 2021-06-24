@@ -1,5 +1,5 @@
 import { Identifiable, PartOfSpeechType, ElementReference, PhraseType, CoordinatedPhraseType, PhraseGuard } from "./utils";
-import { PosMapper, Coordinated, Noun, FunctionalNoun, Pronoun, FunctionalPronoun, SingleOrCoordinatedPartOfSpeech } from "./part-of-speech";
+import { Coordinated, FunctionalNoun, FunctionalPronoun, SingleOrCoordinatedPartOfSpeech } from "./part-of-speech";
 
 type CoordPhraseGuard<Type extends CoordinatedPhraseType> = Type;
 export type PhraseMapper<Type extends PhraseGuard<PhraseType>> =
@@ -35,7 +35,7 @@ function makePhraseTypeGuard<TPhraseType extends PhraseType>(phraseType: TPhrase
 }
 
 export interface CoordinatedPhrase<TPhraseType extends PhraseType & PartOfSpeechType>
-    extends Coordinated<PosMapper<TPhraseType> | PhraseMapper<PhraseGuard<TPhraseType>>>, Phrase {
+    extends Coordinated<TPhraseType | PhraseGuard<TPhraseType>>, Phrase {
     itemType: `${TPhraseType} | ${PhraseGuard<TPhraseType>}`;
     phraseType: TPhraseType;
 }
@@ -53,7 +53,7 @@ type SingleOrCoordinatedPhrase<TPhraseType extends PhraseType & PartOfSpeechType
     | PhraseMapper<PhraseGuard<TPhraseType>>
     | CoordinatedPhrase<TPhraseType>;
 
-export interface CoordinatedNounPhrase extends Phrase, Coordinated<Noun | Pronoun | NounPhrase> {
+export interface CoordinatedNounPhrase extends Phrase, Coordinated<"noun" | "pronoun" | "nounPhrase"> {
     itemType: "noun | pronoun | nounPhrase";
     phraseType: "noun";
 }

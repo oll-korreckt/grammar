@@ -27,7 +27,7 @@ function makeClauseTypeGuard<TClauseType extends ClauseType>(clauseType: TClause
 }
 
 export interface CoordinatedClause<TClauseType extends ClauseType>
-    extends Coordinated<ClauseMapper<ClauseGuard<TClauseType>>>, Clause {
+    extends Coordinated<ClauseGuard<TClauseType>>, Clause {
     itemType: TClauseType;
     clauseType: TClauseType;
 }

@@ -1,5 +1,6 @@
 export type ElementId = string;
-export interface Identifiable {
+type Element = Record<string, undefined | string | ElementReference | ElementReference[]>;
+export interface Identifiable extends Element {
     id: ElementId;
 }
 
