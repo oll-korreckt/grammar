@@ -46,20 +46,24 @@ function _compare<T extends string | number>(value1: T, value2: T): number {
     return 0;
 }
 
-export type AtomicChange = {
+export type AtomicChange = DeleteChange | SetChange | RemoveChange | InsertChange;
+export type DeleteChange = {
     key: ChangeKey;
     type: ChangeType.Delete;
     currVal: SimpleObjectValue;
-} | {
+}
+export type SetChange = {
     key: ChangeKey;
     type: ChangeType.Set;
     currVal: SimpleObjectValue;
     newVal: SimpleObjectValue;
-} | {
+}
+export type RemoveChange = {
     key: ChangeKey;
     type: ChangeType.Remove;
     currVal: SimpleObjectValue;
-} | {
+}
+export type InsertChange = {
     key: ChangeKey;
     type: ChangeType.Insert;
     newVal: SimpleObjectValue;
