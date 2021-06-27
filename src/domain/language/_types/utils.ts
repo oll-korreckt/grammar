@@ -1,6 +1,6 @@
 export type ElementId = string;
-type Element = Record<string, undefined | string | ElementReference | ElementReference[]>;
-export interface Identifiable extends Element {
+export type Element = Record<string, undefined | string | ElementReference | ElementReference[]>;
+export interface Identifiable {
     id: ElementId;
 }
 
@@ -55,12 +55,11 @@ export interface ElementReference<TElementType extends ElementType = ElementType
     type: TElementType;
 }
 
-//#region Word
+export type ReferencingElementDefinition<Keys extends string> = Record<Keys, [boolean, ElementType[]]>;
+export type ReferencingElement<Type> = {
+    [Key in keyof Type]?: Type[Key] extends [boolean, ElementType[]] ? (Type[Key][0] extends true ? ElementReference<Type[Key][1][number]>[] : ElementReference<Type[Key][1][number]>) : never;
+}
+
 export interface Word extends Identifiable {
     lexeme: string;
 }
-export function isWord(element: Identifiable): element is Word {
-    return (element as Word).lexeme !== undefined;
-}
-export type WordReference = ElementReference<"word">;
-//#endregion

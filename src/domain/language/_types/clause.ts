@@ -1,5 +1,6 @@
-import { Identifiable, ElementReference, ClauseType, ClauseGuard, CoordClauseType } from "./utils";
-import { Coordinated } from "./part-of-speech";
+import { Identifiable, ClauseType, ClauseGuard, CoordClauseType, ReferencingElementDefinition, ReferencingElement } from "./utils";
+import { Coordinated, CoordinatedDefinition, FunctionalTypeGuard } from "./part-of-speech";
+import { FunctionalGerundPhrase, FunctionalInfinitivePhrase, FunctionalNounPhrase, FunctionalVerbPhrase } from "./phrase";
 
 type CoordClauseGuard<Type extends CoordClauseType> = Type;
 export type ClauseMapper<Type extends ClauseGuard<ClauseType>> =
@@ -8,6 +9,12 @@ export type ClauseMapper<Type extends ClauseGuard<ClauseType>> =
     : Type extends ClauseGuard<"relative"> ? RelativeClause
     : Type extends ClauseGuard<"adverbial"> ? AdverbialClause
     : never;
+export type ClauseDefinitionMapper<Type extends ClauseGuard<ClauseType>> =
+    Type extends ClauseGuard<"independent"> ? IndependentClauseDefinition
+    : Type extends ClauseGuard<"noun"> ? NounClauseDefinition
+    : Type extends ClauseGuard<"relative"> ? RelativeClauseDefinition
+    : Type extends ClauseGuard<"adverbial"> ? AdverbialClauseDefinition
+    : never;
 
 export type CoordClauseMapper<Type extends CoordClauseType> =
     Type extends CoordClauseGuard<"coordinatedIndependentClause"> ? CoordinatedClause<"independent">
@@ -15,94 +22,73 @@ export type CoordClauseMapper<Type extends CoordClauseType> =
     : Type extends CoordClauseGuard<"coordinatedRelativeClause"> ? CoordinatedClause<"relative">
     : Type extends CoordClauseGuard<"coordinatedAdverbialClause"> ? CoordinatedClause<"adverbial">
     : never;
+export type CoordClauseDefinitionMapper<Type extends CoordClauseType> =
+    Type extends CoordClauseGuard<"coordinatedIndependentClause"> ? CoordinatedDefinition<["independentClause"]>
+    : Type extends CoordClauseGuard<"coordinatedNounClause"> ? CoordinatedDefinition<["nounClause"]>
+    : Type extends CoordClauseGuard<"coordinatedRelativeClause"> ? CoordinatedDefinition<["relativeClause"]>
+    : Type extends CoordClauseGuard<"coordinatedAdverbialClause"> ? CoordinatedDefinition<["adverbialClause"]>
+    : never;
 
 export interface Clause extends Identifiable {
     clauseType?: ClauseType;
 }
 
-function makeClauseTypeGuard<TClauseType extends ClauseType>(clauseType: TClauseType): (element: Identifiable) => element is ClauseMapper<ClauseGuard<TClauseType>> {
-    return function (element: Identifiable): element is ClauseMapper<ClauseGuard<TClauseType>> {
-        return (element as Clause).clauseType === clauseType;
-    };
-}
-
 export interface CoordinatedClause<TClauseType extends ClauseType>
-    extends Coordinated<ClauseGuard<TClauseType>>, Clause {
+    extends Coordinated<[ClauseGuard<TClauseType>]>, Clause {
     itemType: TClauseType;
     clauseType: TClauseType;
 }
 
-function makeCoordinatedClauseTypeGuard<TClauseType extends ClauseType>(
-    clauseType: TClauseType): (element: Identifiable) => element is CoordinatedClause<TClauseType> {
-    return function (element: Identifiable): element is CoordinatedClause<TClauseType> {
-        const typed = element as CoordinatedClause<TClauseType>;
-        return typed.clauseType === clauseType && typed.itemType === clauseType;
-    };
+type ClauseFunctionalTypeGuard<T extends ClauseType> = FunctionalTypeGuard<[
+    ClauseGuard<T>,
+    `coordinated${Capitalize<ClauseGuard<T>>}`
+]>;
+
+export interface IndependentClauseDefinition extends ReferencingElementDefinition<"subject" | "predicate"> {
+    subject: [
+        false,
+        [
+            ...FunctionalNounPhrase,
+            ...FunctionalNounClause,
+            ...FunctionalGerundPhrase,
+            ...FunctionalInfinitivePhrase
+        ]
+    ];
+    predicate: [false, FunctionalVerbPhrase];
 }
 
-type SingleOrCoordinatedClause<TClauseType extends ClauseType> =
-    | ClauseMapper<ClauseGuard<TClauseType>>
-    | CoordinatedClause<TClauseType>;
-
-export const SubjectTypes = [
-    "coordinatedNoun",
-    "coordinatedNounPhrase",
-    "coordinatedNounClause",
-    "coordinatedGerundPhrase",
-    "coordinatedInfinitivePhrase"
-] as const;
-export type Subject = ElementReference<typeof SubjectTypes[number]>;
-
-export type Predicate = ElementReference<"coordinatedVerbPhrase">;
-export interface IndependentClause extends Clause {
+export interface IndependentClause extends Clause, ReferencingElement<IndependentClauseDefinition> {
     clauseType: "independent";
-    subject?: Subject;
-    predicate?: Predicate;
 }
-export type FunctionalIndependentClause = SingleOrCoordinatedClause<"independent">;
-export const isIndependentClause = makeClauseTypeGuard("independent");
-export const isCoordinatedIndependentClause = makeCoordinatedClauseTypeGuard("independent");
+export type FunctionalIndependentClause = ClauseFunctionalTypeGuard<"independent">;
 
-export const NounClauseDependentWordType = [
-    "subordinator",
-    "pronoun"
-] as const;
-export type NounClauseDependentWord = ElementReference<typeof NounClauseDependentWordType[number]>;
+export interface DependentClauseDefinition extends IndependentClauseDefinition, ReferencingElementDefinition<"dependentWord"> {
+}
+
 // sometimes the dependent word also acts as a subject or object of the clause
-export interface NounClause extends Clause {
+export interface NounClauseDefinition extends DependentClauseDefinition {
+    dependentWord: [false, ["subordinator", "pronoun"]];
+}
+export interface NounClause extends Clause, ReferencingElement<NounClauseDefinition> {
     clauseType: "noun";
-    dependentWord?: NounClauseDependentWord;
-    subject?: Subject;
-    predicate?: Predicate;
 }
 // Coordinated: wherever we decide to go and whatever we decide to do
-export type FunctionalNounClause = SingleOrCoordinatedClause<"noun">;
-export const isNounClause = makeClauseTypeGuard("noun");
-export const isCoordinatedNounClause = makeCoordinatedClauseTypeGuard("noun");
+export type FunctionalNounClause = ClauseFunctionalTypeGuard<"noun">;
 
-export const RelativeClauseDependentWordType = [
-    "adverb",
-    "pronoun"
-] as const;
-export type RelativeClauseDependentWord = ElementReference<typeof RelativeClauseDependentWordType[number]>;
-export interface RelativeClause extends Clause {
+export interface RelativeClauseDefinition extends DependentClauseDefinition {
+    dependentWord: [false, ["adverb", "pronoun"]];
+}
+export interface RelativeClause extends Clause, ReferencingElement<RelativeClauseDefinition> {
     clauseType: "relative";
-    dependentWord?: RelativeClauseDependentWord;
-    subject?: Subject;
-    predicate?: Predicate;
 }
 // Coordinated: that I wrote and that sold well
-export type FunctionalRelativeClause = SingleOrCoordinatedClause<"relative">;
-export const isRelativeClause = makeClauseTypeGuard("relative");
-export const isCoordinatedRelativeClause = makeCoordinatedClauseTypeGuard("relative");
+export type FunctionalRelativeClause = ClauseFunctionalTypeGuard<"relative">;
 
-export interface AdverbialClause extends Clause {
+export interface AdverbialClauseDefinition extends DependentClauseDefinition {
+    dependentWord: [false, ["subordinator"]];
+}
+export interface AdverbialClause extends Clause, ReferencingElement<AdverbialClauseDefinition> {
     clauseType: "adverbial";
-    dependentWord?: ElementReference<"subordinator">;
-    subject?: Subject;
-    predicate?: Predicate;
 }
 // Coordinated: after he ate lunch but before he returned to work
-export type FunctionalAdverbialClause = SingleOrCoordinatedClause<"adverbial">;
-export const isAdverbialClause = makeClauseTypeGuard("adverbial");
-export const isCoordinatedAdverbialClause = makeCoordinatedClauseTypeGuard("adverbial");
+export type FunctionalAdverbialClause = ClauseFunctionalTypeGuard<"adverbial">;

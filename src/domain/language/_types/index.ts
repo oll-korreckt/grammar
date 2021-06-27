@@ -1,148 +1,59 @@
 import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word } from "./utils";
-import { PosMapper, CoordPosMapper } from "./part-of-speech";
-import { PhraseMapper, CoordPhraseMapper } from "./phrase";
-import { ClauseMapper, CoordClauseMapper, FunctionalIndependentClause } from "./clause";
+import { PosMapper, CoordPosMapper, PosDefinitionMapper, CoordPosDefinitionMapper, CoordinatedDefinition } from "./part-of-speech";
+import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDefinitionMapper, VerbPhraseBaseDefinition, FunctionalAdverbPhrase, FunctionalNounPhrase, FunctionalPrepositionPhrase, FunctionalInfinitivePhrase, FunctionalAdjectivePhrase, FunctionalGerundPhrase, FunctionalParticiplePhrase, FunctionalVerbPhrase } from "./phrase";
+import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition, FunctionalIndependentClause } from "./clause";
+import { SimpleObject } from "@lib/utils";
 
 export type {
+    Element,
     ElementId,
     Identifiable,
     PartOfSpeechType,
     PhraseType,
+    PhraseGuard,
     ClauseType,
+    ClauseGuard,
     ElementType,
     ElementReference,
-    Word,
-    isWord,
-    WordReference
+    Word
 } from "./utils";
 export type {
     PartOfSpeech,
     CoordinatedPartOfSpeech,
     Coordinated,
-    // noun
     Noun,
-    isNoun,
-    isCoordinatedNoun,
-    // pronoun
     Pronoun,
-    isPronoun,
-    isCoordinatedPronoun,
-    // verb
     Verb,
-    isVerb,
-    isCoordinatedVerb,
-    // adjective
     Adjective,
-    isAdjective,
-    isCoordinatedAdjective,
-    // adverb
     Adverb,
-    isAdverb,
-    isCoordinatedAdverb,
-    // preposition
     Preposition,
-    isPreposition,
-    isCoordinatedPreposition,
-    // infinitive
     Infinitive,
-    isInfinitive,
-    isCoordinatedInfinitive,
-    // participle
     Participle,
-    isParticiple,
-    isCoordinatedParticiple,
-    // gerund
     Gerund,
-    isGerund,
-    isCoordinatedGerund,
-    // determiner
     Determiner,
-    isDeterminer,
-    isCoordinatedDeterminer,
-    // coordinator
     Coordinator,
-    // subordinator
     Subordinator
 } from "./part-of-speech";
 export type {
     Phrase,
     CoordinatedPhrase,
-    // noun
     NounPhrase,
-    NounPhraseHeadTypes,
-    NounPhraseHead,
-    NounModiferTypes,
-    NounModifier,
-    isNounPhrase,
     CoordinatedNounPhrase,
-    isCoordinatedNounPhrase,
-    // verb
     VerbPhrase,
-    VerbModifierTypes,
-    VerbModifier,
-    VerbComplementTypes,
-    VerbComplement,
-    VerbDirectObjectComplementTypes,
-    VerbDirectObjectComplement,
-    isVerbPhrase,
-    isCoordinatedVerbPhrase,
-    // adjective
     AdjectivePhrase,
-    AdjectiveComplementTypes,
-    AdjectiveComplement,
-    isAdjectivePhrase,
-    isCoordinatedAdjectivePhrase,
-    // adverb
     AdverbPhrase,
-    isAdverbPhrase,
-    isCoordinatedAdverbPhrase,
-    // preposition
     PrepositionPhrase,
-    PrepositionObjectTypes,
-    PrepositionObject,
-    isPrepositionPhrase,
-    isCoordinatedPrepositionPhrase,
-    // gerund
     GerundPhrase,
-    isGerundPhrase,
-    isCoordinatedGerundPhrase,
-    // infinitive
     InfinitivePhrase,
-    isInfinitivePhrase,
-    isCoordinatedInfinitivePhrase,
-    // participle
-    ParticiplePhrase,
-    isParticiplePhrase,
-    isCoordinatedParticiplePhrase
+    ParticiplePhrase
 } from "./phrase";
 export type {
     Clause,
     CoordinatedClause,
-    // subject
-    SubjectTypes,
-    Subject,
-    // predicate
-    Predicate,
-    // independent
     IndependentClause,
-    isIndependentClause,
-    isCoordinatedIndependentClause,
-    // noun
     NounClause,
-    NounClauseDependentWordType,
-    NounClauseDependentWord,
-    isNounClause,
-    isCoordinatedNounClause,
-    // relative
     RelativeClause,
-    RelativeClauseDependentWordType,
-    RelativeClauseDependentWord,
-    isRelativeClause,
-    isCoordinatedRelativeClause,
-    // adverbial
-    AdverbialClause,
-    isAdverbialClause,
-    isCoordinatedAdverbialClause
+    AdverbialClause
 } from "./clause";
 
 export type TokenType = "whitespace" | "word" | "end";
@@ -160,5 +71,306 @@ export type ElementMapper<Type extends ElementType> =
     : Type extends ClauseGuard<ClauseType> ? ClauseMapper<Type>
     : Type extends CoordClauseType ? CoordClauseMapper<Type>
     : never;
+
+type DefinitionMapper<Type extends Exclude<ElementType, "word">> =
+    Type extends PartOfSpeechType ? PosDefinitionMapper<Type>
+    : Type extends CoordinatedPartOfSpeechType ? CoordPosDefinitionMapper<Type>
+    : Type extends PhraseGuard<PhraseType> ? PhraseDefinitionMapper<Type>
+    : Type extends CoordinatedPhraseType ? CoordPhraseDefinitionMapper<Type>
+    : Type extends ClauseGuard<ClauseType> ? ClauseDefinitionMapper<Type>
+    : Type extends CoordClauseType ? CoordClauseDefinitionMapper<Type>
+    : never;
+
+type DefinitionObject = {
+    [Key in Exclude<ElementType, "word">]: DefinitionMapper<Key>;
+}
+
+function createCoordinatedDefinition<T extends ElementType[]>(itemTypes: T): CoordinatedDefinition<T> {
+    return {
+        coordinator: [false, ["coordinator"]],
+        items: [true, itemTypes]
+    };
+}
+
+const fnAdverbPhrase: FunctionalAdverbPhrase = [
+    "adverb",
+    "coordinatedAdverb",
+    "adverbPhrase",
+    "coordinatedAdverbPhrase"
+];
+const fnNounPhrase: FunctionalNounPhrase = [
+    "noun",
+    "coordinatedNoun",
+    "pronoun",
+    "coordinatedPronoun",
+    "nounPhrase",
+    "coordinatedNounPhrase"
+];
+const fnPrepositionPhrase: FunctionalPrepositionPhrase = [
+    "preposition",
+    "coordinatedPreposition",
+    "prepositionPhrase",
+    "coordinatedPrepositionPhrase"
+];
+const fnInfinitivePhrase: FunctionalInfinitivePhrase = [
+    "infinitive",
+    "coordinatedInfinitive",
+    "infinitivePhrase",
+    "coordinatedInfinitivePhrase"
+];
+const fnAdjectivePhrase: FunctionalAdjectivePhrase = [
+    "adjective",
+    "coordinatedAdjective",
+    "adjectivePhrase",
+    "coordinatedAdjectivePhrase"
+];
+const fnGerundPhrase: FunctionalGerundPhrase = [
+    "gerund",
+    "coordinatedGerund",
+    "gerundPhrase",
+    "coordinatedGerundPhrase"
+];
+const fnParticiplePhrase: FunctionalParticiplePhrase = [
+    "participle",
+    "coordinatedParticiple",
+    "participlePhrase",
+    "coordinatedParticiplePhrase"
+];
+const fnVerbPhrase: FunctionalVerbPhrase = [
+    "verb",
+    "coordinatedVerb",
+    "verbPhrase",
+    "coordinatedVerbPhrase"
+];
+
+function createVerbPhraseBaseDefinition<T extends ElementType[]>(head: T): Omit<VerbPhraseBaseDefinition, "head"> & { head: [false, T]; } {
+    return {
+        head: [false, head],
+        headModifier: [
+            false,
+            [
+                ...fnAdverbPhrase,
+                "adverbialClause",
+                "coordinatedAdverbialClause",
+                ...fnNounPhrase,
+                ...fnPrepositionPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ],
+        headCompl: [
+            false,
+            [
+                ...fnAdverbPhrase,
+                "adverbialClause",
+                "coordinatedAdverbialClause",
+                ...fnNounPhrase,
+                ...fnPrepositionPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ],
+        subjCompl: [
+            false,
+            [
+                ...fnNounPhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                ...fnAdjectivePhrase,
+                ...fnPrepositionPhrase
+            ]
+        ],
+        dirObj: [
+            false,
+            [
+                ...fnNounPhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                ...fnGerundPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ],
+        dirObjCompl: [
+            false,
+            [
+                ...fnNounPhrase,
+                ...fnAdjectivePhrase,
+                ...fnInfinitivePhrase,
+                ...fnParticiplePhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                "relativeClause",
+                "coordinatedRelativeClause",
+                "adverbialClause",
+                "coordinatedAdverbialClause"
+            ]
+        ],
+        indObj: [
+            false,
+            [
+                ...fnNounPhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                ...fnGerundPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ]
+    };
+}
+
+function createDependentClauseDefinition<T extends ElementType[]>(dependentWordTypes: T): Omit<DependentClauseDefinition, "dependentWord"> & { dependentWord: [false, T]; } {
+    return {
+        dependentWord: [false, dependentWordTypes],
+        subject: [
+            false,
+            [
+                ...fnNounPhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                ...fnGerundPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ],
+        predicate: [false, fnVerbPhrase]
+    };
+}
+
+const definitionObject: DefinitionObject = {
+    noun: {
+        words: [true, ["word"]]
+    },
+    coordinatedNoun: createCoordinatedDefinition(["noun"]),
+    nounPhrase: {
+        head: [
+            false,
+            [
+                "noun",
+                "pronoun",
+                "coordinatedNounPhrase"
+            ]
+        ],
+        modifiers: [
+            true,
+            [
+                "determiner",
+                "coordinatedDeterminer",
+                ...fnAdjectivePhrase,
+                ...fnPrepositionPhrase,
+                "relativeClause",
+                "coordinatedRelativeClause",
+                ...fnParticiplePhrase,
+                ...fnInfinitivePhrase
+            ]
+        ]
+    },
+    coordinatedNounPhrase: createCoordinatedDefinition(["noun", "pronoun", "nounPhrase"]),
+    nounClause: createDependentClauseDefinition(["subordinator", "pronoun"]),
+    coordinatedNounClause: createCoordinatedDefinition(["nounClause"]),
+    pronoun: {
+        words: [true, ["word"]]
+    },
+    coordinatedPronoun: createCoordinatedDefinition(["pronoun"]),
+    adjective: {
+        words: [true, ["word"]]
+    },
+    coordinatedAdjective: createCoordinatedDefinition(["adjective"]),
+    adjectivePhrase: {
+        determiner: [false, ["determiner", "coordinatedDeterminer"]],
+        head: [false, ["adjective", "coordinatedAdjective"]],
+        modifiers: [true, fnAdverbPhrase],
+        complement: [
+            false,
+            [
+                ...fnPrepositionPhrase,
+                ...fnInfinitivePhrase,
+                ...fnNounPhrase
+            ]
+        ]
+    },
+    coordinatedAdjectivePhrase: createCoordinatedDefinition(["adjective", "adjectivePhrase"]),
+    verb: {
+        auxiliaryVerbs: [true, ["word"]],
+        mainVerb: [true, ["word"]]
+    },
+    coordinatedVerb: createCoordinatedDefinition(["verb"]),
+    verbPhrase: createVerbPhraseBaseDefinition(["verb", "coordinatedVerb"]),
+    coordinatedVerbPhrase: createCoordinatedDefinition(["verb", "verbPhrase"]),
+    adverb: {
+        word: [false, ["word"]]
+    },
+    coordinatedAdverb: createCoordinatedDefinition(["adverb"]),
+    adverbPhrase: {
+        head: [false, ["adverb"]],
+        modifier: [false, ["adverb"]]
+    },
+    coordinatedAdverbPhrase: createCoordinatedDefinition(["adverb", "adverbPhrase"]),
+    adverbialClause: createDependentClauseDefinition(["subordinator"]),
+    coordinatedAdverbialClause: createCoordinatedDefinition(["adverbialClause"]),
+    infinitive: {
+        to: [false, ["word"]],
+        verb: [true, ["word"]]
+    },
+    coordinatedInfinitive: createCoordinatedDefinition(["infinitive"]),
+    infinitivePhrase: createVerbPhraseBaseDefinition(["infinitive", "coordinatedInfinitive"]),
+    coordinatedInfinitivePhrase: createCoordinatedDefinition(["infinitive", "infinitivePhrase"]),
+    gerund: {
+        word: [true, ["word"]]
+    },
+    coordinatedGerund: createCoordinatedDefinition(["gerund"]),
+    gerundPhrase: createVerbPhraseBaseDefinition(["gerund", "coordinatedGerund"]),
+    coordinatedGerundPhrase: createCoordinatedDefinition(["gerund", "gerundPhrase"]),
+    participle: {
+        word: [true, ["word"]]
+    },
+    coordinatedParticiple: createCoordinatedDefinition(["participle"]),
+    participlePhrase: createVerbPhraseBaseDefinition(["participle", "coordinatedParticiple"]),
+    coordinatedParticiplePhrase: createCoordinatedDefinition(["participle", "participlePhrase"]),
+    preposition: {
+        words: [true, ["word"]]
+    },
+    coordinatedPreposition: createCoordinatedDefinition(["preposition"]),
+    prepositionPhrase: {
+        head: [false, ["preposition", "coordinatedPreposition"]],
+        object: [
+            false,
+            [
+                ...fnNounPhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                ...fnGerundPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ]
+    },
+    coordinatedPrepositionPhrase: createCoordinatedDefinition(["preposition", "prepositionPhrase"]),
+    determiner: {
+        words: [true, ["word"]]
+    },
+    coordinatedDeterminer: createCoordinatedDefinition(["determiner"]),
+    coordinator: {
+        words: [true, ["word"]]
+    },
+    subordinator: {
+        words: [true, ["word"]]
+    },
+    independentClause: {
+        subject: [
+            false,
+            [
+                ...fnNounPhrase,
+                "nounClause",
+                "coordinatedNounClause",
+                ...fnGerundPhrase,
+                ...fnInfinitivePhrase
+            ]
+        ],
+        predicate: [false, fnVerbPhrase]
+    },
+    coordinatedIndependentClause: createCoordinatedDefinition(["independentClause"]),
+    relativeClause: createDependentClauseDefinition(["adverb", "pronoun"]),
+    coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"])
+};
+
+export function getElementDefinition<T extends Exclude<ElementType, "word">>(type: T): DefinitionMapper<T> {
+    return SimpleObject.clone(definitionObject[type]) as DefinitionMapper<T>;
+}
 
 export type Sentence = FunctionalIndependentClause;

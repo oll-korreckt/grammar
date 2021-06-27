@@ -1,4 +1,4 @@
-import { ElementType, PartOfSpeechType, CoordinatedPartOfSpeechType, Identifiable, WordReference, ElementReference } from "./utils";
+import { ElementType, PartOfSpeechType, CoordinatedPartOfSpeechType, Identifiable, ReferencingElementDefinition, ReferencingElement } from "./utils";
 
 type PosGuard<Type extends PartOfSpeechType> = Type;
 type CoordPosGuard<Type extends CoordinatedPartOfSpeechType> = Type;
@@ -16,6 +16,20 @@ export type PosMapper<Type extends ElementType> =
     : Type extends PosGuard<"coordinator"> ? Coordinator
     : Type extends PosGuard<"subordinator"> ? Subordinator
     : never;
+export type PosDefinitionMapper<Type extends PartOfSpeechType> =
+    Type extends PosGuard<"noun"> ? NounDefinition
+    : Type extends PosGuard<"pronoun"> ? PronounDefinition
+    : Type extends PosGuard<"verb"> ? VerbDefinition
+    : Type extends PosGuard<"infinitive"> ? InfinitiveDefinition
+    : Type extends PosGuard<"participle"> ? ParticipleDefinition
+    : Type extends PosGuard<"gerund"> ? GerundDefinition
+    : Type extends PosGuard<"adjective"> ? AdjectiveDefinition
+    : Type extends PosGuard<"adverb"> ? AdverbDefinition
+    : Type extends PosGuard<"preposition"> ? PrepositionDefinition
+    : Type extends PosGuard<"determiner"> ? DeterminerDefinition
+    : Type extends PosGuard<"coordinator"> ? CoordinatorDefinition
+    : Type extends PosGuard<"subordinator"> ? SubordinatorDefinition
+    : never;
 
 export type CoordPosMapper<Type extends CoordinatedPartOfSpeechType> =
     Type extends CoordPosGuard<"coordinatedNoun"> ? CoordinatedPartOfSpeech<"noun">
@@ -29,159 +43,160 @@ export type CoordPosMapper<Type extends CoordinatedPartOfSpeechType> =
     : Type extends CoordPosGuard<"coordinatedPreposition"> ? CoordinatedPartOfSpeech<"preposition">
     : Type extends CoordPosGuard<"coordinatedDeterminer"> ? CoordinatedPartOfSpeech<"determiner">
     : never;
+export type CoordPosDefinitionMapper<Type extends CoordinatedPartOfSpeechType> =
+    Type extends CoordPosGuard<"coordinatedNoun"> ? CoordinatedDefinition<["noun"]>
+    : Type extends CoordPosGuard<"coordinatedPronoun"> ? CoordinatedDefinition<["pronoun"]>
+    : Type extends CoordPosGuard<"coordinatedVerb"> ? CoordinatedDefinition<["verb"]>
+    : Type extends CoordPosGuard<"coordinatedInfinitive"> ? CoordinatedDefinition<["infinitive"]>
+    : Type extends CoordPosGuard<"coordinatedParticiple"> ? CoordinatedDefinition<["participle"]>
+    : Type extends CoordPosGuard<"coordinatedGerund"> ? CoordinatedDefinition<["gerund"]>
+    : Type extends CoordPosGuard<"coordinatedAdjective"> ? CoordinatedDefinition<["adjective"]>
+    : Type extends CoordPosGuard<"coordinatedAdverb"> ? CoordinatedDefinition<["adverb"]>
+    : Type extends CoordPosGuard<"coordinatedPreposition"> ? CoordinatedDefinition<["preposition"]>
+    : Type extends CoordPosGuard<"coordinatedDeterminer"> ? CoordinatedDefinition<["determiner"]>
+    : never;
 
-export interface Coordinated<T extends ElementType> extends Identifiable {
+export interface CoordinatedDefinition<T extends ElementType[]> extends Record<"items" | "coordinator", [boolean, ElementType[]]> {
+    items: [true, T];
+    coordinator: [false, ["coordinator"]];
+}
+export interface Coordinated<T extends ElementType[]> extends Identifiable, ReferencingElement<CoordinatedDefinition<T>> {
     itemType: string;
-    items?: ElementReference<T>[];
-    coordinator?: ElementReference<"coordinator">;
 }
 
 export interface CoordinatedPartOfSpeech<TPartOfSpeechType extends PartOfSpeechType>
-    extends Coordinated<TPartOfSpeechType>, PartOfSpeech {
+    extends Coordinated<[TPartOfSpeechType]>, PartOfSpeech {
     itemType: TPartOfSpeechType;
     posType: TPartOfSpeechType;
 }
 
-function makeCoordinatedPartOfSpeechTypeGuard<TPartOfSpeechType extends PartOfSpeechType>(
-    partOfSpeechType: TPartOfSpeechType): (element: Identifiable) => element is CoordinatedPartOfSpeech<TPartOfSpeechType> {
-    return function (element: Identifiable): element is CoordinatedPartOfSpeech<TPartOfSpeechType> {
-        const typed = element as CoordinatedPartOfSpeech<TPartOfSpeechType>;
-        return typed.posType === partOfSpeechType
-            && typed.itemType === partOfSpeechType;
-    };
-}
-
-export type SingleOrCoordinatedPartOfSpeech<TPartOfSpeechType extends PartOfSpeechType> =
-    | PosMapper<TPartOfSpeechType>
-    | CoordinatedPartOfSpeech<TPartOfSpeechType>;
+export type FunctionalTypeGuard<T extends ElementType[]> = T;
+export type PosFunctionalTypeGuard<T extends Exclude<PartOfSpeechType, "coordinator" | "subordinator">> = FunctionalTypeGuard<[T, `coordinated${Capitalize<T>}`]>
 
 export interface PartOfSpeech extends Identifiable {
     posType?: PartOfSpeechType;
 }
 
-function makePartOfSpeechTypeGuard<Type extends PartOfSpeechType>(
-    partOfSpeechType: Type): (element: Identifiable) => element is PosMapper<Type> {
-    return function (element: Identifiable): element is PosMapper<Type> {
-        return (element as PartOfSpeech).posType !== partOfSpeechType;
-    };
+export interface NounDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: table
+    // Multi: water bottle
+    words: [true, ["word"]];
 }
-
-// Single: table
-// Multi: water bottle
-export interface Noun extends PartOfSpeech {
+export interface Noun extends PartOfSpeech, ReferencingElement<NounDefinition> {
     posType: "noun";
-    words?: WordReference[];
 }
 // Coordinated: carnivores, herbivores, and omnivores
-export type FunctionalNoun = SingleOrCoordinatedPartOfSpeech<"noun">;
-export const isNoun = makePartOfSpeechTypeGuard("noun");
-export const isCoordinatedNoun = makeCoordinatedPartOfSpeechTypeGuard("noun");
+export type FunctionalNoun = PosFunctionalTypeGuard<"noun">;
 
-// Single: he
-// Multi: each other
-export interface Pronoun extends PartOfSpeech {
+export interface PronounDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: he
+    // Multi: each other
+    words: [true, ["word"]];
+}
+export interface Pronoun extends PartOfSpeech, ReferencingElement<PronounDefinition> {
     posType: "pronoun";
-    words?: WordReference[];
 }
 // Coordinated: he and she
-export type FunctionalPronoun = SingleOrCoordinatedPartOfSpeech<"pronoun">;
-export const isPronoun = makePartOfSpeechTypeGuard("pronoun");
-export const isCoordinatedPronoun = makeCoordinatedPartOfSpeechTypeGuard("pronoun");
+export type FunctionalPronoun = PosFunctionalTypeGuard<"pronoun">;
 
-export interface Verb extends PartOfSpeech {
-    posType: "verb";
+export interface VerbDefinition extends ReferencingElementDefinition<"mainVerb" | "auxiliaryVerbs"> {
     // Single: add
     // Multi: add up
-    mainVerb?: WordReference[];
+    mainVerb: [true, ["word"]];
     // Single: will
     // Multi: will have
-    auxiliaryVerbs?: WordReference[];
+    auxiliaryVerbs: [true, ["word"]];
+}
+export interface Verb extends PartOfSpeech, ReferencingElement<VerbDefinition> {
+    posType: "verb";
 }
 // Coordinated: am running and (am) skipping
-export type FunctionalVerb = SingleOrCoordinatedPartOfSpeech<"verb">;
-export const isVerb = makePartOfSpeechTypeGuard("verb");
-export const isCoordinatedVerb = makeCoordinatedPartOfSpeechTypeGuard("verb");
+export type FunctionalVerb = PosFunctionalTypeGuard<"verb">;
 
-// Single: unhappy
-// Multi: New Yorker
-export interface Adjective extends PartOfSpeech {
+export interface AdjectiveDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: unhappy
+    // Multi: New Yorker
+    words: [true, ["word"]];
+}
+export interface Adjective extends PartOfSpeech, ReferencingElement<AdjectiveDefinition> {
     posType: "adjective";
-    words?: WordReference[];
 }
 // Coordinated: energetic yet focused
-export type FunctionalAdjective = SingleOrCoordinatedPartOfSpeech<"adjective">;
-export const isAdjective = makePartOfSpeechTypeGuard("adjective");
-export const isCoordinatedAdjective = makeCoordinatedPartOfSpeechTypeGuard("adjective");
+export type FunctionalAdjective = PosFunctionalTypeGuard<"adjective">;
 
-export interface Adverb extends PartOfSpeech {
+export interface AdverbDefinition extends ReferencingElementDefinition<"word"> {
+    word: [false, ["word"]];
+}
+export interface Adverb extends PartOfSpeech, ReferencingElement<AdverbDefinition> {
     posType: "adverb";
-    word?: WordReference;
 }
 // Coordinated: slowly but surely
-export type FunctionalAdverb = SingleOrCoordinatedPartOfSpeech<"adverb">;
-export const isAdverb = makePartOfSpeechTypeGuard("adverb");
-export const isCoordinatedAdverb = makeCoordinatedPartOfSpeechTypeGuard("adverb");
+export type FunctionalAdverb = PosFunctionalTypeGuard<"adverb">;
 
-// Single: for
-// Multi: because of
-export interface Preposition extends PartOfSpeech {
+export interface PrepositionDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: for
+    // Multi: because of
+    words: [true, ["word"]];
+}
+export interface Preposition extends PartOfSpeech, ReferencingElement<PrepositionDefinition> {
     posType: "preposition";
-    words?: WordReference[];
 }
 // Coordinated: in or near
-export type FunctionalPreposition = SingleOrCoordinatedPartOfSpeech<"preposition">;
-export const isPreposition = makePartOfSpeechTypeGuard("preposition");
-export const isCoordinatedPreposition = makeCoordinatedPartOfSpeechTypeGuard("preposition");
+export type FunctionalPreposition = PosFunctionalTypeGuard<"preposition">;
 
-// Single: this
-// Multi: half of the
-export interface Determiner extends PartOfSpeech {
+export interface DeterminerDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: this
+    // Multi: half of the
+    words: [true, ["word"]];
+}
+export interface Determiner extends PartOfSpeech, ReferencingElement<DeterminerDefinition> {
     posType: "determiner";
-    words?: WordReference[];
 }
 // Coordinated: each and every
-export type FunctionalDeterminer = SingleOrCoordinatedPartOfSpeech<"determiner">;
-export const isDeterminer = makePartOfSpeechTypeGuard("determiner");
-export const isCoordinatedDeterminer = makeCoordinatedPartOfSpeechTypeGuard("determiner");
+export type FunctionalDeterminer = PosFunctionalTypeGuard<"determiner">;
 
-// Single: and
-// Multi: neither <...> nor <...>
-export interface Coordinator extends PartOfSpeech {
+export interface CoordinatorDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: and
+    // Multi: neither <...> nor <...>
+    words: [true, ["word"]];
+}
+export interface Coordinator extends PartOfSpeech, ReferencingElement<CoordinatorDefinition> {
     posType: "coordinator";
-    words?: WordReference[];
 }
 
-// Single: because
-// Multi: even though
-export interface Subordinator extends PartOfSpeech {
+export interface SubordinatorDefinition extends ReferencingElementDefinition<"words"> {
+    // Single: because
+    // Multi: even though
+    words: [true, ["word"]];
+}
+export interface Subordinator extends PartOfSpeech, ReferencingElement<SubordinatorDefinition> {
     posType: "subordinator";
-    words?: WordReference[];
 }
 
-export interface Infinitive extends PartOfSpeech {
+export interface InfinitiveDefinition extends ReferencingElementDefinition<"to" | "verb"> {
+    to: [false, ["word"]];
+    verb: [true, ["word"]];
+}
+export interface Infinitive extends PartOfSpeech, ReferencingElement<InfinitiveDefinition> {
     posType: "infinitive";
-    to?: WordReference;
-    verb?: WordReference[];
 }
 // Coordinated: to eat and (to) drink
-export type FunctionalInfinitive = SingleOrCoordinatedPartOfSpeech<"infinitive">;
-export const isInfinitive = makePartOfSpeechTypeGuard("infinitive");
-export const isCoordinatedInfinitive = makeCoordinatedPartOfSpeechTypeGuard("infinitive");
+export type FunctionalInfinitive = PosFunctionalTypeGuard<"infinitive">;
 
-export interface Gerund extends PartOfSpeech {
+export interface GerundDefinition extends ReferencingElementDefinition<"word"> {
+    word: [true, ["word"]];
+}
+export interface Gerund extends PartOfSpeech, ReferencingElement<GerundDefinition> {
     posType: "gerund";
-    word?: WordReference[];
 }
 // Coordinated: smoking and drinking
-export type FunctionalGerund = SingleOrCoordinatedPartOfSpeech<"gerund">;
-export const isGerund = makePartOfSpeechTypeGuard("gerund");
-export const isCoordinatedGerund = makeCoordinatedPartOfSpeechTypeGuard("gerund");
+export type FunctionalGerund = PosFunctionalTypeGuard<"gerund">;
 
-export interface Participle extends PartOfSpeech {
+export interface ParticipleDefinition extends ReferencingElementDefinition<"word"> {
+    word: [true, ["word"]];
+}
+export interface Participle extends PartOfSpeech, ReferencingElement<ParticipleDefinition> {
     posType: "participle";
-    word?: WordReference[];
 }
 // Coordinated: broken and shattered
-export type FunctionalParticiple = SingleOrCoordinatedPartOfSpeech<"participle">;
-export const isParticiple = makePartOfSpeechTypeGuard("participle");
-export const isCoordinatedParticiple = makeCoordinatedPartOfSpeechTypeGuard("participle");
+export type FunctionalParticiple = PosFunctionalTypeGuard<"participle">;
