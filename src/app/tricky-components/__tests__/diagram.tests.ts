@@ -1,46 +1,329 @@
-import { LinkType } from "@app/utils";
-import { ElementId, NounTag, WordTag } from "@domain/language";
-import { AtomicChange } from "@lib/utils";
 import { assert } from "chai";
 import { Diagram } from "../diagram";
+import { Word } from "@domain/language";
+import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
+import { TypedDiagramStateItem } from "@app/utils";
 
 describe("SentenceState", () => {
     let state: Diagram;
     beforeEach(() => {
-        state = Diagram.fromSentence("The quick brown fox jumped over the lazy dog");
+        state = Diagram.fromText("The quick brown fox jumped over the lazy dog.");
     });
 
-    test("undoChange + redoChange", () => {
+    test("constructor", () => {
         // check initial
         assert.isFalse(state.canUndo());
         assert.isFalse(state.canRedo());
-        const id = "1.3";
-        let current = state.getElement(id).value;
-        const originalExpected: WordTag = { id: id, lexeme: "fox" };
-        const currentExpected: WordTag = { id: id, lexeme: "fox", posType: "noun" };
-        assert.deepEqual(current, { id: id, lexeme: "fox" });
-        // stage a change
-        state.stageChange(AtomicChange.createSet(
-            [id, "value", "posType"],
-            undefined,
-            "noun"
-        ));
+        const expected: Word = { id: "3", lexeme: "fox" };
+        const result = state.getItem("3").value;
+        assert.deepEqual(result, expected);
+    });
+
+    test("getItem - error", () => {
+        assert.throw(
+            () => state.getItem(""),
+            /does not exist/i
+        );
+    });
+
+    test("getTypedItem - error", () => {
+        assert.throw(
+            () => state.getTypedItem("adverbPhrase", "1"),
+            /does not have type adverbphrase/i
+        );
+    });
+
+    test("createAddItem", () => {
+        const result = state.createAddItem("noun");
+        assert.lengthOf(result.key, 1);
+        if (result.type === ChangeType.Set) {
+            assert.isUndefined(result.currVal);
+            const newVal = result.newVal as TypedDiagramStateItem<"noun">;
+            assert.deepEqual(
+                newVal.value,
+                {
+                    id: result.key[0] as string,
+                    posType: "noun"
+                }
+            );
+        } else {
+            assert.fail();
+        }
+    });
+
+    describe("createDeleteItem", () => {
+        test("standard", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            const addNounPhrase = state.createAddItem("nounPhrase");
+            const nounPhraseId = addNounPhrase.key[0] as string;
+            state.stageChange(addNounPhrase);
+            const addAdjectivePhrase = state.createAddItem("adjectivePhrase");
+            const adjectivePhraseId = addAdjectivePhrase.key[0] as string;
+            state.stageChange(addAdjectivePhrase);
+            const addIndependentClause = state.createAddItem("independentClause");
+            const independentClauseId = addIndependentClause.key[0] as string;
+            state.stageChange(addIndependentClause);
+            state.stageChange(...state.createAddReference("nounPhrase", nounPhraseId, "head", nounId));
+            state.stageChange(...state.createAddReference("nounPhrase", nounPhraseId, "modifiers", adjectivePhraseId));
+            state.stageChange(...state.createAddReference("independentClause", independentClauseId, "subject", nounPhraseId));
+            const result = state.createDeleteItem(nounPhraseId).sort((a, b) => ChangeKey.sort(a.key, b.key));
+            const expected: AtomicChange[] = [
+                AtomicChange.createSet(
+                    [nounId, "refs"],
+                    state.getItem(nounId).refs,
+                    []
+                ),
+                AtomicChange.createSet(
+                    [adjectivePhraseId, "refs"],
+                    state.getItem(adjectivePhraseId).refs,
+                    []
+                ),
+                AtomicChange.createDelete(
+                    [independentClauseId, "value", "subject"],
+                    state.getTypedItem("independentClause", independentClauseId).value.subject
+                ),
+                AtomicChange.createDelete(
+                    [nounPhraseId],
+                    state.getItem(nounPhraseId)
+                )
+            ].sort((a, b) => ChangeKey.sort(a.key, b.key));
+            assert.deepEqual(result, expected);
+        });
+
+        test("error - delete word", () => {
+            assert.throw(
+                () => state.createDeleteItem("3"),
+                /cannot delete words/i
+            );
+        });
+
+        test("error - referenced by word", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            state.stageChange(AtomicChange.createSet(
+                [nounId, "refs"],
+                state.getItem(nounId).refs,
+                ["3"]
+            ));
+            assert.throw(
+                () => state.createDeleteItem(nounId),
+                /'word' element type/i
+            );
+        });
+    });
+
+    describe("createAddReference", () => {
+        test("standard", () => {
+            const addNoun = state.createAddItem("noun");
+            state.stageChange(addNoun);
+            const nounId = addNoun.key[0] as string;
+            const result = state.createAddReference("noun", nounId, "words", "3");
+            const expected = [
+                AtomicChange.createSet(
+                    [nounId, "value", "words"],
+                    undefined,
+                    [{ id: "3", type: "word" }]
+                ),
+                AtomicChange.createSet(
+                    ["3", "refs"],
+                    [],
+                    [nounId]
+                )
+            ];
+            assert.deepEqual(result, expected);
+        });
+
+        test("error - reference not allowed", () => {
+            const addVerbPhrase = state.createAddItem("verbPhrase");
+            const verbPhraseId = addVerbPhrase.key[0] as string;
+            state.stageChange(addVerbPhrase);
+            assert.throw(
+                () => state.createAddReference("verbPhrase", verbPhraseId, "head", "4"),
+                /element is not allowed to reference a/i
+            );
+        });
+
+        test("error - reference already exists - array property", () => {
+            const addNoun = state.createAddItem("noun");
+            state.stageChange(addNoun);
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
+            assert.throw(
+                () => state.createAddReference("noun", nounId, "words", "3"),
+                /already contains a reference to/i
+            );
+        });
+
+        test("error - reference already exists - object property", () => {
+            const addVerb = state.createAddItem("verb");
+            state.stageChange(addVerb);
+            const verbId = addVerb.key[0] as string;
+            const addVerbPhrase = state.createAddItem("verbPhrase");
+            state.stageChange(addVerbPhrase);
+            const verbPhraseId = addVerbPhrase.key[0] as string;
+            state.stageChange(...state.createAddReference("verbPhrase", verbPhraseId, "head", verbId));
+            assert.throw(
+                () => state.createAddReference("verbPhrase", verbPhraseId, "head", verbId),
+                /already references/i
+            );
+        });
+    });
+
+    describe("createDeleteReference", () => {
+        test("standard", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
+            const result = state.createDeleteReference("noun", nounId, "words", "3");
+            const expected = [
+                AtomicChange.createDelete(
+                    [nounId, "value", "words"],
+                    state.getTypedItem("noun", nounId).value.words
+                ),
+                AtomicChange.createSet(
+                    ["3", "refs"],
+                    state.getItem("3").refs,
+                    []
+                )
+            ];
+            assert.deepEqual(result, expected);
+        });
+
+        test("error - no property", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            assert.throw(
+                () => state.createDeleteReference("noun", nounId, "words", ""),
+                /does not have a 'words' property/i
+            );
+        });
+
+        test("error - array - parent does not reference", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
+            assert.throw(
+                () => state.createDeleteReference("noun", nounId, "words", "8"),
+                /element does not contain a reference/i
+            );
+        });
+
+        test("error - array - parent has multiple references", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
+            state.stageChange(AtomicChange.createSet(
+                ["3", "refs"],
+                state.getItem("3").refs,
+                [...state.getItem("3").refs, nounId]
+            ));
+            const words = state.getTypedItem("noun", nounId).value.words;
+            if (words === undefined) {
+                throw "should not be undefined";
+            }
+            state.stageChange(AtomicChange.createSet(
+                [nounId, "value", "words"],
+                words,
+                [...words, { id: "3", type: "word" }]
+            ));
+            assert.throw(
+                () => state.createDeleteReference("noun", nounId, "words", "3"),
+                /element contains multiple/i
+            );
+        });
+
+        test("error - object - parent does not reference", () => {
+            const addVerb = state.createAddItem("verb");
+            const addVerbId = addVerb.key[0] as string;
+            const addVerbPhrase = state.createAddItem("verbPhrase");
+            const addVerbPhraseId = addVerbPhrase.key[0] as string;
+            state.stageChange(addVerb, addVerbPhrase);
+            state.stageChange(...state.createAddReference("verbPhrase", addVerbPhraseId, "head", addVerbId));
+            state.stageChange(AtomicChange.createSet(
+                [addVerbPhraseId, "value", "head"],
+                state.getTypedItem("verbPhrase", addVerbPhraseId).value.head,
+                {
+                    id: "4",
+                    type: "word"
+                }
+            ));
+            assert.throw(
+                () => state.createDeleteReference("verbPhrase", addVerbPhraseId, "head", addVerbId),
+                /element does not reference/i
+            );
+        });
+
+        test("error - child not referenced", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
+            state.stageChange(AtomicChange.createSet(
+                ["3", "refs"],
+                state.getItem("3").refs,
+                []
+            ));
+            assert.throw(
+                () => state.createDeleteReference("noun", nounId, "words", "3"),
+                /is not referenced by/i
+            );
+        });
+
+        test("error - child referenced multiple times", () => {
+            const addNoun = state.createAddItem("noun");
+            const nounId = addNoun.key[0] as string;
+            state.stageChange(addNoun);
+            state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
+            const refs = state.getItem("3").refs;
+            state.stageChange(AtomicChange.createSet(
+                ["3", "refs"],
+                refs,
+                [...refs, nounId]
+            ));
+            assert.throw(
+                () => state.createDeleteReference("noun", nounId, "words", "3"),
+                /is referenced.*multiple times/i
+            );
+        });
+    });
+
+    test("add item", () => {
+        // create change
+        const change = state.createAddItem("adverbPhrase");
+        const id = change.key[0] as string;
+        state.stageChange(change);
+        assert.deepEqual(
+            state.getTypedItem("adverbPhrase", id).value,
+            {
+                id: id,
+                phraseType: "adverb"
+            }
+        );
         assert.isTrue(state.canUndo());
         assert.isFalse(state.canRedo());
-        current = state.getElement(id).value;
-        assert.deepEqual(current, currentExpected);
-        // undo the change
+        // undo
         state.undoChange();
-        current = state.getElement(id).value;
-        assert.deepEqual(current, originalExpected);
         assert.isFalse(state.canUndo());
         assert.isTrue(state.canRedo());
-        // redo the change
+        expect(() => state.getItem(id)).toThrow();
+        // redo
         state.redoChange();
-        current = state.getElement(id).value;
-        assert.deepEqual(current, currentExpected);
         assert.isTrue(state.canUndo());
         assert.isFalse(state.canRedo());
+        assert.deepEqual(
+            state.getTypedItem("adverbPhrase", id).value,
+            {
+                id: id,
+                phraseType: "adverb"
+            }
+        );
     });
 
     test("undoChange - error", () => {
@@ -51,165 +334,118 @@ describe("SentenceState", () => {
         expect(() => state.redoChange()).toThrow("redo");
     });
 
-    test("createAddLink", () => {
-        const referenceId: ElementId = "1.3";
-        const targetId: ElementId = "1.4";
-        const expected: AtomicChange[] = [
-            AtomicChange.createSet(
-                [referenceId, "links", targetId],
-                undefined,
-                LinkType.Target
-            ),
-            AtomicChange.createSet(
-                [targetId, "links", referenceId],
-                undefined,
-                LinkType.Reference
-            )
-        ];
-        const result = state.createAddLink(referenceId, targetId);
-        assert.deepEqual(result, expected);
-    });
-
-    test("createRemoveLink", () => {
-        const referenceId: ElementId = "1.3";
-        const targetId: ElementId = "1.4";
-        const expected: AtomicChange[] = [
-            AtomicChange.createSet(
-                [referenceId, "links", targetId],
-                undefined,
-                LinkType.Target
-            ),
-            AtomicChange.createSet(
-                [targetId, "links", referenceId],
-                undefined,
-                LinkType.Reference
-            )
-        ].map((x) => AtomicChange.invertChange(x));
-        state.stageChange(...state.createAddLink(referenceId, targetId));
-        const result = state.createRemoveLink(referenceId, targetId);
-        assert.deepEqual(result, expected);
-    });
-
-    test("createValueOverwrite", () => {
-        const newValue: NounTag = {
-            ...state.getElement("1.3").value,
-            posType: "noun"
-        };
-        const expected = AtomicChange.createSet(
-            ["1.3", "value"],
-            state.getElement("1.3").value,
-            newValue
-        );
-        const result = state.createValueOverwrite(newValue);
-        assert.deepEqual(expected, result);
-    });
-
-    test("multiple staged changes", () => {
-        // stage 2 changes
-        state.stageChange(AtomicChange.createSet(
-            ["1.3", "value"],
-            state.getElement("1.3").value,
-            { id: "1.3", lexeme: "fox", posType: "noun" }
-        ));
-        state.stageChange(AtomicChange.createSet(
-            ["1.4", "value"],
-            state.getElement("1.4"),
-            { id: "1.4", lexeme: "jumped", posType: "verb" }
-        ));
-        assert.deepEqual(
-            state.getElement("1.3").value,
-            { id: "1.3", lexeme: "fox", posType: "noun" }
-        );
-        assert.deepEqual(
-            state.getElement("1.4").value,
-            { id: "1.4", lexeme: "jumped", posType: "verb" }
-        );
-        // undo 1 change
-        state.undoChange();
-        assert.isTrue(state.canUndo());
-        assert.isTrue(state.canRedo());
-        // undo another change
-        state.undoChange();
-        assert.isFalse(state.canUndo());
-        assert.isTrue(state.canRedo());
-        // stage a change to overwrite remaining changes
-        state.stageChange(AtomicChange.createSet(
-            ["1.8", "value", "posType"],
-            undefined,
-            "noun"
-        ));
+    test("child + import", () => {
+        // make parent changes
+        const change = state.createAddItem("noun");
+        const id = change.key[0] as string;
+        state.stageChange(change);
+        state.stageChange(...state.createAddReference("noun", id, "words", "3"));
         assert.isTrue(state.canUndo());
         assert.isFalse(state.canRedo());
-    });
-
-    test("createChild", () => {
+        assert.deepEqual(
+            state.getTypedItem("noun", id).value,
+            {
+                id: id,
+                posType: "noun",
+                words: [{
+                    id: "3",
+                    type: "word"
+                }]
+            }
+        );
         // create child
-        state.stageChange(AtomicChange.createSet(
-            ["1.3", "value", "lexeme"],
-            "fox",
-            "bear"
-        ));
         const child = state.createChild();
         assert.isFalse(child.canUndo());
         assert.isFalse(child.canRedo());
         assert.deepEqual(
-            child.getElement("1.3").value,
-            { id: "1.3", lexeme: "bear" }
+            child.getTypedItem("noun", id).value,
+            {
+                id: id,
+                posType: "noun",
+                words: [{
+                    id: "3",
+                    type: "word"
+                }]
+            }
         );
-        // stage changes
-        child.stageChange(
-            AtomicChange.createSet(
-                ["1.4", "value", "posType"],
-                undefined,
-                "verb"
-            ),
-            AtomicChange.createSet(
-                ["1.8", "value", "posType"],
-                undefined,
-                "noun"
-            )
-        );
-        assert.notDeepEqual(
-            child.getElement("1.4").value,
-            state.getElement("1.4").value
-        );
-        assert.notDeepEqual(
-            child.getElement("1.8").value,
-            state.getElement("1.8").value
-        );
-    });
-
-    test("importState", () => {
-        // create child
-        state.stageChange(
-            AtomicChange.createSet(
-                ["1.3", "value", "lexeme"],
-                "fox",
-                "bear"
-            ),
-            AtomicChange.createSet(
-                ["1.3", "value", "posType"],
-                undefined,
-                "noun"
-            )
-        );
-        const child = state.createChild();
-        child.stageChange(
-            AtomicChange.createSet(
-                ["1.8", "value", "lexeme"],
-                "dog",
-                "hog"
-            ),
-            AtomicChange.createSet(
-                ["1.8", "value", "posType"],
-                undefined,
-                "noun"
-            )
-        );
-        state.importState(child);
+        // make child changes
+        child.stageChange(...child.createDeleteItem(id));
+        // check child changed
+        assert.isTrue(child.canUndo());
+        assert.isFalse(child.canRedo());
+        assert.throw(() => child.getItem(id));
+        // check parent not changed
+        assert.isTrue(state.canUndo());
+        assert.isFalse(state.canRedo());
         assert.deepEqual(
-            state.getElement("1.8").value,
-            state.getElement("1.8").value
+            state.getTypedItem("noun", id).value,
+            {
+                id: id,
+                posType: "noun",
+                words: [{
+                    id: "3",
+                    type: "word"
+                }]
+            }
+        );
+        // undo child change
+        child.undoChange();
+        assert.isFalse(child.canUndo());
+        assert.isTrue(child.canRedo());
+        assert.lengthOf(child.getItem("3").refs, 1);
+        assert.deepEqual(
+            child.getTypedItem("noun", id).value,
+            {
+                id: id,
+                posType: "noun",
+                words: [{
+                    id: "3",
+                    type: "word"
+                }]
+            }
+        );
+        // change child reference
+        child.stageChange(...child.createDeleteReference("noun", id, "words", "3"));
+        child.stageChange(...child.createAddReference("noun", id, "words", "8"));
+        assert.deepEqual(
+            child.getTypedItem("noun", id).value,
+            {
+                id: id,
+                posType: "noun",
+                words: [{
+                    id: "8",
+                    type: "word"
+                }]
+            }
+        );
+        // check parent not changed
+        assert.isTrue(state.canUndo());
+        assert.isFalse(state.canRedo());
+        assert.deepEqual(
+            state.getTypedItem("noun", id).value,
+            {
+                id: id,
+                posType: "noun",
+                words: [{
+                    id: "3",
+                    type: "word"
+                }]
+            }
+        );
+        // import child
+        state.importState(child);
+        // check parent state matches child
+        assert.deepEqual(
+            state.getItem(id),
+            child.getItem(id)
+        );
+        assert.deepEqual(
+            state.getItem("3"),
+            child.getItem("3")
+        );
+        assert.deepEqual(
+            state.getItem("8"),
+            child.getItem("8")
         );
     });
 });
