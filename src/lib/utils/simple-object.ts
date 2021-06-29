@@ -73,9 +73,14 @@ function deepEqualsArray(array1: Values[], array2: Values[]): boolean {
     return true;
 }
 
-function getSortedEntries(obj: SimpleObject): [string, Exclude<SimpleObjectValue, undefined>][] {
+function getEntries(obj: SimpleObject): [string, Exclude<SimpleObjectValue, undefined>][] {
     const output = Object.entries(obj)
-        .filter(([, value]) => value !== undefined)
+        .filter(([, value]) => value !== undefined) as [string, Exclude<SimpleObjectValue, undefined>][];
+    return output;
+}
+
+function getSortedEntries(obj: SimpleObject): [string, Exclude<SimpleObjectValue, undefined>][] {
+    const output = getEntries(obj)
         .sort(([key1], [key2]) => {
             if (key1 < key2) {
                 return -1;
@@ -84,7 +89,7 @@ function getSortedEntries(obj: SimpleObject): [string, Exclude<SimpleObjectValue
                 return 1;
             }
             return 0;
-        }) as [string, Exclude<SimpleObjectValue, undefined>][];
+        });
     return output;
 }
 
@@ -144,5 +149,5 @@ export const SimpleObject = {
     deepEquals: deepEquals,
     clone: clone,
     getValueType: getValueType,
-    getSortedEntries
+    getSortedEntries: getSortedEntries
 };
