@@ -72,7 +72,7 @@ export type ElementMapper<Type extends ElementType> =
     : Type extends CoordClauseType ? CoordClauseMapper<Type>
     : never;
 
-type DefinitionMapper<Type extends Exclude<ElementType, "word">> =
+export type ElementDefinitionMapper<Type extends Exclude<ElementType, "word">> =
     Type extends PartOfSpeechType ? PosDefinitionMapper<Type>
     : Type extends CoordinatedPartOfSpeechType ? CoordPosDefinitionMapper<Type>
     : Type extends PhraseGuard<PhraseType> ? PhraseDefinitionMapper<Type>
@@ -82,7 +82,7 @@ type DefinitionMapper<Type extends Exclude<ElementType, "word">> =
     : never;
 
 type DefinitionObject = {
-    [Key in Exclude<ElementType, "word">]: DefinitionMapper<Key>;
+    [Key in Exclude<ElementType, "word">]: ElementDefinitionMapper<Key>;
 }
 
 function createCoordinatedDefinition<T extends ElementType[]>(itemTypes: T): CoordinatedDefinition<T> {
@@ -369,8 +369,8 @@ const definitionObject: DefinitionObject = {
     coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"])
 };
 
-export function getElementDefinition<T extends Exclude<ElementType, "word">>(type: T): DefinitionMapper<T> {
-    return SimpleObject.clone(definitionObject[type]) as DefinitionMapper<T>;
+export function getElementDefinition<T extends Exclude<ElementType, "word">>(type: T): ElementDefinitionMapper<T> {
+    return SimpleObject.clone(definitionObject[type]) as ElementDefinitionMapper<T>;
 }
 
 export type Sentence = FunctionalIndependentClause;
