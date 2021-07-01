@@ -4,6 +4,10 @@ import { Word } from "@domain/language";
 import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { TypedDiagramStateItem } from "@app/utils";
 
+function getElementId(key: ChangeKey): string {
+    return key[1] as string;
+}
+
 describe("SentenceState", () => {
     let state: Diagram;
     beforeEach(() => {
@@ -17,6 +21,52 @@ describe("SentenceState", () => {
         const expected: Word = { id: "3", lexeme: "fox" };
         const result = state.getItem("3").value;
         assert.deepEqual(result, expected);
+    });
+
+    test("getWords", () => {
+        const result = state.getWords();
+        const expected: Word[] = [
+            {
+                id: "0",
+                lexeme: "The"
+            },
+            {
+                id: "1",
+                lexeme: "quick"
+            },
+            {
+                id: "2",
+                lexeme: "brown"
+            },
+            {
+                id: "3",
+                lexeme: "fox"
+            },
+            {
+                id: "4",
+                lexeme: "jumped"
+            },
+            {
+                id: "5",
+                lexeme: "over"
+            },
+            {
+                id: "6",
+                lexeme: "the"
+            },
+            {
+                id: "7",
+                lexeme: "lazy"
+            },
+            {
+                id: "8",
+                lexeme: "dog."
+            }
+        ];
+        assert.deepEqual(
+            result,
+            expected
+        );
     });
 
     test("getItem - error", () => {
@@ -35,14 +85,14 @@ describe("SentenceState", () => {
 
     test("createAddItem", () => {
         const result = state.createAddItem("noun");
-        assert.lengthOf(result.key, 1);
+        assert.lengthOf(result.key, 2);
         if (result.type === ChangeType.Set) {
             assert.isUndefined(result.currVal);
             const newVal = result.newVal as TypedDiagramStateItem<"noun">;
             assert.deepEqual(
                 newVal.value,
                 {
-                    id: result.key[0] as string,
+                    id: getElementId(result.key),
                     posType: "noun"
                 }
             );
@@ -54,16 +104,16 @@ describe("SentenceState", () => {
     describe("createDeleteItem", () => {
         test("standard", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             const addNounPhrase = state.createAddItem("nounPhrase");
-            const nounPhraseId = addNounPhrase.key[0] as string;
+            const nounPhraseId = getElementId(addNounPhrase.key);
             state.stageChange(addNounPhrase);
             const addAdjectivePhrase = state.createAddItem("adjectivePhrase");
-            const adjectivePhraseId = addAdjectivePhrase.key[0] as string;
+            const adjectivePhraseId = getElementId(addAdjectivePhrase.key);
             state.stageChange(addAdjectivePhrase);
             const addIndependentClause = state.createAddItem("independentClause");
-            const independentClauseId = addIndependentClause.key[0] as string;
+            const independentClauseId = getElementId(addIndependentClause.key);
             state.stageChange(addIndependentClause);
             state.stageChange(...state.createAddReference("nounPhrase", nounPhraseId, "head", nounId));
             state.stageChange(...state.createAddReference("nounPhrase", nounPhraseId, "modifiers", adjectivePhraseId));
@@ -71,21 +121,21 @@ describe("SentenceState", () => {
             const result = state.createDeleteItem(nounPhraseId).sort((a, b) => ChangeKey.sort(a.key, b.key));
             const expected: AtomicChange[] = [
                 AtomicChange.createSet(
-                    [nounId, "refs"],
+                    ["elements", nounId, "refs"],
                     state.getItem(nounId).refs,
                     []
                 ),
                 AtomicChange.createSet(
-                    [adjectivePhraseId, "refs"],
+                    ["elements", adjectivePhraseId, "refs"],
                     state.getItem(adjectivePhraseId).refs,
                     []
                 ),
                 AtomicChange.createDelete(
-                    [independentClauseId, "value", "subject"],
+                    ["elements", independentClauseId, "value", "subject"],
                     state.getTypedItem("independentClause", independentClauseId).value.subject
                 ),
                 AtomicChange.createDelete(
-                    [nounPhraseId],
+                    ["elements", nounPhraseId],
                     state.getItem(nounPhraseId)
                 )
             ].sort((a, b) => ChangeKey.sort(a.key, b.key));
@@ -101,10 +151,10 @@ describe("SentenceState", () => {
 
         test("error - referenced by word", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             state.stageChange(AtomicChange.createSet(
-                [nounId, "refs"],
+                ["elements", nounId, "refs"],
                 state.getItem(nounId).refs,
                 ["3"]
             ));
@@ -119,16 +169,16 @@ describe("SentenceState", () => {
         test("standard", () => {
             const addNoun = state.createAddItem("noun");
             state.stageChange(addNoun);
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             const result = state.createAddReference("noun", nounId, "words", "3");
             const expected = [
                 AtomicChange.createSet(
-                    [nounId, "value", "words"],
+                    ["elements", nounId, "value", "words"],
                     undefined,
                     [{ id: "3", type: "word" }]
                 ),
                 AtomicChange.createSet(
-                    ["3", "refs"],
+                    ["elements", "3", "refs"],
                     [],
                     [nounId]
                 )
@@ -138,7 +188,7 @@ describe("SentenceState", () => {
 
         test("error - reference not allowed", () => {
             const addVerbPhrase = state.createAddItem("verbPhrase");
-            const verbPhraseId = addVerbPhrase.key[0] as string;
+            const verbPhraseId = getElementId(addVerbPhrase.key);
             state.stageChange(addVerbPhrase);
             assert.throw(
                 () => state.createAddReference("verbPhrase", verbPhraseId, "head", "4"),
@@ -149,7 +199,7 @@ describe("SentenceState", () => {
         test("error - reference already exists - array property", () => {
             const addNoun = state.createAddItem("noun");
             state.stageChange(addNoun);
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
             assert.throw(
                 () => state.createAddReference("noun", nounId, "words", "3"),
@@ -160,10 +210,10 @@ describe("SentenceState", () => {
         test("error - reference already exists - object property", () => {
             const addVerb = state.createAddItem("verb");
             state.stageChange(addVerb);
-            const verbId = addVerb.key[0] as string;
+            const verbId = getElementId(addVerb.key);
             const addVerbPhrase = state.createAddItem("verbPhrase");
             state.stageChange(addVerbPhrase);
-            const verbPhraseId = addVerbPhrase.key[0] as string;
+            const verbPhraseId = getElementId(addVerbPhrase.key);
             state.stageChange(...state.createAddReference("verbPhrase", verbPhraseId, "head", verbId));
             assert.throw(
                 () => state.createAddReference("verbPhrase", verbPhraseId, "head", verbId),
@@ -175,17 +225,17 @@ describe("SentenceState", () => {
     describe("createDeleteReference", () => {
         test("standard", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
             const result = state.createDeleteReference("noun", nounId, "words", "3");
             const expected = [
                 AtomicChange.createDelete(
-                    [nounId, "value", "words"],
+                    ["elements", nounId, "value", "words"],
                     state.getTypedItem("noun", nounId).value.words
                 ),
                 AtomicChange.createSet(
-                    ["3", "refs"],
+                    ["elements", "3", "refs"],
                     state.getItem("3").refs,
                     []
                 )
@@ -195,7 +245,7 @@ describe("SentenceState", () => {
 
         test("error - no property", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             assert.throw(
                 () => state.createDeleteReference("noun", nounId, "words", ""),
@@ -205,7 +255,7 @@ describe("SentenceState", () => {
 
         test("error - array - parent does not reference", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
             assert.throw(
@@ -216,11 +266,11 @@ describe("SentenceState", () => {
 
         test("error - array - parent has multiple references", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
             state.stageChange(AtomicChange.createSet(
-                ["3", "refs"],
+                ["elements", "3", "refs"],
                 state.getItem("3").refs,
                 [...state.getItem("3").refs, nounId]
             ));
@@ -229,7 +279,7 @@ describe("SentenceState", () => {
                 throw "should not be undefined";
             }
             state.stageChange(AtomicChange.createSet(
-                [nounId, "value", "words"],
+                ["elements", nounId, "value", "words"],
                 words,
                 [...words, { id: "3", type: "word" }]
             ));
@@ -241,13 +291,13 @@ describe("SentenceState", () => {
 
         test("error - object - parent does not reference", () => {
             const addVerb = state.createAddItem("verb");
-            const addVerbId = addVerb.key[0] as string;
+            const addVerbId = getElementId(addVerb.key);
             const addVerbPhrase = state.createAddItem("verbPhrase");
-            const addVerbPhraseId = addVerbPhrase.key[0] as string;
+            const addVerbPhraseId = getElementId(addVerbPhrase.key);
             state.stageChange(addVerb, addVerbPhrase);
             state.stageChange(...state.createAddReference("verbPhrase", addVerbPhraseId, "head", addVerbId));
             state.stageChange(AtomicChange.createSet(
-                [addVerbPhraseId, "value", "head"],
+                ["elements", addVerbPhraseId, "value", "head"],
                 state.getTypedItem("verbPhrase", addVerbPhraseId).value.head,
                 {
                     id: "4",
@@ -262,11 +312,11 @@ describe("SentenceState", () => {
 
         test("error - child not referenced", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
             state.stageChange(AtomicChange.createSet(
-                ["3", "refs"],
+                ["elements", "3", "refs"],
                 state.getItem("3").refs,
                 []
             ));
@@ -278,12 +328,12 @@ describe("SentenceState", () => {
 
         test("error - child referenced multiple times", () => {
             const addNoun = state.createAddItem("noun");
-            const nounId = addNoun.key[0] as string;
+            const nounId = getElementId(addNoun.key);
             state.stageChange(addNoun);
             state.stageChange(...state.createAddReference("noun", nounId, "words", "3"));
             const refs = state.getItem("3").refs;
             state.stageChange(AtomicChange.createSet(
-                ["3", "refs"],
+                ["elements", "3", "refs"],
                 refs,
                 [...refs, nounId]
             ));
@@ -297,7 +347,7 @@ describe("SentenceState", () => {
     test("add item", () => {
         // create change
         const change = state.createAddItem("adverbPhrase");
-        const id = change.key[0] as string;
+        const id = getElementId(change.key);
         state.stageChange(change);
         assert.deepEqual(
             state.getTypedItem("adverbPhrase", id).value,
@@ -337,7 +387,7 @@ describe("SentenceState", () => {
     test("child + import", () => {
         // make parent changes
         const change = state.createAddItem("noun");
-        const id = change.key[0] as string;
+        const id = getElementId(change.key);
         state.stageChange(change);
         state.stageChange(...state.createAddReference("noun", id, "words", "3"));
         assert.isTrue(state.canUndo());

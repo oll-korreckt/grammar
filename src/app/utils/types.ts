@@ -13,5 +13,8 @@ export type TypedDiagramStateItem<T extends ElementType> = {
 }
 
 export type DiagramState = {
-    [key: string]: DiagramStateItem;
+    wordOrder: ElementId[];
+    elements: {
+        [key: string]: DiagramStateItem;
+    };
 }

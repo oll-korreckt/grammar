@@ -16,7 +16,10 @@ function getNewItemId(): string {
 
 export class Diagram {
     static fromText(text: string): Diagram {
-        const baseState: DiagramState = {};
+        const baseState: DiagramState = {
+            wordOrder: [],
+            elements: {}
+        };
         let wordCnt = 0;
         scan(text).forEach(({ lexeme, tokenType }) => {
             if (tokenType === "word") {
@@ -24,11 +27,12 @@ export class Diagram {
                     id: wordCnt.toString(),
                     lexeme: lexeme
                 };
-                baseState[word.id] = {
+                baseState.elements[word.id] = {
                     value: word,
                     type: "word",
                     refs: []
                 };
+                baseState.wordOrder.push(word.id);
                 wordCnt++;
             }
         });
@@ -46,8 +50,12 @@ export class Diagram {
         this.newState = SimpleObject.clone(state);
     }
 
+    getWords(): Word[] {
+        return this.currState.wordOrder.map((id) => this.getTypedItem("word", id).value);
+    }
+
     getItem(id: ElementId): DiagramStateItem {
-        const output = this.newState[id];
+        const output = this.newState.elements[id];
         if (output === undefined) {
             throw `Element ${id} does not exist`;
         }
@@ -100,7 +108,7 @@ export class Diagram {
         const child = this.getItem(childId);
         // make change to parent
         let parentChange: AtomicChange;
-        const parentChangeKey = [parentId, "value", keyStr];
+        const parentChangeKey = ["elements", parentId, "value", keyStr];
         const [isArray, childTypes] = getElementDefinition(parentType)[key] as unknown as [boolean, ElementId[]];
         if (!childTypes.includes(child.type)) {
             throw `'${key}' property of '${parentType}' element is not allowed to reference a '${child.type}' element`;
@@ -141,7 +149,7 @@ export class Diagram {
         // make changes to child if necessary
         if (!child.refs.includes(parentId)) {
             const childChange = AtomicChange.createSet(
-                [childId, "refs"],
+                ["elements", childId, "refs"],
                 child.refs,
                 [...child.refs, parentId]
             );
@@ -155,7 +163,7 @@ export class Diagram {
         const parent = this.getTypedItem(parentType, parentId);
         // make change to parent
         let parentChange: AtomicChange;
-        const parentChangeKey = [parentId, "value", keyStr];
+        const parentChangeKey = ["elements", parentId, "value", keyStr];
         const currVal: undefined | ElementReference | ElementReference[] = (parent.value as any)[keyStr];
         if (currVal === undefined) {
             throw `element '${parentId}' does not have a '${keyStr}' property`;
@@ -206,7 +214,7 @@ export class Diagram {
                 throw `'${childId}' element is referenced by '${parentId}' multiple times`;
         }
         const childChange = AtomicChange.createSet(
-            [childId, "refs"],
+            ["elements", childId, "refs"],
             childRefs,
             newChildRefs
         );
@@ -222,7 +230,7 @@ export class Diagram {
             refs: []
         };
         return AtomicChange.createSet(
-            [value.id],
+            ["elements", value.id],
             undefined,
             newValue
         );
@@ -247,7 +255,7 @@ export class Diagram {
                     const newValue = currValue.filter((eRef) => eRef.id !== id);
                     if (newValue.length !== currValue.length) {
                         output.push(AtomicChange.createSet(
-                            [parentId, "value", key],
+                            ["elements", parentId, "value", key],
                             currValue,
                             newValue
                         ));
@@ -255,7 +263,7 @@ export class Diagram {
                 } else {
                     if (currValue.id === id) {
                         output.push(AtomicChange.createDelete(
-                            [parentId, "value", key],
+                            ["elements", parentId, "value", key],
                             currValue
                         ));
                     }
@@ -269,7 +277,7 @@ export class Diagram {
             const newVal = currVal.filter((ref) => ref !== id);
             if (newVal.length !== currVal.length) {
                 output.push(AtomicChange.createSet(
-                    [childId, "refs"],
+                    ["elements", childId, "refs"],
                     currVal,
                     newVal
                 ));
@@ -277,7 +285,7 @@ export class Diagram {
         });
         // delete the item itself
         const itemDelete = AtomicChange.createDelete(
-            [id],
+            ["elements", id],
             item
         );
         output.push(itemDelete);
