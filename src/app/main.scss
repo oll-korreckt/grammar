@@ -1,0 +1,20 @@
+@mixin center-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+$color-1: ("main": #4682b4, "dark": #23415a, "text": #fff);
+$color-2: ("main": #48d1cc, "dark": #2b7d7a, "text": #fff);
+$color-3: ("main": #dc143c, "dark": #9a0e2a, "text": #fff);
+$color-4: ("main": #f39999, "dark": #d87373, "text": #fff);
+$color-5: ("main": #71bc78, "dark": #4f8454, "text": #fff);
+$color-6: ("main": #67afa9, "dark": #016d64, "text": #fff);
+$color-7: ("main": #b366b3, "dark": #730073, "text": #fff);
+$color-8: ("main": #99cd32, "dark": #6b9023, "text": #fff);
+$color-9: ("main": #a6a6a6, "dark": #5f5f5f, "text": #fff);
+$color-10: ("main": #ff7f50, "dark": #cc6640, "text": #fff);
+$color-11: ("main": #bdb76b, "dark": #84814b, "text": #fff);
+$color-12: ("main": #aa6342, "dark": #70391f, "text": #fff);
+
+$colors: $color-1, $color-2, $color-3, $color-4, $color-5, $color-6, $color-7, $color-8, $color-9, $color-10, $color-11, $color-12;

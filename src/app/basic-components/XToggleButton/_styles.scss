@@ -1,4 +1,4 @@
-@use "utils";
+@use "main";
 
 .xToggleButton {
     border: 1px solid black;
@@ -11,10 +11,10 @@
     user-select: none;
     cursor: pointer;
     .text {
-        @include utils.center-content;
+        @include main.center-content;
     }
     .xIcon {
-        @include utils.center-content;
+        @include main.center-content;
         margin-left: 5px;
     }
 }
