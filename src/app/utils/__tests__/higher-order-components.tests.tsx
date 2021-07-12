@@ -28,31 +28,51 @@ describe("higher-order-components", () => {
     });
 
     describe("withClassName", () => {
-        test("with 1", () => {
-            const WrappedComponent = withClassName(MockComponent, "hello");
-            const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
-            expect(result.className).toBe("hello");
+        describe("classNames", () => {
+            test("with 0", () => {
+                expect(() => withClassName(MockComponent)).toThrow(/at least 1/i);
+            });
+
+            test("with 1", () => {
+                const WrappedComponent = withClassName(MockComponent, "hello");
+                const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
+                expect(result.className).toBe("hello");
+            });
+
+            test("with 2", () => {
+                const WrappedComponent = withClassName(MockComponent, "hello1", "hello2");
+                const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
+                const classNames: string[] = [];
+                result.classList.forEach((value) => classNames.push(value));
+                classNames.sort();
+                const expected = ["hello1", "hello2"].sort();
+
+                expect(classNames).toStrictEqual(expected);
+            });
+
+            test("multi call", () => {
+                const WrappedComponent = withClassName(withClassName(MockComponent, "hello1"), "hello2");
+                const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
+                const classNames: string[] = [];
+                result.classList.forEach((value) => classNames.push(value));
+                classNames.sort();
+                const expected = ["hello1", "hello2"].sort();
+                expect(classNames).toStrictEqual(expected);
+            });
         });
 
-        test("with 2", () => {
-            const WrappedComponent = withClassName(MockComponent, "hello1", "hello2");
-            const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
-            const classNames: string[] = [];
-            result.classList.forEach((value) => classNames.push(value));
-            classNames.sort();
-            const expected = ["hello1", "hello2"].sort();
-
-            expect(classNames).toStrictEqual(expected);
-        });
-
-        test("multi call", () => {
-            const WrappedComponent = withClassName(withClassName(MockComponent, "hello1"), "hello2");
-            const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
-            const classNames: string[] = [];
-            result.classList.forEach((value) => classNames.push(value));
-            classNames.sort();
-            const expected = ["hello1", "hello2"].sort();
-            expect(classNames).toStrictEqual(expected);
+        describe("function", () => {
+            test("standard", () => {
+                const WrappedComponent = withClassName(MockComponent, ({ children }) => { return children === "hello" ? ["hi"] : ["goodbye"]; });
+                const result = render(
+                    <>
+                        <WrappedComponent>hello</WrappedComponent>
+                        <WrappedComponent>something</WrappedComponent>
+                    </>
+                );
+                expect(result.getByText("hello").className).toStrictEqual("hi");
+                expect(result.getByText("something").className).toStrictEqual("goodbye");
+            });
         });
     });
 
