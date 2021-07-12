@@ -1,6 +1,6 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react";
-import { withClassName, makeRefComponent, withOnClick } from "../higher-order-components";
+import { withClassName, makeRefComponent, withOnClick, withoutClassName } from "../higher-order-components";
 
 const MockComponent = makeRefComponent<HTMLDivElement, { children: string; }>("MockComponent", ({ children }, ref) => {
     return <div ref={ref}>{children}</div>;
@@ -35,7 +35,7 @@ describe("higher-order-components", () => {
         });
 
         test("with 2", () => {
-            const WrappedComponent = withClassName(withClassName(MockComponent, "hello2"), "hello1");
+            const WrappedComponent = withClassName(MockComponent, "hello1", "hello2");
             const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
             const classNames: string[] = [];
             result.classList.forEach((value) => classNames.push(value));
@@ -43,6 +43,40 @@ describe("higher-order-components", () => {
             const expected = ["hello1", "hello2"].sort();
 
             expect(classNames).toStrictEqual(expected);
+        });
+
+        test("multi call", () => {
+            const WrappedComponent = withClassName(withClassName(MockComponent, "hello1"), "hello2");
+            const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
+            const classNames: string[] = [];
+            result.classList.forEach((value) => classNames.push(value));
+            classNames.sort();
+            const expected = ["hello1", "hello2"].sort();
+            expect(classNames).toStrictEqual(expected);
+        });
+    });
+
+    describe("withoutClassName", () => {
+        const MockClassComponent = makeRefComponent<HTMLDivElement, { children: string; }>("MockClassComponent", ({ children }, ref) => {
+            return <div ref={ref} className="class1 class2">{children}</div>;
+        });
+        test("remove 1", () => {
+            const NoClassName = withoutClassName(MockClassComponent, "class1");
+            const result = render(<NoClassName>NoClassName</NoClassName>).getByText("NoClassName");
+            expect(result.classList).toContain("class2");
+            expect(result.classList).not.toContain("class1");
+        });
+
+        test("remove 2", () => {
+            const NoClassName = withoutClassName(MockClassComponent, "class1", "class2");
+            const result = render(<NoClassName>NoClassName</NoClassName>).getByText("NoClassName");
+            expect(result.classList).toHaveLength(0);
+        });
+
+        test("multi call", () => {
+            const NoClassName = withoutClassName(withoutClassName(MockClassComponent, "class1"), "class2");
+            const result = render(<NoClassName>NoClassName</NoClassName>).getByText("NoClassName");
+            expect(result.classList).toHaveLength(0);
         });
     });
 });

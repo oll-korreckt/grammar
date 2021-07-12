@@ -45,6 +45,12 @@ export function withOnClick<TElement extends HTMLElement, TProps>(
 
 export function withClassName<TElement extends HTMLElement, TProps>(
     Component: RefComponent<TElement, TProps>,
-    className: string): RefComponent<TElement, TProps> {
-    return makeRefHoc(Component, "withClassName", (instance) => instance.classList.add(className));
+    ...classNames: string[]): RefComponent<TElement, TProps> {
+    return makeRefHoc(Component, "withClassName", (instance) => instance.classList.add(...classNames));
+}
+
+export function withoutClassName<TElement extends HTMLElement, TProps>(
+    Component: RefComponent<TElement, TProps>,
+    ...classNames: string[]): RefComponent<TElement, TProps> {
+    return makeRefHoc(Component, "withoutClassName", (instance) => instance.classList.remove(...classNames));
 }
