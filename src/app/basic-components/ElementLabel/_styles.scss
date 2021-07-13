@@ -1,0 +1,58 @@
+@use "main";
+
+@function make-border($color) {
+    @return 3px solid $color;
+}
+
+$radius: 13px;
+
+@for $i from 1 through length(main.$colors) {
+    $temp: nth(main.$colors, $i);
+    $main: map-get($temp, "main");
+    $dark: map-get($temp, "dark");
+    $text: map-get($temp, "text");
+
+    .color#{$i}LeftBorder {
+        border-left: make-border($dark);
+        border-top-left-radius: $radius;
+        border-bottom-left-radius: $radius;
+    }
+
+    .color#{$i}RightBorder {
+        border-right: make-border($dark);
+        border-top-right-radius: $radius;
+        border-bottom-right-radius: $radius;
+    }
+
+    .color#{$i}VerticalBorders {
+        border-top: make-border($dark);
+        border-bottom: make-border($dark);
+    }
+
+    .color#{$i}ElementLabel {
+        background-color: $main;
+        color: $text;
+        padding: 3rem;
+        font-size: 5rem;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .color#{$i}HeadElementLabel {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-content: flex-start;
+        flex-shrink: 0;
+        cursor: pointer;
+
+        .color#{$i}HeadElementLabelText {
+            writing-mode: sideways-lr;
+            text-orientation: sideways;
+            text-align: center;
+            background-color: $dark;
+            color: $text;
+        }
+    }
+}
