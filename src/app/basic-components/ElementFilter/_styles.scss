@@ -1,0 +1,55 @@
+$side-length: 100px;
+
+.elementFilter {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+    cursor: pointer;
+}
+
+.display {
+    display: grid;
+    place-items: center;
+    border: 1px solid black;
+    color: black;
+    width: $side-length;
+    height: $side-length;
+}
+
+.icon {
+    font-size: 3rem;
+}
+
+.iconActive {
+    color: black;
+}
+
+.iconInactive {
+    color: grey;
+}
+
+.itemContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.item {
+    text-align: center;
+    color: black;
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    width: $side-length;
+    height: $side-length;
+    display: grid;
+    place-items: center;
+}
+
+.selected {
+    box-shadow: 0 0 25px black inset;
+}
