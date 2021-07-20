@@ -66,17 +66,17 @@ function getTypedItem<T extends ElementType>(state: DiagramState, type: T, id: E
 function getElementReferences<T extends Exclude<ElementType, "word">>(type: T, value: ElementMapper<T>): ElementReference[] {
     const output: ElementReference[] = [];
     const def = getElementDefinition(type);
-    const entries = Object.entries<[boolean, ElementId[]]>(def as any);
+    const entries = Object.entries(def);
     for (let index = 0; index < entries.length; index++) {
         const [key, [isArray]] = entries[index];
         const propValue = (value as any)[key] as undefined | ElementReference | ElementReference[];
         if (propValue === undefined) {
             continue;
         }
-        else if (isArray) {
-            output.push(...(propValue as ElementReference[]));
+        else if (isArrayReference(isArray, propValue)) {
+            output.push(...propValue);
         } else {
-            output.push(propValue as ElementReference);
+            output.push(propValue);
         }
     }
     return output;
@@ -118,16 +118,16 @@ function _createDeleteParentReference(state: DiagramState, childId: ElementId, p
         throw "'word' element type cannot reference other elements";
     }
     const parentDef = getElementDefinition(parent.type);
-    const entries = Object.entries<[boolean, ElementId[]]>(parentDef as any);
+    const entries = Object.entries(parentDef);
     for (let index = 0; index < entries.length; index++) {
         const [key, [isArray]] = entries[index];
         const currValue = (parent.value as any)[key] as undefined | ElementReference | ElementReference[];
         if (currValue === undefined) {
             continue;
         }
-        else if (isArray) {
-            const newValue = (currValue as ElementReference[]).filter((x) => x.id !== childId);
-            if (newValue.length < (currValue as ElementReference[]).length) {
+        else if (isArrayReference(isArray, currValue)) {
+            const newValue = currValue.filter((x) => x.id !== childId);
+            if (newValue.length < currValue.length) {
                 return newValue.length === 0
                     ? AtomicChange.createDelete(
                         ["elements", parentId, "value", key],
@@ -140,7 +140,7 @@ function _createDeleteParentReference(state: DiagramState, childId: ElementId, p
                     );
             }
         } else {
-            if ((currValue as ElementReference).id === childId) {
+            if (currValue.id === childId) {
                 return AtomicChange.createDelete(
                     ["elements", parentId, "value", key],
                     currValue
@@ -184,7 +184,7 @@ function _addReferenceToParent(state: DiagramState, parentId: ElementId, key: st
     const parent = getItem(state, parentId);
     const child = getItem(state, childId);
     const parentChangeKey = ["elements", parentId, "value", key];
-    const [isArray, childTypes] = (getElementDefinition(parent.type as Exclude<ElementType, "word">) as any)[key] as [boolean, ElementId[]];
+    const [isArray, childTypes] = (getElementDefinition(parent.type as Exclude<ElementType, "word">))[key];
     if (!childTypes.includes(child.type)) {
         throw `'${key}' property of '${parent.type}' element is not allowed to reference a '${child.type}' element`;
     }
@@ -201,18 +201,17 @@ function _addReferenceToParent(state: DiagramState, parentId: ElementId, key: st
             newVal
         );
     } else {
-        if (isArray) {
-            const currValArray = currVal as ElementReference[];
-            if (currValArray.map((ref) => ref.id).includes(childId)) {
+        if (isArrayReference(isArray, currVal)) {
+            if (currVal.map((ref) => ref.id).includes(childId)) {
                 throw `'${key}' property of '${parentId}' element of type ${parent.type} already contains a reference to '${childId}' element`;
             }
             return AtomicChange.createSet(
                 parentChangeKey,
                 currVal,
-                [...currValArray, newRef]
+                [...currVal, newRef]
             );
         } else {
-            if ((currVal as ElementReference).id === childId) {
+            if (currVal.id === childId) {
                 throw `'${key}' property of '${parentId}' element of type ${parent.type} already references '${childId}' element`;
             }
             return AtomicChange.createSet(
@@ -251,35 +250,38 @@ function _deleteReferenceFromParent(state: DiagramState, parentId: ElementId, ke
     if (currVal === undefined) {
         throw `element '${parentId}' does not have a '${key}' property`;
     }
-    const [isArray] = (getElementDefinition(parent.type as Exclude<ElementType, "word">) as any)[key] as [boolean, ElementId[]];
-    if (isArray) {
-        const currValArray = currVal as ElementReference[];
-        const newVal = currValArray.filter((ref) => ref.id !== childId);
+    const [isArray] = getElementDefinition(parent.type as Exclude<ElementType, "word">)[key];
+    if (isArrayReference(isArray, currVal)) {
+        const newVal = currVal.filter((ref) => ref.id !== childId);
         // verify currValArray only contained 1 reference to childId
         switch (newVal.length) {
-            case currValArray.length - 1:
+            case currVal.length - 1:
                 // do nothing
                 break;
-            case currValArray.length:
+            case currVal.length:
                 throw `'${key}' of '${parentId}' element does not contain a reference to '${childId}'`;
             default:
                 throw `'${key}' of '${parentId}' element contains multiple references to '${childId}'`;
         }
         if (newVal.length === 0) {
-            return AtomicChange.createDelete(parentChangeKey, currValArray);
+            return AtomicChange.createDelete(parentChangeKey, currVal);
         } else {
             return AtomicChange.createSet(
                 parentChangeKey,
-                currValArray,
+                currVal,
                 newVal
             );
         }
     } else {
-        if ((currVal as ElementReference).id !== childId) {
+        if (currVal.id !== childId) {
             throw `'${key}' of '${parentId}' element does not reference '${childId}'`;
         }
         return AtomicChange.createDelete(parentChangeKey, currVal);
     }
+}
+
+function isArrayReference(isArray: boolean, reference: ElementReference | ElementReference[]): reference is ElementReference[] {
+    return isArray;
 }
 
 function _deleteReferenceFromChild(state: DiagramState, parentId: ElementId, childId: ElementId): AtomicChange {

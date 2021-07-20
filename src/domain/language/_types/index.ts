@@ -369,8 +369,12 @@ const definitionObject: DefinitionObject = {
     coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"])
 };
 
-export function getElementDefinition<T extends Exclude<ElementType, "word">>(type: T): ElementDefinitionMapper<T> {
+export function getTypedElementDefinition<T extends Exclude<ElementType, "word">>(type: T): ElementDefinitionMapper<T> {
     return SimpleObject.clone(definitionObject[type]) as ElementDefinitionMapper<T>;
+}
+
+export function getElementDefinition(type: Exclude<ElementType, "word">): { [key: string]: [boolean, ElementType[]]; } {
+    return getTypedElementDefinition(type) as any;
 }
 
 export type Sentence = FunctionalIndependentClause;
