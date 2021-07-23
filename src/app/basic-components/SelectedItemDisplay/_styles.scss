@@ -1,0 +1,29 @@
+@use "main";
+
+.selectedItemDisplay {
+    display: flex;
+    flex-direction: row;
+}
+
+.button {
+    border: 1px solid black;
+    border-radius: 5px;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    user-select: none;
+    cursor: pointer;
+    padding: 7px;
+    .buttonText {
+        @include main.center-content;
+    }
+    .buttonX {
+        @include main.center-content;
+        margin-left: 5px;
+    }
+}
+
+.arrow {
+    @include main.center-content;
+}
