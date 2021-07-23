@@ -5,3 +5,5 @@ export * from "./hooks";
 export * from "./diagram-state";
 export * from "./history-state";
 export * from "./display-model";
+export * from "./diagram-state-context";
+export * from "./display-model-context";
