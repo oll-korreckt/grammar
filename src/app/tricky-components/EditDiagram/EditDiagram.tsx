@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Colors, DiagramState, DiagramStateContext, DisplayModelContext, withOnClick, accessClassName, ElementSelectNode, SimpleComponent, DiagramStateItem, DisplayModel, makeRefComponent, useOutsideClick, SimpleComponentProps } from "@app/utils";
+import { Colors, DiagramState, DiagramStateContext, DisplayModelContext, withOnClick, accessClassName, ElementSelectNode, SimpleComponent, DiagramStateItem, DisplayModel, makeRefComponent, useOutsideClick, SimpleComponentProps, SelectedElement, isHeadElementSelectNode, isTailElementSelectNode } from "@app/utils";
 import { ElementLabel, withHeadLabel, withSideBorder } from "@app/basic-components";
 import { ElementReference, ElementType, getElementDefinition } from "@domain/language";
 import styles from "./_styles.scss";
@@ -187,9 +187,19 @@ export const EditDiagram: React.VFC = () => {
     const ref = useOutsideClick<HTMLDivElement>(reset);
 
     function labelClickFunction(node: ElementSelectNode) {
-        const baseArray = model.selectedItem === undefined ? [] : model.selectedItem;
-        baseArray.push(node);
-        model.setSelectedItem(baseArray);
+        let newSelectedItem: SelectedElement;
+        if (model.selectedItem === undefined) {
+            if (!isHeadElementSelectNode(node)) {
+                throw "";
+            }
+            newSelectedItem = [node];
+        } else {
+            if (!isTailElementSelectNode(node)) {
+                throw "";
+            }
+            newSelectedItem = [...model.selectedItem, node];
+        }
+        model.setSelectedItem(newSelectedItem);
     }
 
     const items = createDisplayLabels(state, model, labelClickFunction, reset);
