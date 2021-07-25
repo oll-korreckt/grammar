@@ -7,3 +7,4 @@ export * from "./history-state";
 export * from "./display-model";
 export * from "./diagram-state-context";
 export * from "./display-model-context";
+export * from "./element-display-info";
