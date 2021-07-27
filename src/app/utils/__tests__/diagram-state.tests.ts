@@ -1,4 +1,4 @@
-import { AdjectivePhrase, ElementReference } from "@domain/language";
+import { AdjectivePhrase, ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive } from "@domain/language";
 import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
@@ -244,13 +244,13 @@ describe("DiagramState", () => {
         });
     });
 
-    describe("createAddReference", () => {
+    describe("createTypedAddReference", () => {
         test("standard", () => {
             const wordId = state.wordOrder[3];
             const addNoun = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             const nounId = getElementId(addNoun.key);
-            const result = DiagramState.createAddReference(state, "noun", nounId, "words", wordId);
+            const result = DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId);
             const expected = [
                 AtomicChange.createSet(
                     ["elements", nounId, "value", "words"],
@@ -272,7 +272,7 @@ describe("DiagramState", () => {
             const verbPhraseId = getElementId(addVerbPhrase.key);
             state = AtomicChange.apply(state, addVerbPhrase);
             assert.throw(
-                () => DiagramState.createAddReference(state, "verbPhrase", verbPhraseId, "head", wordId),
+                () => DiagramState.createTypedAddReference(state, "verbPhrase", verbPhraseId, "head", wordId),
                 /element is not allowed to reference a/i
             );
         });
@@ -282,9 +282,9 @@ describe("DiagramState", () => {
             const addNoun = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             const nounId = getElementId(addNoun.key);
-            state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "noun", nounId, "words", wordId));
+            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             assert.throw(
-                () => DiagramState.createAddReference(state, "noun", nounId, "words", wordId),
+                () => DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId),
                 /already contains a reference to/i
             );
         });
@@ -296,22 +296,22 @@ describe("DiagramState", () => {
             const addVerbPhrase = DiagramState.createAddItem("verbPhrase");
             state = AtomicChange.apply(state, addVerbPhrase);
             const verbPhraseId = getElementId(addVerbPhrase.key);
-            state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "verbPhrase", verbPhraseId, "head", verbId));
+            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "verbPhrase", verbPhraseId, "head", verbId));
             assert.throw(
-                () => DiagramState.createAddReference(state, "verbPhrase", verbPhraseId, "head", verbId),
+                () => DiagramState.createTypedAddReference(state, "verbPhrase", verbPhraseId, "head", verbId),
                 /already references/i
             );
         });
     });
 
-    describe("createDeleteReference", () => {
+    describe("createTypedDeleteReference", () => {
         test("standard", () => {
             const wordId = state.wordOrder[3];
             const addNoun = DiagramState.createAddItem("noun");
             const nounId = getElementId(addNoun.key);
             state = AtomicChange.apply(state, addNoun);
-            state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "noun", nounId, "words", wordId));
-            const result = DiagramState.createDeleteReference(state, "noun", nounId, "words", wordId);
+            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
+            const result = DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", wordId);
             const expected = [
                 AtomicChange.createDelete(
                     ["elements", nounId, "value", "words"],
@@ -330,7 +330,7 @@ describe("DiagramState", () => {
             const nounId = getElementId(addNoun.key);
             state = AtomicChange.apply(state, addNoun);
             assert.throw(
-                () => DiagramState.createDeleteReference(state, "noun", nounId, "words", ""),
+                () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", ""),
                 /does not have a 'words' property/i
             );
         });
@@ -339,9 +339,9 @@ describe("DiagramState", () => {
             const addNoun = DiagramState.createAddItem("noun");
             const nounId = getElementId(addNoun.key);
             state = AtomicChange.apply(state, addNoun);
-            state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "noun", nounId, "words", state.wordOrder[3]));
+            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", state.wordOrder[3]));
             assert.throw(
-                () => DiagramState.createDeleteReference(state, "noun", nounId, "words", state.wordOrder[8]),
+                () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", state.wordOrder[8]),
                 /element does not contain a reference/i
             );
         });
@@ -351,7 +351,7 @@ describe("DiagramState", () => {
             const addNoun = DiagramState.createAddItem("noun");
             const nounId = getElementId(addNoun.key);
             state = AtomicChange.apply(state, addNoun);
-            state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "noun", nounId, "words", wordId));
+            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             state = AtomicChange.apply(state, AtomicChange.createSet(
                 ["elements", wordId, "ref"],
                 DiagramState.getItem(state, wordId).ref,
@@ -367,7 +367,7 @@ describe("DiagramState", () => {
                 [...words, { id: wordId, type: "word" }]
             ));
             assert.throw(
-                () => DiagramState.createDeleteReference(state, "noun", nounId, "words", wordId),
+                () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", wordId),
                 /element contains multiple/i
             );
         });
@@ -388,7 +388,7 @@ describe("DiagramState", () => {
                 }
             ));
             assert.throw(
-                () => DiagramState.createDeleteReference(state, "verbPhrase", addVerbPhraseId, "head", addVerbId),
+                () => DiagramState.createTypedDeleteReference(state, "verbPhrase", addVerbPhraseId, "head", addVerbId),
                 /element does not reference/i
             );
         });
@@ -398,14 +398,306 @@ describe("DiagramState", () => {
             const addNoun = DiagramState.createAddItem("noun");
             const nounId = getElementId(addNoun.key);
             state = AtomicChange.apply(state, addNoun);
-            state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "noun", nounId, "words", wordId));
+            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             state = AtomicChange.apply(state, AtomicChange.createDelete(
                 ["elements", wordId, "ref"],
                 DiagramState.getItem(state, wordId).ref
             ));
             assert.throw(
-                () => DiagramState.createDeleteReference(state, "noun", nounId, "words", wordId),
+                () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", wordId),
                 /is not referenced by/i
+            );
+        });
+    });
+
+    describe("setReference + setTypedReference", () => {
+        const catsId = "cats";
+        const dogsId = "dogs";
+        const miceId = "mice";
+        const andId = "and";
+        const menId = "men";
+        const catsNounId = "catsNoun";
+        const dogsNounId = "dogsNoun";
+        const miceNounId = "miceNoun";
+        const andCoordId = "andCoord";
+        const menNounId = "menNoun";
+        const coordNounId = "coordNoun";
+        let setRefState: DiagramState;
+        beforeEach(() => {
+            const catsWord: Word = {
+                id: catsId,
+                lexeme: "Cats,"
+            };
+            const dogsWord: Word = {
+                id: dogsId,
+                lexeme: "dogs,"
+            };
+            const miceWord: Word = {
+                id: miceId,
+                lexeme: "mice,"
+            };
+            const andWord: Word = {
+                id: andId,
+                lexeme: "and"
+            };
+            const menWord: Word = {
+                id: menId,
+                lexeme: "men"
+            };
+            const catsNoun: Noun = {
+                id: catsNounId,
+                posType: "noun",
+                words: [{
+                    id: catsId,
+                    type: "word"
+                }]
+            };
+            const dogsNoun: Noun = {
+                id: dogsNounId,
+                posType: "noun",
+                words: [{
+                    id: dogsNounId,
+                    type: "word"
+                }]
+            };
+            const miceNoun: Noun = {
+                id: miceNounId,
+                posType: "noun",
+                words: [{
+                    id: miceNounId,
+                    type: "word"
+                }]
+            };
+            const andCoord: Coordinator = {
+                id: andCoordId,
+                posType: "coordinator",
+                words: [{
+                    id: andCoordId,
+                    type: "word"
+                }]
+            };
+            const menNoun: Noun = {
+                id: menNounId,
+                posType: "noun",
+                words: [{
+                    id: menId,
+                    type: "word"
+                }]
+            };
+            const coordNoun: ElementMapper<"coordinatedNoun"> = {
+                id: coordNounId,
+                posType: "noun",
+                itemType: "noun",
+                coordinator: {
+                    id: andCoordId,
+                    type: "coordinator"
+                },
+                items: [
+                    {
+                        id: catsNounId,
+                        type: "noun"
+                    },
+                    {
+                        id: dogsNounId,
+                        type: "noun"
+                    },
+                    {
+                        id: miceNounId,
+                        type: "noun"
+                    },
+                    {
+                        id: menNounId,
+                        type: "noun"
+                    }
+                ]
+            };
+            setRefState = {
+                wordOrder: [catsId, dogsId, miceId, andId, menId],
+                elements: {
+                    [catsId]: {
+                        type: "word",
+                        value: catsWord,
+                        ref: catsNounId
+                    },
+                    [dogsId]: {
+                        type: "word",
+                        value: dogsWord,
+                        ref: dogsNounId
+                    },
+                    [miceId]: {
+                        type: "word",
+                        value: miceWord,
+                        ref: miceNounId
+                    },
+                    [andId]: {
+                        type: "word",
+                        value: andWord,
+                        ref: andCoordId
+                    },
+                    [menId]: {
+                        type: "word",
+                        value: menWord,
+                        ref: menNounId
+                    },
+                    [catsNounId]: {
+                        type: "noun",
+                        value: catsNoun,
+                        ref: coordNounId
+                    },
+                    [dogsNounId]: {
+                        type: "noun",
+                        value: dogsNoun,
+                        ref: coordNounId
+                    },
+                    [miceNounId]: {
+                        type: "noun",
+                        value: miceNoun,
+                        ref: coordNounId
+                    },
+                    [andCoordId]: {
+                        type: "coordinator",
+                        value: andCoord,
+                        ref: coordNounId
+                    },
+                    [menNounId]: {
+                        type: "noun",
+                        value: menNoun,
+                        ref: coordNounId
+                    },
+                    [coordNounId]: {
+                        type: "coordinatedNoun",
+                        value: coordNoun
+                    }
+                }
+            };
+        });
+
+        test("delete all -> add all", () => {
+            // delete
+            let changes = DiagramState.setTypedReference(setRefState, "coordinatedNoun", coordNounId, "items", undefined);
+            setRefState = AtomicChange.apply(setRefState, ...changes);
+            const ids = [
+                catsNounId,
+                dogsNounId,
+                miceNounId,
+                menNounId
+            ];
+            ids.forEach((id) => assert.isUndefined(setRefState.elements[id].ref));
+            assert.isUndefined((setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).items);
+            // add
+            const newRefs: ElementReference<"noun">[] = [
+                { id: catsNounId, type: "noun" },
+                { id: dogsNounId, type: "noun" },
+                { id: miceNounId, type: "noun" },
+                { id: menNounId, type: "noun" }
+            ];
+            changes = DiagramState.setTypedReference(setRefState, "coordinatedNoun", coordNounId, "items", newRefs);
+            setRefState = AtomicChange.apply(setRefState, ...changes);
+            ids.forEach((id) => assert.strictEqual(setRefState.elements[id].ref, coordNounId));
+            assert.deepStrictEqual((setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).items, newRefs);
+        });
+
+        test("partial delete -> partial add", () => {
+            // partial delete
+            const oldRefs = (setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).items;
+            if (oldRefs === undefined) {
+                assert.fail();
+            }
+            const newRefs = oldRefs.filter((x) => x.id !== menNounId);
+            let changes = DiagramState.setTypedReference(setRefState, "coordinatedNoun", coordNounId, "items", newRefs);
+            setRefState = AtomicChange.apply(setRefState, ...changes);
+            assert.isUndefined(setRefState.elements[menNounId].ref);
+            newRefs.forEach((x) => assert.strictEqual(setRefState.elements[x.id].ref, coordNounId));
+            assert.deepStrictEqual((setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).items, newRefs);
+            // partial add
+            changes = DiagramState.setTypedReference(setRefState, "coordinatedNoun", coordNounId, "items", oldRefs);
+            setRefState = AtomicChange.apply(setRefState, ...changes);
+            oldRefs.forEach((x) => assert.strictEqual(setRefState.elements[x.id].ref, coordNounId));
+            assert.deepStrictEqual((setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).items, oldRefs);
+        });
+
+        test("delete single -> add single", () => {
+            // delete
+            let changes = DiagramState.setTypedReference(setRefState, "coordinatedNoun", coordNounId, "coordinator", undefined);
+            setRefState = AtomicChange.apply(setRefState, ...changes);
+            assert.isUndefined(setRefState.elements[andCoordId].ref);
+            assert.isUndefined((setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).coordinator);
+            // add
+            const newRef: ElementReference<"coordinator"> = { id: andCoordId, type: "coordinator" };
+            changes = DiagramState.setTypedReference(setRefState, "coordinatedNoun", coordNounId, "coordinator", newRef);
+            setRefState = AtomicChange.apply(setRefState, ...changes);
+            assert.strictEqual(setRefState.elements[andCoordId].ref, coordNounId);
+            assert.deepStrictEqual((setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).coordinator, newRef);
+        });
+
+        test("replace value", () => {
+            const to1Id = "to1";
+            const to2Id = "to2";
+            const to1Word: Word = {
+                id: to1Id,
+                lexeme: "to"
+            };
+            const to2Word: Word = {
+                id: to2Id,
+                lexeme: "to"
+            };
+            const infId = "inf";
+            const inf: Infinitive = {
+                id: infId,
+                posType: "infinitive",
+                to: { id: to1Id, type: "word" }
+            };
+            let testState: DiagramState = {
+                wordOrder: [to1Id, to2Id],
+                elements: {
+                    [to1Id]: {
+                        type: "word",
+                        value: to1Word,
+                        ref: infId
+                    },
+                    [to2Id]: {
+                        type: "word",
+                        value: to2Word
+                    },
+                    [infId]: {
+                        type: "infinitive",
+                        value: inf
+                    }
+                }
+            };
+            const changes = DiagramState.setTypedReference(testState, "infinitive", infId, "to", { id: to2Id, type: "word" });
+            testState = AtomicChange.apply(testState, ...changes);
+            assert.isUndefined(testState.elements[to1Id].ref);
+            assert.strictEqual(testState.elements[to2Id].ref, infId);
+            assert.deepStrictEqual((testState.elements[infId].value as Infinitive).to, { id: to2Id, type: "word" });
+        });
+
+        test("error - wrong type", () => {
+            assert.throw(
+                () => DiagramState.setReference(setRefState, "noun", coordNounId, "words", undefined),
+                /does not have type/i
+            );
+        });
+
+        test("error - both undefined", () => {
+            delete (setRefState.elements[coordNounId].value as ElementMapper<"coordinatedNoun">).items;
+            assert.throw(
+                () => DiagramState.setReference(setRefState, "coordinatedNoun", coordNounId, "items", undefined),
+                /cannot both be undefined/i
+            );
+        });
+
+        test("error - expected array", () => {
+            assert.throw(
+                () => DiagramState.setReference(setRefState, "coordinatedNoun", coordNounId, "items", { id: dogsNounId, type: "noun" }),
+                /expected array/i
+            );
+        });
+
+        test("error - expected value", () => {
+            assert.throw(
+                () => DiagramState.setReference(setRefState, "coordinatedNoun", coordNounId, "coordinator", [{ id: dogsNounId, type: "noun" }]),
+                /expected value/i
             );
         });
     });

@@ -1,6 +1,7 @@
 import { SerialId } from "@app/tricky-components/serial-id";
 import { ElementDefinitionMapper, ElementId, ElementMapper, ElementReference, ElementType, getElementDefinition, Identifiable, scan, Word } from "@domain/language";
 import { initElement } from "@domain/language/element-init";
+import { DefinitionMapper } from "@domain/language/_types/utils";
 import { AtomicChange } from "@lib/utils";
 
 export type DiagramStateItem = {
@@ -237,7 +238,11 @@ function _addReferenceToChild(state: DiagramState, childId: ElementId, parentId:
     return output;
 }
 
-function createAddReference<TElementType extends Exclude<ElementType, "word">, TKey extends keyof ElementDefinitionMapper<TElementType>>(state: DiagramState, parentType: TElementType, parentId: ElementId, key: TKey, childId: ElementId): AtomicChange[] {
+function createTypedAddReference<TElementType extends Exclude<ElementType, "word">, TKey extends keyof ElementDefinitionMapper<TElementType>>(state: DiagramState, parentType: TElementType, parentId: ElementId, key: TKey, childId: ElementId): AtomicChange[] {
+    return createAddReference(state, parentType, parentId, key as string, childId);
+}
+
+function createAddReference(state: DiagramState, parentType: Exclude<ElementType, "word">, parentId: ElementId, key: string, childId: ElementId): AtomicChange[] {
     const parentChange = _addReferenceToParent(state, parentId, key as string, childId);
     const childChange = _addReferenceToChild(state, childId, parentId);
     return [parentChange, ...childChange];
@@ -295,10 +300,111 @@ function _deleteReferenceFromChild(state: DiagramState, parentId: ElementId, chi
     );
 }
 
-function createDeleteReference<TElementType extends Exclude<ElementType, "word">, TKey extends keyof ElementDefinitionMapper<TElementType>>(state: DiagramState, parentType: TElementType, parentId: ElementId, key: TKey, childId: ElementId): AtomicChange[] {
-    const parentChange = _deleteReferenceFromParent(state, parentId, key as string, childId);
+function createTypedDeleteReference<TElementType extends Exclude<ElementType, "word">, TKey extends keyof ElementDefinitionMapper<TElementType>>(state: DiagramState, parentType: TElementType, parentId: ElementId, key: TKey, childId: ElementId): AtomicChange[] {
+    return createDeleteReference(state, parentType, parentId, key as string, childId);
+}
+
+function createDeleteReference(state: DiagramState, parentType: Exclude<ElementType, "word">, parentId: ElementId, key: string, childId: ElementId): AtomicChange[] {
+    if (getElementDefinition(parentType)[key] === undefined) {
+        throw `key '${key}' does not exist on type '${parentType}'`;
+    }
+    const parentChange = _deleteReferenceFromParent(state, parentId, key, childId);
     const childChange = _deleteReferenceFromChild(state, parentId, childId);
     return [parentChange, childChange];
+}
+
+function _getDifference(currValue: undefined | ElementReference[], newValue: undefined | ElementReference[]): { delete: boolean[]; add: boolean[]; } {
+    const cvPresent = 1 << 0;
+    const nvPresent = 1 << 1;
+    let state = 0;
+    if (currValue !== undefined) {
+        state |= cvPresent;
+    }
+    if (newValue !== undefined) {
+        state |= nvPresent;
+    }
+    switch (state) {
+        case cvPresent:
+            // delete cv
+            return {
+                delete: (currValue as ElementReference[]).map(() => true),
+                add: []
+            };
+        case nvPresent:
+            // add all values from nv
+            return {
+                delete: [],
+                add: (newValue as ElementReference[]).map(() => true)
+            };
+        case cvPresent | nvPresent:
+            const currValIds = (currValue as ElementReference[]).map((x) => x.id);
+            const newValIds = (newValue as ElementReference[]).map((x) => x.id);
+            return {
+                delete: currValIds.map((x) => !newValIds.includes(x)),
+                add: newValIds.map((x) => !currValIds.includes(x))
+            };
+        case 0:
+        default:
+            throw "Unexpected state. The current value and new value cannot both be undefined";
+    }
+}
+
+function _checkNewValueDataType(newValue: undefined | ElementReference | ElementReference[], isArray: boolean, elementTypes: ElementType[]): undefined | ElementReference[] {
+    if (newValue !== undefined) {
+        const actual = Array.isArray(newValue);
+        if (isArray !== actual) {
+            throw isArray
+                ? "Expected array. Received value."
+                : "Expected value. Received array.";
+        }
+        const refArray = isArrayReference(isArray, newValue) ? newValue : [newValue];
+        refArray.forEach((ref) => {
+            if (!elementTypes.includes(ref.type)) {
+                throw `${ref.id}`;
+            }
+        });
+        return refArray;
+    }
+}
+
+function setTypedReference<TParentType extends Exclude<ElementType, "word">, TKey extends keyof ElementDefinitionMapper<TParentType>>(state: DiagramState, parentType: TParentType, parentId: ElementId, key: TKey, newValue: DefinitionMapper<ElementDefinitionMapper<TParentType>[TKey]>): AtomicChange[] {
+    return setReference(
+        state,
+        parentType,
+        parentId, key as string,
+        newValue as unknown as undefined | ElementReference | ElementReference[]
+    );
+}
+
+function setReference(state: DiagramState, parentType: Exclude<ElementType, "word">, parentId: ElementId, key: string, newValue: undefined | ElementReference | ElementReference[]): AtomicChange[] {
+    const [isArray, elementTypes] = getElementDefinition(parentType)[key];
+    const newValueArray = _checkNewValueDataType(newValue, isArray, elementTypes);
+    const currValue = (getTypedItem(state, parentType, parentId).value as any)[key] as typeof newValue;
+    const currValueArray = currValue == undefined
+        ? currValue
+        : isArrayReference(isArray, currValue) ? currValue : [currValue];
+    const diff = _getDifference(currValueArray, newValueArray);
+    const output: AtomicChange[] = [];
+    for (let index = 0; index < diff.delete.length; index++) {
+        if (diff.delete[index]) {
+            const { id } = (currValueArray as ElementReference[])[index];
+            const deleteChg = _deleteReferenceFromChild(state, parentId, id);
+            output.push(deleteChg);
+        }
+    }
+    for (let index = 0; index < diff.add.length; index++) {
+        if (diff.add[index]) {
+            const { id } = (newValueArray as ElementReference[])[index];
+            const addChg = _addReferenceToChild(state, id, parentId);
+            output.push(...addChg);
+        }
+    }
+    const changeKey = ["elements", parentId, "value", key];
+    const parentChg = newValue === undefined
+        ? AtomicChange.createDelete(changeKey, currValue)
+        : AtomicChange.createSet(changeKey, currValue, newValue);
+    output.push(parentChg);
+    return output;
 }
 
 export const DiagramState = {
@@ -311,5 +417,9 @@ export const DiagramState = {
     createAddItem: createAddItem,
     createDeleteItem: createDeleteItem,
     createAddReference: createAddReference,
-    createDeleteReference: createDeleteReference
+    createTypedAddReference: createTypedAddReference,
+    createDeleteReference: createDeleteReference,
+    createTypedDeleteReference: createTypedDeleteReference,
+    setTypedReference: setTypedReference,
+    setReference: setReference
 };
