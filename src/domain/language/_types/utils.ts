@@ -57,8 +57,9 @@ export interface ElementReference<TElementType extends ElementType = ElementType
 
 export type ReferencingElementDefinition<Keys extends string> = Record<Keys, [boolean, ElementType[]]>;
 export type ReferencingElement<Type> = {
-    [Key in keyof Type]?: Type[Key] extends [boolean, ElementType[]] ? (Type[Key][0] extends true ? ElementReference<Type[Key][1][number]>[] : ElementReference<Type[Key][1][number]>) : never;
+    [Key in keyof Type]?: DefinitionMapper<Type[Key]>;
 }
+export type DefinitionMapper<Type> = undefined | (Type extends [boolean, ElementType[]] ? (Type[0] extends true ? ElementReference<Type[1][number]>[] : ElementReference<Type[1][number]>) : never);
 
 export interface Word extends Identifiable {
     lexeme: string;
