@@ -1,10 +1,10 @@
-import { createContext } from "react";
+import { createContext, Dispatch, SetStateAction } from "react";
 import { DiagramState } from "./diagram-state";
 import { HistoryState } from "./history-state";
 
 export interface DiagramStateContext {
     state: HistoryState<DiagramState>;
-    setState: (newState: HistoryState<DiagramState>) => void;
+    setState: Dispatch<SetStateAction<HistoryState<DiagramState>>>;
 }
 
 export const DiagramStateContext = createContext<DiagramStateContext>({
