@@ -10,6 +10,8 @@ export type Rect = {
     height: number;
 }
 
+export type PartialRect = Pick<Rect, "width" | "height">;
+
 function init(domRect: DOMRect): Rect {
     return {
         top: domRect.top,
