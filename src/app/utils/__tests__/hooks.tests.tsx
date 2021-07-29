@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useOutsideClick } from "../hooks";
+import { useClientRect, useOutsideClick } from "../hooks";
 
 const MockComponent: React.VFC<{ onClick: () => void; }> = ({ onClick }) => {
     const ref = useOutsideClick<HTMLDivElement>(onClick);
@@ -10,6 +10,12 @@ const MockComponent: React.VFC<{ onClick: () => void; }> = ({ onClick }) => {
             <div>Outside click</div>
         </>
     );
+};
+
+const CRComponent: React.VFC = () => {
+    const [rect, ref] = useClientRect<HTMLDivElement>();
+    const text = rect === undefined ? undefined : `top: ${rect.top} left: ${rect.left}`;
+    return <div data-testid="yo" ref={ref}>{text}</div>;
 };
 
 describe("hooks", () => {
@@ -30,5 +36,10 @@ describe("hooks", () => {
             fireEvent.mouseDown(screen.getByText(/outside/i));
             expect(callback).toBeCalledTimes(1);
         });
+    });
+
+    test("useClientRect", () => {
+        const result = render(<CRComponent />).getByTestId("yo");
+        expect(result.textContent).not.toBeUndefined();
     });
 });
