@@ -1,6 +1,6 @@
 import { Rect, PartialRect } from "@app/utils";
+import { placeMenu } from "../withContextMenu";
 import { assert } from "chai";
-import { placeMenu } from "../utils";
 
 describe("utils", () => {
     describe("placeMenu", () => {
