@@ -1,0 +1,45 @@
+@use "main";
+
+@for $i from 1 through length(main.$colors) {
+    $temp: nth(main.$colors, $i);
+    $main: map-get($temp, "main");
+    $dark: map-get($temp, "dark");
+    $text: map-get($temp, "text");
+
+    .color#{$i} {
+        border: 3px solid $dark;
+        background-color: $main;
+        color: $text;
+    }
+    .color#{$i}Dark {
+        background-color: $dark;
+    }
+}
+
+.item {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border-radius: 5px;
+    user-select: none;
+    cursor: pointer;
+
+    .head {
+        @include main.center-content;
+        writing-mode: sideways-lr;
+        text-orientation: sideways;
+        text-align: center;
+        font-size: 10px;
+    }
+    .text {
+        @include main.center-content;
+        padding: 5px;
+        white-space: nowrap;
+    }
+    .icon {
+        @include main.center-content;
+        padding-right: 5px;
+    }
+}
