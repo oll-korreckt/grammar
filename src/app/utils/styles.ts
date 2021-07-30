@@ -30,6 +30,10 @@ export function accessClassName(styles: Styles, ...classNames: string[]): string
     return output;
 }
 
+export function appendClassName(className: string, styles: Styles, newClassName: string): string {
+    return `${className} ${getClassName(styles, newClassName)}`;
+}
+
 function getClassName(styles: Styles, className: string): string {
     const output = styles[className];
     if (output === undefined) {

@@ -1,5 +1,5 @@
 import styles from "./_styles.scss";
-import { accessClassName } from "../styles";
+import { accessClassName, appendClassName } from "../styles";
 import { assert } from "chai";
 
 describe("styles", () => {
@@ -21,6 +21,21 @@ describe("styles", () => {
 
         test("error - does not exist", () => {
             assert.throw(() => accessClassName(styles, "does not exist"), /does not exist/i);
+        });
+    });
+
+    describe("appendClassName", () => {
+        test("standard", () => {
+            const input = accessClassName(styles, "className1");
+            const result = appendClassName(input, styles, "className2");
+            assert.strictEqual(result, "className1 className2");
+        });
+
+        test("error - does not exist", () => {
+            assert.throw(
+                () => appendClassName("", styles, "does not exist"),
+                /does not exist/i
+            );
         });
     });
 });
