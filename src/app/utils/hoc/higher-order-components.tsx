@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import React from "react";
 
-export type RefComponent<TElement extends HTMLElement, TProps> = React.ForwardRefExoticComponent<React.PropsWithoutRef<TProps> & React.RefAttributes<TElement>>;
+export type RefComponent<TElement extends HTMLElement, TProps = {}> = React.ForwardRefExoticComponent<React.PropsWithoutRef<TProps> & React.RefAttributes<TElement>>;
 type Action<TElement extends HTMLElement, TProps> = (props: TProps, instance: TElement) => void;
 
-export function makeRefComponent<TElement extends HTMLElement, TProps>(displayName: string, render: React.ForwardRefRenderFunction<TElement, TProps>): RefComponent<TElement, TProps> {
+export function makeRefComponent<TElement extends HTMLElement, TProps = {}>(displayName: string, render: React.ForwardRefRenderFunction<TElement, TProps>): RefComponent<TElement, TProps> {
     const output = React.forwardRef(render);
     output.displayName = displayName;
     return output;
