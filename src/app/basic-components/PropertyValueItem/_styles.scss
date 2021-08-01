@@ -17,11 +17,8 @@
 }
 
 .item {
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+    display: inline-grid;
+    grid-template-columns: auto auto auto;
     border-radius: 5px;
     user-select: none;
     cursor: pointer;
@@ -40,6 +37,6 @@
     }
     .icon {
         @include main.center-content;
-        padding-right: 5px;
+        padding: 5px;
     }
 }
