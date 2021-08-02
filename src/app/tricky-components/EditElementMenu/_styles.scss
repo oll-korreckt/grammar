@@ -1,0 +1,49 @@
+@use "main";
+
+.editElementMenu {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: min-content auto;
+}
+
+.editElementMenuTitle {
+    display: block;
+    font-size: x-large;
+}
+
+.menuItemList {
+    display: grid;
+    grid-auto-rows: 3rem;
+}
+
+.menuItem {
+    display: grid;
+    grid-template-columns: 10rem auto;
+    column-gap: 5px;
+}
+
+.propertyLabel {
+    display: grid;
+    grid-template-columns: auto 2rem;
+    column-gap: 5px;
+
+    .propertyLabelText {
+        display: grid;
+        align-items: center;
+        text-align: right;
+    }
+    .propertyLabelAdd {
+        @include main.center-content;
+        font-size: 2rem;
+        cursor: pointer;
+    }
+}
+
+.propertyValues {
+    display: flex;
+    align-items: center;
+}
+
+.redText {
+    color: red;
+}
