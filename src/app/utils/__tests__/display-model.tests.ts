@@ -1,370 +1,247 @@
-import { ElementId } from "@domain/language";
-import { AtomicChange } from "@lib/utils";
+import { createState, Ids } from "@app/testing";
+import { ElementType } from "@domain/language";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
-import { DisplayModel } from "../display-model";
+import { DisplayModel, TypedDisplayModelElement, WordIndices, _appendWord } from "../display-model";
 
-function getElementId(change: AtomicChange): ElementId {
-    return change.key[1] as string;
+function createElement<Type extends ElementType>(type: Type, element: TypedDisplayModelElement<Type>): TypedDisplayModelElement<Type> {
+    return element;
 }
 
 describe("DisplayModel", () => {
     let state: DiagramState;
-    let theDet1: AtomicChange;
-    let quickBrownAdj: AtomicChange;
-    let foxNoun: AtomicChange;
-    let jumpsVerb: AtomicChange;
-    let overPrep: AtomicChange;
-    let theDet2: AtomicChange;
-    let lazyAdj: AtomicChange;
-    let dogNoun: AtomicChange;
-    let adjPhrase1: AtomicChange;
-    let nounPhrase1: AtomicChange;
-    let verbPhrase: AtomicChange;
-    let prepPhrase: AtomicChange;
-    let adjPhrase2: AtomicChange;
-    let nounPhrase2: AtomicChange;
-    let indClause: AtomicChange;
     beforeAll(() => {
-        state = DiagramState.fromText("The quick brown fox jumps over the lazy dog.");
-        theDet1 = DiagramState.createAddItem("determiner");
-        quickBrownAdj = DiagramState.createAddItem("adjective");
-        foxNoun = DiagramState.createAddItem("noun");
-        jumpsVerb = DiagramState.createAddItem("verb");
-        overPrep = DiagramState.createAddItem("preposition");
-        theDet2 = DiagramState.createAddItem("determiner");
-        lazyAdj = DiagramState.createAddItem("adjective");
-        dogNoun = DiagramState.createAddItem("noun");
-        state = AtomicChange.apply(
-            state,
-            theDet1,
-            quickBrownAdj,
-            foxNoun,
-            jumpsVerb,
-            overPrep,
-            theDet2,
-            lazyAdj,
-            dogNoun
-        );
-        state = AtomicChange.apply(
-            state,
-            ...DiagramState.createAddReference(
-                state,
-                "determiner",
-                getElementId(theDet1),
-                "words",
-                state.wordOrder[0]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "adjective",
-                getElementId(quickBrownAdj),
-                "words",
-                state.wordOrder[1]
-            )
-        );
-        state = AtomicChange.apply(
-            state,
-            ...DiagramState.createAddReference(
-                state,
-                "adjective",
-                getElementId(quickBrownAdj),
-                "words",
-                state.wordOrder[2]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "noun",
-                getElementId(foxNoun),
-                "words",
-                state.wordOrder[3]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "verb",
-                getElementId(jumpsVerb),
-                "mainVerb",
-                state.wordOrder[4]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "preposition",
-                getElementId(overPrep),
-                "words",
-                state.wordOrder[5]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "determiner",
-                getElementId(theDet2),
-                "words",
-                state.wordOrder[6]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "adjective",
-                getElementId(lazyAdj),
-                "words",
-                state.wordOrder[7]
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "noun",
-                getElementId(dogNoun),
-                "words",
-                state.wordOrder[8]
-            )
-        );
-        adjPhrase1 = DiagramState.createAddItem("adjectivePhrase");
-        nounPhrase1 = DiagramState.createAddItem("nounPhrase");
-        verbPhrase = DiagramState.createAddItem("verbPhrase");
-        prepPhrase = DiagramState.createAddItem("prepositionPhrase");
-        adjPhrase2 = DiagramState.createAddItem("adjectivePhrase");
-        nounPhrase2 = DiagramState.createAddItem("nounPhrase");
-        state = AtomicChange.apply(
-            state,
-            adjPhrase1,
-            nounPhrase1,
-            verbPhrase,
-            prepPhrase,
-            adjPhrase2,
-            nounPhrase2
-        );
-        state = AtomicChange.apply(
-            state,
-            ...DiagramState.createAddReference(
-                state,
-                "adjectivePhrase",
-                getElementId(adjPhrase1),
-                "determiner",
-                getElementId(theDet1)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "adjectivePhrase",
-                getElementId(adjPhrase1),
-                "head",
-                getElementId(quickBrownAdj)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "nounPhrase",
-                getElementId(nounPhrase1),
-                "head",
-                getElementId(foxNoun)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "nounPhrase",
-                getElementId(nounPhrase1),
-                "modifiers",
-                getElementId(adjPhrase1)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "verbPhrase",
-                getElementId(verbPhrase),
-                "head",
-                getElementId(jumpsVerb)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "verbPhrase",
-                getElementId(verbPhrase),
-                "headModifier",
-                getElementId(prepPhrase)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "prepositionPhrase",
-                getElementId(prepPhrase),
-                "head",
-                getElementId(overPrep)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "prepositionPhrase",
-                getElementId(prepPhrase),
-                "object",
-                getElementId(nounPhrase2)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "adjectivePhrase",
-                getElementId(adjPhrase2),
-                "determiner",
-                getElementId(theDet2)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "adjectivePhrase",
-                getElementId(adjPhrase2),
-                "head",
-                getElementId(lazyAdj)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "nounPhrase",
-                getElementId(nounPhrase2),
-                "head",
-                getElementId(dogNoun)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "nounPhrase",
-                getElementId(nounPhrase2),
-                "modifiers",
-                getElementId(adjPhrase2)
-            )
-        );
-        indClause = DiagramState.createAddItem("independentClause");
-        state = AtomicChange.apply(state, indClause);
-        state = AtomicChange.apply(
-            state,
-            ...DiagramState.createAddReference(
-                state,
-                "independentClause",
-                getElementId(indClause),
-                "subject",
-                getElementId(nounPhrase1)
-            ),
-            ...DiagramState.createAddReference(
-                state,
-                "independentClause",
-                getElementId(indClause),
-                "predicate",
-                getElementId(verbPhrase)
-            )
-        );
+        state = createState();
+    });
+
+    describe("_appendWord", () => {
+        test("empty array", () => {
+            const input: WordIndices = [];
+            _appendWord(input, 5);
+            assert.deepStrictEqual(input, [5]);
+        });
+        test("1 entry - adjacent", () => {
+            const input: WordIndices = [5];
+            _appendWord(input, 6);
+            assert.deepStrictEqual(input, [[5, 6]]);
+        });
+        test("1 entry - non adjacent", () => {
+            const input: WordIndices = [5];
+            _appendWord(input, 7);
+            assert.deepStrictEqual(input, [5, 7]);
+        });
+        test("range entry - adjacent", () => {
+            const input: WordIndices = [[5, 6]];
+            _appendWord(input, 7);
+            assert.deepStrictEqual(input, [[5, 7]]);
+        });
+        test("range entry - non adjacent", () => {
+            const input: WordIndices = [[5, 6]];
+            _appendWord(input, 8);
+            assert.deepStrictEqual(input, [[5, 6], 8]);
+        });
     });
 
     test("init - 1", () => {
         const result = DisplayModel.init(state);
         const expected: DisplayModel = {
-            word: state.wordOrder,
-            partOfSpeech: [
-                getElementId(theDet1),
-                getElementId(quickBrownAdj),
-                getElementId(foxNoun),
-                getElementId(jumpsVerb),
-                getElementId(overPrep),
-                getElementId(theDet2),
-                getElementId(lazyAdj),
-                getElementId(dogNoun)
-            ],
-            phrase: [
-                getElementId(adjPhrase1),
-                getElementId(nounPhrase1),
-                getElementId(verbPhrase),
-                getElementId(prepPhrase),
-                getElementId(adjPhrase2),
-                getElementId(nounPhrase2)
-            ],
-            clause: [getElementId(indClause)],
-            elements: {
-                [state.wordOrder[0]]: {
-                    category: "word",
-                    words: [0]
-                },
-                [state.wordOrder[1]]: {
-                    category: "word",
-                    words: [1]
-                },
-                [state.wordOrder[2]]: {
-                    category: "word",
-                    words: [2]
-                },
-                [state.wordOrder[3]]: {
-                    category: "word",
-                    words: [3]
-                },
-                [state.wordOrder[4]]: {
-                    category: "word",
-                    words: [4]
-                },
-                [state.wordOrder[5]]: {
-                    category: "word",
-                    words: [5]
-                },
-                [state.wordOrder[6]]: {
-                    category: "word",
-                    words: [6]
-                },
-                [state.wordOrder[7]]: {
-                    category: "word",
-                    words: [7]
-                },
-                [state.wordOrder[8]]: {
-                    category: "word",
-                    words: [8]
-                },
-                [getElementId(theDet1)]: {
-                    category: "partOfSpeech",
-                    words: [0]
-                },
-                [getElementId(quickBrownAdj)]: {
-                    category: "partOfSpeech",
-                    words: [1, 2]
-                },
-                [getElementId(foxNoun)]: {
-                    category: "partOfSpeech",
-                    words: [3]
-                },
-                [getElementId(jumpsVerb)]: {
-                    category: "partOfSpeech",
-                    words: [4]
-                },
-                [getElementId(overPrep)]: {
-                    category: "partOfSpeech",
-                    words: [5]
-                },
-                [getElementId(theDet2)]: {
-                    category: "partOfSpeech",
-                    words: [6]
-                },
-                [getElementId(lazyAdj)]: {
-                    category: "partOfSpeech",
-                    words: [7]
-                },
-                [getElementId(dogNoun)]: {
-                    category: "partOfSpeech",
-                    words: [8]
-                },
-                [getElementId(adjPhrase1)]: {
-                    category: "phrase",
-                    words: [1, 2]
-                },
-                [getElementId(nounPhrase1)]: {
-                    category: "phrase",
-                    words: [3]
-                },
-                [getElementId(verbPhrase)]: {
-                    category: "phrase",
-                    words: [4]
-                },
-                [getElementId(prepPhrase)]: {
-                    category: "phrase",
-                    words: [5]
-                },
-                [getElementId(adjPhrase2)]: {
-                    category: "phrase",
-                    words: [7]
-                },
-                [getElementId(nounPhrase2)]: {
-                    category: "phrase",
-                    words: [8]
-                },
-                [getElementId(indClause)]: {
-                    category: "clause",
-                    words: [3, 4]
+            [Ids.the1]: {
+                category: "word",
+                type: "word",
+                words: [0],
+                ref: Ids.the1Det
+            },
+            [Ids.quick]: {
+                category: "word",
+                type: "word",
+                words: [1],
+                ref: Ids.quickBrownAdj
+            },
+            [Ids.brown]: {
+                category: "word",
+                type: "word",
+                words: [2],
+                ref: Ids.quickBrownAdj
+            },
+            [Ids.fox]: {
+                category: "word",
+                type: "word",
+                words: [3],
+                ref: Ids.foxNoun
+            },
+            [Ids.jumps]: {
+                category: "word",
+                type: "word",
+                words: [4],
+                ref: Ids.jumpsVerb
+            },
+            [Ids.over]: {
+                category: "word",
+                type: "word",
+                words: [5],
+                ref: Ids.overPrep
+            },
+            [Ids.the2]: {
+                category: "word",
+                type: "word",
+                words: [6],
+                ref: Ids.the2Det
+            },
+            [Ids.lazy]: {
+                category: "word",
+                type: "word",
+                words: [7],
+                ref: Ids.lazyAdj
+            },
+            [Ids.dog]: {
+                category: "word",
+                type: "word",
+                words: [8],
+                ref: Ids.dogNoun
+            },
+            [Ids.the1Det]: createElement("determiner", {
+                category: "partOfSpeech",
+                type: "determiner",
+                words: [0],
+                ref: Ids.quickBrownAdjPhrase,
+                properties: {
+                    words: [Ids.the1]
                 }
-            }
+            }),
+            [Ids.quickBrownAdj]: createElement("adjective", {
+                category: "partOfSpeech",
+                type: "adjective",
+                words: [[1, 2]],
+                ref: Ids.quickBrownAdjPhrase,
+                properties: {
+                    words: [Ids.quick, Ids.brown]
+                }
+            }),
+            [Ids.foxNoun]: createElement("noun", {
+                category: "partOfSpeech",
+                type: "noun",
+                words: [3],
+                ref: Ids.foxNounPhrase,
+                properties: {
+                    words: [Ids.fox]
+                }
+            }),
+            [Ids.jumpsVerb]: createElement("verb", {
+                category: "partOfSpeech",
+                type: "verb",
+                words: [4],
+                ref: Ids.jumpsVerbPhrase,
+                properties: {
+                    mainVerb: [Ids.jumps]
+                }
+            }),
+            [Ids.overPrep]: createElement("preposition", {
+                category: "partOfSpeech",
+                type: "preposition",
+                words: [5],
+                ref: Ids.overPrepPhrase,
+                properties: {
+                    words: [Ids.over]
+                }
+            }),
+            [Ids.the2Det]: createElement("determiner", {
+                category: "partOfSpeech",
+                type: "determiner",
+                words: [6],
+                ref: Ids.lazyAdjPhrase,
+                properties: {
+                    words: [Ids.the2]
+                }
+            }),
+            [Ids.lazyAdj]: createElement("adjective", {
+                category: "partOfSpeech",
+                type: "adjective",
+                words: [7],
+                ref: Ids.lazyAdjPhrase,
+                properties: {
+                    words: [Ids.lazy]
+                }
+            }),
+            [Ids.dogNoun]: createElement("noun", {
+                category: "partOfSpeech",
+                type: "noun",
+                words: [8],
+                ref: Ids.dogNounPhrase,
+                properties: {
+                    words: [Ids.dog]
+                }
+            }),
+            [Ids.quickBrownAdjPhrase]: createElement("adjectivePhrase", {
+                category: "phrase",
+                type: "adjectivePhrase",
+                words: [[0, 2]],
+                ref: Ids.foxNounPhrase,
+                properties: {
+                    determiner: [Ids.the1Det],
+                    head: [Ids.quickBrownAdj]
+                }
+            }),
+            [Ids.foxNounPhrase]: createElement("nounPhrase", {
+                category: "phrase",
+                type: "nounPhrase",
+                words: [[0, 3]],
+                ref: Ids.indClause,
+                properties: {
+                    modifiers: [Ids.quickBrownAdjPhrase],
+                    head: [Ids.foxNoun]
+                }
+            }),
+            [Ids.jumpsVerbPhrase]: createElement("verbPhrase", {
+                category: "phrase",
+                type: "verbPhrase",
+                words: [[4, 8]],
+                ref: Ids.indClause,
+                properties: {
+                    head: [Ids.jumpsVerb],
+                    headModifier: [Ids.overPrepPhrase]
+                }
+            }),
+            [Ids.overPrepPhrase]: createElement("prepositionPhrase", {
+                category: "phrase",
+                type: "prepositionPhrase",
+                words: [[5, 8]],
+                ref: Ids.jumpsVerbPhrase,
+                properties: {
+                    head: [Ids.overPrep],
+                    object: [Ids.dogNounPhrase]
+                }
+            }),
+            [Ids.lazyAdjPhrase]: createElement("adjectivePhrase", {
+                category: "phrase",
+                type: "adjectivePhrase",
+                words: [[6, 7]],
+                ref: Ids.dogNounPhrase,
+                properties: {
+                    determiner: [Ids.the2Det],
+                    head: [Ids.lazyAdj]
+                }
+            }),
+            [Ids.dogNounPhrase]: createElement("nounPhrase", {
+                category: "phrase",
+                type: "nounPhrase",
+                words: [[6, 8]],
+                ref: Ids.overPrepPhrase,
+                properties: {
+                    modifiers: [Ids.lazyAdjPhrase],
+                    head: [Ids.dogNoun]
+                }
+            }),
+            [Ids.indClause]: createElement("independentClause", {
+                category: "clause",
+                type: "independentClause",
+                words: [[0, 8]],
+                properties: {
+                    subject: [Ids.foxNounPhrase],
+                    predicate: [Ids.jumpsVerbPhrase]
+                }
+            })
         };
-        assert.deepStrictEqual(result.word.sort(), expected.word.sort());
-        assert.deepStrictEqual(result.partOfSpeech.sort(), expected.partOfSpeech.sort());
-        assert.deepStrictEqual(result.phrase.sort(), expected.phrase.sort());
-        assert.deepStrictEqual(result.clause.sort(), expected.clause.sort());
-        assert.deepStrictEqual(result.elements, expected.elements);
+        assert.deepStrictEqual(result, expected);
     });
 
     test("init - 2", () => {
@@ -446,45 +323,61 @@ describe("DisplayModel", () => {
         };
         const result = DisplayModel.init(input);
         const expected: DisplayModel = {
-            word: ["catsWord", "andWord", "dogsWord"],
-            partOfSpeech: ["coordNoun"],
-            phrase: [],
-            clause: [],
-            elements: {
-                catsWord: {
-                    category: "word",
-                    words: [0]
-                },
-                catsNoun: {
-                    category: "partOfSpeech",
-                    words: [0]
-                },
-                andWord: {
-                    category: "word",
-                    words: [1]
-                },
-                andCoord: {
-                    category: "partOfSpeech",
-                    words: [1]
-                },
-                dogsWord: {
-                    category: "word",
-                    words: [2]
-                },
-                dogsNoun: {
-                    category: "partOfSpeech",
-                    words: [2]
-                },
-                coordNoun: {
-                    category: "partOfSpeech",
-                    words: [0, 1, 2]
+            catsWord: createElement("word", {
+                category: "word",
+                type: "word",
+                words: [0],
+                ref: "catsNoun"
+            }),
+            catsNoun: createElement("word", {
+                category: "partOfSpeech",
+                type: "noun",
+                words: [0],
+                ref: "coordNoun",
+                properties: {
+                    words: ["catsWord"]
                 }
-            }
+            }),
+            andWord: createElement("word", {
+                category: "word",
+                type: "word",
+                words: [1],
+                ref: "andCoord"
+            }),
+            andCoord: createElement("coordinator", {
+                category: "partOfSpeech",
+                type: "coordinator",
+                words: [1],
+                ref: "coordNoun",
+                properties: {
+                    words: ["andWord"]
+                }
+            }),
+            dogsWord: createElement("word", {
+                category: "word",
+                type: "word",
+                words: [2],
+                ref: "dogsNoun"
+            }),
+            dogsNoun: createElement("noun", {
+                category: "partOfSpeech",
+                type: "noun",
+                words: [2],
+                ref: "coordNoun",
+                properties: {
+                    words: ["dogsWord"]
+                }
+            }),
+            coordNoun: createElement("coordinatedNoun", {
+                category: "partOfSpeech",
+                type: "coordinatedNoun",
+                words: [[0, 2]],
+                properties: {
+                    coordinator: ["andCoord"],
+                    items: ["catsNoun", "dogsNoun"]
+                }
+            })
         };
-        assert.sameDeepMembers(result.word, expected.word);
-        assert.sameDeepMembers(result.partOfSpeech, expected.partOfSpeech);
-        assert.sameDeepMembers(result.phrase, expected.phrase);
-        assert.sameDeepMembers(result.clause, expected.clause);
         assert.deepStrictEqual(result.elements, expected.elements);
     });
 });
