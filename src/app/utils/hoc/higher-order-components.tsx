@@ -38,10 +38,12 @@ export function makeRefHoc<TElement extends HTMLElement, TProps>(
     return output;
 }
 
-export function withOnClick<TElement extends HTMLElement, TProps>(
-    Component: RefComponent<TElement, TProps>,
-    onClick: () => void): RefComponent<TElement, TProps> {
-    return makeRefHoc(Component, "withOnClick", (_, instance) => instance.addEventListener("click", onClick));
+export function withEventListener<TElement extends HTMLElement, TProps, TEventType extends keyof HTMLElementEventMap>(Component: RefComponent<TElement, TProps>, type: TEventType, listener: (ev: HTMLElementEventMap[TEventType]) => any): RefComponent<TElement, TProps> {
+    return makeRefHoc(
+        Component,
+        "withEventListener",
+        (_, instance) => instance.addEventListener(type, listener)
+    );
 }
 
 export function withClassName<TElement extends HTMLElement, TProps>(Component: RefComponent<TElement, TProps>, ...classNames: string[]): RefComponent<TElement, TProps>

@@ -1,27 +1,30 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react";
-import { withClassName, makeRefComponent, withOnClick, withoutClassName } from "../higher-order-components";
+import { withClassName, makeRefComponent, withoutClassName, withEventListener } from "../higher-order-components";
 
 const MockComponent = makeRefComponent<HTMLDivElement, { children: string; }>("MockComponent", ({ children }, ref) => {
     return <div ref={ref}>{children}</div>;
 });
 
 describe("higher-order-components", () => {
-    describe("withOnClick", () => {
+    describe("withEventListener", () => {
         test("with 1", () => {
             const callback = jest.fn(() => { return; });
-            const WrappedComponent = withOnClick(MockComponent, callback);
+            const WrappedComponent = withEventListener(MockComponent, "mousedown", callback);
             const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
-            fireEvent(result, new MouseEvent("click"));
+            fireEvent(result, new MouseEvent("mousedown"));
             expect(callback).toBeCalledTimes(1);
         });
 
         test("with 2", () => {
             const callback1 = jest.fn(() => { return; });
             const callback2 = jest.fn(() => { return; });
-            const WrappedComponent = withOnClick(withOnClick(MockComponent, callback1), callback2);
+            const WrappedComponent = withEventListener(withEventListener(MockComponent, "click", callback1), "mouseover", callback2);
             const result = render(<WrappedComponent>Some text</WrappedComponent>).getByText("Some text");
             fireEvent(result, new MouseEvent("click"));
+            expect(callback1).toBeCalledTimes(1);
+            expect(callback2).toBeCalledTimes(0);
+            fireEvent(result, new MouseEvent("mouseover"));
             expect(callback1).toBeCalledTimes(1);
             expect(callback2).toBeCalledTimes(1);
         });
