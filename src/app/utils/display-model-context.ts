@@ -1,17 +1,19 @@
 import { ElementId, ElementType } from "@domain/language";
 import { createContext, Dispatch, SetStateAction } from "react";
-import { DisplayModel } from "./display-model";
+import { ElementCategory } from "./display-model";
 
-export type FilterType = Extract<keyof DisplayModel, "word" | "partOfSpeech" | "phrase" | "clause">;
+export type ElementSelectState = "expand" | "select";
 
 export type ElementSelectNode = {
     id: ElementId;
     type: ElementType;
+    state: ElementSelectState;
     property?: string;
 }
 
 export interface HeadElementSelectNode {
     id: ElementId;
+    state: ElementSelectState;
     type: ElementType;
 }
 
@@ -20,6 +22,7 @@ export function isHeadElementSelectNode(node: ElementSelectNode): node is HeadEl
 }
 
 export interface TailElementSelectNode extends HeadElementSelectNode {
+    state: ElementSelectState;
     property: string;
 }
 
@@ -30,21 +33,13 @@ export function isTailElementSelectNode(node: ElementSelectNode): node is TailEl
 export type SelectedElement = [HeadElementSelectNode, ...TailElementSelectNode[]];
 
 export interface DisplayModelContext {
-    displayModel: DisplayModel;
-    topFilter?: FilterType;
-    setTopFilter: Dispatch<SetStateAction<FilterType | undefined>>;
+    elementFilter?: ElementCategory;
+    setElementFilter: Dispatch<SetStateAction<ElementCategory | undefined>>;
     selectedItem?: SelectedElement;
     setSelectedItem: Dispatch<SetStateAction<SelectedElement | undefined>>;
 }
 
 export const DisplayModelContext = createContext<DisplayModelContext>({
-    displayModel: {
-        word: [],
-        partOfSpeech: [],
-        phrase: [],
-        clause: [],
-        elements: {}
-    },
-    setTopFilter: () => { throw "not implemented"; },
+    setElementFilter: () => { throw "not implemented"; },
     setSelectedItem: () => { throw "not implemented"; }
 });
