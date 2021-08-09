@@ -202,6 +202,22 @@ function _containsReference(propValue: undefined | ElementReference | ElementRef
     }
 }
 
+function expand(wRng: WordRange): number[] {
+    const output: number[] = [];
+    const [start, end] = wRng;
+    if (start > end) {
+        throw "cannot expand WordRange with a starting index greater than an ending index";
+    }
+    for (let index = start; index < end + 1; index++) {
+        output.push(index);
+    }
+    return output;
+}
+
+export const WordRange = {
+    expand: expand
+};
+
 export const DisplayModel = {
     init: init
 };

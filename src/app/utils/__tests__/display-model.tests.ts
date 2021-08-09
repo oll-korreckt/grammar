@@ -2,7 +2,7 @@ import { createState, Ids } from "@app/testing";
 import { ElementType } from "@domain/language";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
-import { DisplayModel, TypedDisplayModelElement, WordIndices, _appendWord } from "../display-model";
+import { DisplayModel, TypedDisplayModelElement, WordIndices, WordRange, _appendWord } from "../display-model";
 
 function createElement<Type extends ElementType>(type: Type, element: TypedDisplayModelElement<Type>): TypedDisplayModelElement<Type> {
     return element;
@@ -379,5 +379,27 @@ describe("DisplayModel", () => {
             })
         };
         assert.deepStrictEqual(result.elements, expected.elements);
+    });
+
+    describe("WordRange - expand", () => {
+        test("overlap", () => {
+            const result = WordRange.expand([2, 2]);
+            assert.deepStrictEqual(result, [2]);
+        });
+
+        test("range", () => {
+            const result = WordRange.expand([1, 5]);
+            assert.deepStrictEqual(
+                result,
+                [1, 2, 3, 4, 5]
+            );
+        });
+
+        test("error", () => {
+            assert.throw(
+                () => WordRange.expand([1, 0]),
+                /cannot expand/i
+            );
+        });
     });
 });
