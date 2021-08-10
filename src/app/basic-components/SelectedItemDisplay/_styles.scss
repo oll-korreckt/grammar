@@ -1,27 +1,27 @@
 @use "main";
 
 .selectedItemDisplay {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: auto 2rem;
+    padding: 2px;
+
+    .displayItems {
+        display: flex;
+        flex-direction: row;
+    }
 }
 
 .button {
     border: 1px solid black;
     border-radius: 5px;
-    display: inline-flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    user-select: none;
     cursor: pointer;
+    user-select: none;
     padding: 7px;
-    .buttonText {
-        @include main.center-content;
-    }
-    .buttonX {
-        @include main.center-content;
-        margin-left: 5px;
-    }
+}
+
+.cancelButton {
+    @include main.center-content;
+    cursor: pointer;
 }
 
 .arrow {
