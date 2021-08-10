@@ -1,6 +1,17 @@
+import { RefComponent } from "@app/utils/hoc";
 import { ElementId, ElementType } from "@domain/language";
-import { createContext, Dispatch, SetStateAction } from "react";
-import { ElementCategory } from "./display-model";
+import { createContext } from "react";
+import { WordIndices } from "./display-model";
+
+export type ElementData = {
+    head: boolean;
+    id: ElementId;
+    key: string;
+    type: ElementType;
+    lexemes: string[];
+    selected: boolean;
+    index: WordIndices[number];
+}
 
 export type ElementSelectState = "expand" | "select";
 
@@ -31,15 +42,15 @@ export function isTailElementSelectNode(node: ElementSelectNode): node is TailEl
 }
 
 export type SelectedElement = [HeadElementSelectNode, ...TailElementSelectNode[]];
+export type WordViewCategory = "partOfSpeech" | "phraseAndClause";
+export type BuildFunction = (Component: RefComponent<HTMLSpanElement>, data: ElementData) => RefComponent<HTMLSpanElement>;
 
-export interface DisplayModelContext {
-    elementFilter?: ElementCategory;
-    setElementFilter: Dispatch<SetStateAction<ElementCategory | undefined>>;
+export interface WordViewContext {
+    category: WordViewCategory;
     selectedItem?: SelectedElement;
-    setSelectedItem: Dispatch<SetStateAction<SelectedElement | undefined>>;
+    buildFn?: BuildFunction;
 }
 
-export const DisplayModelContext = createContext<DisplayModelContext>({
-    setElementFilter: () => { throw "not implemented"; },
-    setSelectedItem: () => { throw "not implemented"; }
+export const WordViewContext = createContext<WordViewContext>({
+    category: "partOfSpeech"
 });

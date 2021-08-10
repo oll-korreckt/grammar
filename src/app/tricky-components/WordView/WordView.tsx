@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
-import { DiagramState, DiagramStateContext, DisplayModel, DisplayModelContext, ElementCategory, ElementDisplayInfo, ElementSelectState, SelectedElement, WordIndices, WordRange } from "@app/utils";
-import { ElementId, ElementType } from "@domain/language";
+import { DiagramState, DiagramStateContext, DisplayModel, ElementCategory, ElementData, ElementDisplayInfo, ElementSelectState, SelectedElement, WordIndices, WordRange, WordViewCategory, WordViewContext } from "@app/utils";
+import { ElementId } from "@domain/language";
 import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
+
+type ElementFilterFunction = (cat: ElementCategory) => boolean;
 
 function getLexemes(diagram: DiagramState, index: WordIndices[number]): string[] {
     return (Array.isArray(index) ? WordRange.expand(index) : [index])
@@ -105,12 +107,12 @@ function _selectedItem(diagram: DiagramState, displayModel: DisplayModel, select
     }
 }
 
-function _elementFilter(diagram: DiagramState, displayModel: DisplayModel, elementFilter: ElementCategory, output: (ElementData | undefined)[]): void {
+function _elementFilter(diagram: DiagramState, displayModel: DisplayModel, elementFilter: ElementFilterFunction, output: (ElementData | undefined)[]): void {
     Object.entries(displayModel)
         .filter(([, { category, ref }]) => {
-            return category === elementFilter
+            return elementFilter(category)
                 && ref !== undefined
-                && displayModel[ref].category !== category;
+                && !elementFilter(displayModel[ref].category);
         })
         .forEach(([id]) => _populate(diagram, displayModel, id, undefined, output));
 }
@@ -134,32 +136,34 @@ function _fillOutput(diagram: DiagramState, displayModel: DisplayModel, output: 
     }
 }
 
-function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: ElementCategory | undefined, selectedItem: SelectedElement | undefined): ElementData[] {
+function createFilterFn(category: WordViewCategory): ElementFilterFunction {
+    let filterSet: ElementCategory[];
+    switch (category) {
+        case "partOfSpeech":
+            filterSet = ["partOfSpeech", "word"];
+            break;
+        case "phraseAndClause":
+            filterSet = ["clause", "phrase", "partOfSpeech"];
+            break;
+        default:
+            throw "";
+    }
+    const filterObj = new Set(filterSet);
+    return (cat) => filterObj.has(cat);
+}
+
+function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewCategory, selectedItem: SelectedElement | undefined): ElementData[] {
     const output: (ElementData | undefined)[] = diagram.wordOrder.map(() => undefined);
     _elementFilter(
         diagram,
         displayModel,
-        elementFilter === undefined ? "word" : elementFilter,
+        createFilterFn(elementFilter),
         output
     );
     _selectedItem(diagram, displayModel, selectedItem, output);
     _fillOutput(diagram, displayModel, output);
 
     return output.filter((x) => x !== undefined) as ElementData[];
-}
-
-export type ElementData = {
-    head: boolean;
-    id: ElementId;
-    key: string;
-    type: ElementType;
-    lexemes: string[];
-    selected: boolean;
-    index: WordIndices[number];
-}
-
-export interface EditDiagramProps {
-    elementBuildFn?: (Component: RefComponent<HTMLSpanElement>, data: ElementData) => RefComponent<HTMLSpanElement>;
 }
 
 function withSpace(Component: RefComponent<HTMLSpanElement>): RefComponent<HTMLSpanElement> {
@@ -171,14 +175,14 @@ function withSpace(Component: RefComponent<HTMLSpanElement>): RefComponent<HTMLS
     ));
 }
 
-export const EditDiagram = makeRefComponent<HTMLDivElement, EditDiagramProps>("EditDiagram", ({ elementBuildFn }, ref) => {
+export const WordView = makeRefComponent<HTMLDivElement>("EditDiagram", (_, ref) => {
     const diagram = useContext(DiagramStateContext);
-    const model = useContext(DisplayModelContext);
+    const edContext = useContext(WordViewContext);
     const elementData = getElementData(
         diagram.state.currState,
         diagram.model,
-        model.elementFilter,
-        model.selectedItem
+        edContext.category,
+        edContext.selectedItem
     );
 
     function createElement(data: ElementData): RefComponent<HTMLSpanElement> {
@@ -203,7 +207,7 @@ export const EditDiagram = makeRefComponent<HTMLDivElement, EditDiagramProps>("E
                 })}
             </WordLabel>
         ));
-        return elementBuildFn ? elementBuildFn(output, data) : output;
+        return edContext.buildFn ? edContext.buildFn(output, data) : output;
     }
 
     return (

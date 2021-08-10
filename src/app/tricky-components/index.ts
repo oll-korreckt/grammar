@@ -1,1 +1,1 @@
-export * from "./EditDiagram";
+export * from "./WordView";

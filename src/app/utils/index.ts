@@ -6,5 +6,5 @@ export * from "./history-state";
 export { DisplayModel, WordRange } from "./display-model";
 export type { ElementCategory, WordIndices, DisplayModelElement, TypedDisplayModelElement } from "./display-model";
 export * from "./diagram-state-context";
-export * from "./display-model-context";
+export * from "./word-view-context";
 export * from "./element-display-info";
