@@ -1,5 +1,7 @@
 import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, getElementDefinition } from "@domain/language";
 import { DiagramState, DiagramStateItem } from "./diagram-state";
+import { ElementDisplayInfo } from "./element-display-info";
+import { WordViewCategory } from "./word-view-context";
 
 export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
 export type WordRange = [number, number];
@@ -202,6 +204,205 @@ function _containsReference(propValue: undefined | ElementReference | ElementRef
     }
 }
 
+function _getWordCount(indices: WordIndices): number {
+    let output = 0;
+    indices.forEach((index) => {
+        const incr = Array.isArray(index) ? index[1] - index[0] + 1 : 1;
+        output += incr;
+    });
+    return output;
+}
+
+function _isComplete(element: DisplayModelElement): boolean {
+    if (element.type === "word") {
+        return true;
+    }
+    if (element.properties === undefined) {
+        return false;
+    }
+    const info = ElementDisplayInfo.getDisplayInfo(element.type);
+    const reqProps = Object.entries(info.properties)
+        .filter(([, value]) => value.required === true)
+        .map(([key]) => key);
+    for (let index = 0; index < reqProps.length; index++) {
+        const propName = reqProps[index];
+        if (element.properties[propName] === undefined) {
+            return false;
+        }
+    }
+    return true;
+}
+
+export type Progress = {
+    [Key in WordViewCategory]: {
+        percentage: number;
+        errorItems: ElementId[];
+    };
+}
+
+type ProgressPreOutputValue = {
+    count: number;
+    errorItems: ElementId[];
+}
+
+export type ProgressPreOutput = {
+    wordCount: number;
+    partOfSpeech: ProgressPreOutputValue;
+    nonIndClause: ProgressPreOutputValue;
+    indClause: ProgressPreOutputValue;
+}
+
+type IdFunction = (element: DisplayModelElement) => boolean;
+
+function _isWord(element: DisplayModelElement): boolean {
+    return element.category === "word";
+}
+
+function _isPartOfSpeech(element: DisplayModelElement): boolean {
+    return element.category === "partOfSpeech";
+}
+
+function _isNonIndClause(element: DisplayModelElement): boolean {
+    switch (element.category) {
+        case "phrase":
+        case "clause":
+            // do nothing
+            break;
+        default:
+            return false;
+    }
+    switch (element.type) {
+        case "independentClause":
+        case "coordinatedIndependentClause":
+            return false;
+        default:
+            return true;
+    }
+}
+
+function _isIndClause(element: DisplayModelElement): boolean {
+    switch (element.type) {
+        case "independentClause":
+        case "coordinatedIndependentClause":
+            return true;
+        default:
+            return false;
+    }
+}
+
+function _isTopLevel(model: DisplayModel, element: DisplayModelElement, idFn: IdFunction): boolean {
+    if (element.ref === undefined) {
+        return true;
+    }
+    const parent = model[element.ref];
+    return !idFn(parent);
+}
+
+function _updateProgressOutput(model: DisplayModel, [id, element]: [ElementId, DisplayModelElement], pOutput: ProgressPreOutputValue, idFn: IdFunction): void {
+    if (_isComplete(element)) {
+        if (_isTopLevel(model, element, idFn)) {
+            const incr = _getWordCount(element.words);
+            pOutput.count += incr;
+        }
+    } else {
+        pOutput.errorItems.push(id);
+    }
+}
+
+function _calcProgress(wordCount: number, itemCount: number, errorItemCount: number): number {
+    let output = itemCount * 100 / wordCount;
+    for (let index = 0; index < errorItemCount; index++) {
+        output *= 0.9;
+    }
+    return output;
+}
+
+function _calcPartOfSpeechProgress({ wordCount, partOfSpeech }: ProgressPreOutput): Progress[keyof Progress] {
+    return {
+        percentage: _calcProgress(
+            wordCount,
+            partOfSpeech.count,
+            partOfSpeech.errorItems.length
+        ),
+        errorItems: partOfSpeech.errorItems
+    };
+}
+
+export function _calcPhraseAndClauseProgress({ wordCount, nonIndClause, indClause }: ProgressPreOutput): Progress[keyof Progress] {
+    const indClausePct = _calcProgress(
+        wordCount,
+        indClause.count,
+        indClause.errorItems.length
+    );
+    const rawNonIndClausePct = _calcProgress(
+        wordCount,
+        nonIndClause.count,
+        nonIndClause.errorItems.length
+    );
+    const nonIndClausePct = Math.pow(rawNonIndClausePct / 100, 0.4) * 100;
+    const percentage = indClausePct === 100 && nonIndClause.errorItems.length === 0
+        ? indClausePct
+        : (indClausePct + nonIndClausePct) / 2;
+    return {
+        percentage: percentage,
+        errorItems: [...nonIndClause.errorItems, ...indClause.errorItems]
+    };
+}
+
+function calcProgress(model: DisplayModel): Progress {
+    const elements = Object.entries(model);
+    const preOutput: ProgressPreOutput = {
+        wordCount: 0,
+        partOfSpeech: {
+            count: 0,
+            errorItems: []
+        },
+        nonIndClause: {
+            count: 0,
+            errorItems: []
+        },
+        indClause: {
+            count: 0,
+            errorItems: []
+        }
+    };
+    for (let index = 0; index < elements.length; index++) {
+        const [id, element] = elements[index];
+        if (_isWord(element)) {
+            preOutput.wordCount++;
+        } else if (_isPartOfSpeech(element)) {
+            _updateProgressOutput(
+                model,
+                [id, element],
+                preOutput.partOfSpeech,
+                _isPartOfSpeech
+            );
+        } else if (_isNonIndClause(element)) {
+            _updateProgressOutput(
+                model,
+                [id, element],
+                preOutput.nonIndClause,
+                _isNonIndClause
+            );
+        } else if (_isIndClause(element)) {
+            _updateProgressOutput(
+                model,
+                [id, element],
+                preOutput.indClause,
+                _isIndClause
+            );
+        } else {
+            throw `category '${element.category}' is not supported`;
+        }
+    }
+    const partOfSpeech = _calcPartOfSpeechProgress(preOutput);
+    const phraseAndClause = _calcPhraseAndClauseProgress(preOutput);
+    return {
+        partOfSpeech: partOfSpeech,
+        phraseAndClause: phraseAndClause
+    };
+}
+
 function expand(wRng: WordRange): number[] {
     const output: number[] = [];
     const [start, end] = wRng;
@@ -219,5 +420,6 @@ export const WordRange = {
 };
 
 export const DisplayModel = {
-    init: init
+    init: init,
+    calcProgress: calcProgress
 };

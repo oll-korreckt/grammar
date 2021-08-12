@@ -1,8 +1,9 @@
 import { createState, Ids } from "@app/testing";
 import { ElementType } from "@domain/language";
+import { AtomicChange } from "@lib/utils";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
-import { DisplayModel, TypedDisplayModelElement, WordIndices, WordRange, _appendWord } from "../display-model";
+import { DisplayModel, Progress, TypedDisplayModelElement, WordIndices, WordRange, _appendWord, _calcPhraseAndClauseProgress, ProgressPreOutput } from "../display-model";
 
 function createElement<Type extends ElementType>(type: Type, element: TypedDisplayModelElement<Type>): TypedDisplayModelElement<Type> {
     return element;
@@ -10,7 +11,7 @@ function createElement<Type extends ElementType>(type: Type, element: TypedDispl
 
 describe("DisplayModel", () => {
     let state: DiagramState;
-    beforeAll(() => {
+    beforeEach(() => {
         state = createState();
     });
 
@@ -379,6 +380,204 @@ describe("DisplayModel", () => {
             })
         };
         assert.deepStrictEqual(result.elements, expected.elements);
+    });
+
+    describe("calcProgress", () => {
+        test("100%", () => {
+            const input = DisplayModel.init(state);
+            const result = DisplayModel.calcProgress(input);
+            const expected: Progress = {
+                partOfSpeech: {
+                    percentage: 100,
+                    errorItems: []
+                },
+                phraseAndClause: {
+                    percentage: 100,
+                    errorItems: []
+                }
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("with incomplete partOfSpeech", () => {
+            const input: DisplayModel = {
+                to: {
+                    type: "word",
+                    category: "word",
+                    words: [0],
+                    ref: "preposition"
+                },
+                eat: {
+                    type: "word",
+                    category: "word",
+                    words: [1],
+                    ref: "infinitive"
+                },
+                preposition: {
+                    type: "preposition",
+                    category: "partOfSpeech",
+                    words: [0],
+                    properties: {
+                        words: ["to"]
+                    }
+                },
+                verb: {
+                    type: "infinitive",
+                    category: "partOfSpeech",
+                    words: [1],
+                    properties: {
+                        verb: ["eat"]
+                    }
+                }
+            };
+            const result = DisplayModel.calcProgress(input);
+            const expected: Progress = {
+                partOfSpeech: {
+                    percentage: 50 * 0.9,
+                    errorItems: ["verb"]
+                },
+                phraseAndClause: {
+                    percentage: 0,
+                    errorItems: []
+                }
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("with incomplete phraseAndClause - low level", () => {
+            const changes = DiagramState.setTypedReference(state, "prepositionPhrase", Ids.overPrepPhrase, "head", undefined);
+            state = AtomicChange.apply(state, ...changes);
+            const input = DisplayModel.init(state);
+            const result = DisplayModel.calcProgress(input);
+            const expected: Progress = {
+                partOfSpeech: {
+                    percentage: 100,
+                    errorItems: []
+                },
+                phraseAndClause: {
+                    percentage: (8 / 9) * 50 + Math.pow((8 / 9) * 0.9, 0.4) * 50,
+                    errorItems: [Ids.overPrepPhrase]
+                }
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("with incomplete phraseAndClause - top level", () => {
+            const changes = DiagramState.setTypedReference(state, "verbPhrase", Ids.jumpsVerbPhrase, "headModifier", undefined);
+            state = AtomicChange.apply(state, ...changes);
+            const input = DisplayModel.init(state);
+            const result = DisplayModel.calcProgress(input);
+            const expected: Progress = {
+                partOfSpeech: {
+                    percentage: 100,
+                    errorItems: []
+                },
+                phraseAndClause: {
+                    percentage: (5 / 9) * 50 + 50,
+                    errorItems: []
+                }
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+    });
+
+    describe("_calcPhraseAndClauseProgress", () => {
+        const partOfSpeech: ProgressPreOutput["partOfSpeech"] = {
+            count: 0,
+            errorItems: []
+        };
+
+        test("100% - no nonIndClause", () => {
+            const input: ProgressPreOutput = {
+                wordCount: 100,
+                partOfSpeech: partOfSpeech,
+                nonIndClause: { count: 0, errorItems: [] },
+                indClause: { count: 100, errorItems: [] }
+            };
+            const result = _calcPhraseAndClauseProgress(input);
+            const expected: Progress[keyof Progress] = {
+                percentage: 100,
+                errorItems: []
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("100% - both", () => {
+            const input: ProgressPreOutput = {
+                wordCount: 100,
+                partOfSpeech: partOfSpeech,
+                nonIndClause: { count: 100, errorItems: [] },
+                indClause: { count: 100, errorItems: [] }
+            };
+            const result = _calcPhraseAndClauseProgress(input);
+            const expected: Progress[keyof Progress] = {
+                percentage: 100,
+                errorItems: []
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("no indClause", () => {
+            const input: ProgressPreOutput = {
+                wordCount: 100,
+                partOfSpeech: partOfSpeech,
+                nonIndClause: { count: 80, errorItems: [] },
+                indClause: { count: 0, errorItems: [] }
+            };
+            const result = _calcPhraseAndClauseProgress(input);
+            const expected: Progress[keyof Progress] = {
+                percentage: Math.pow(0.8, 0.4) * 100 * 0.5,
+                errorItems: []
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("partial both", () => {
+            const input: ProgressPreOutput = {
+                wordCount: 100,
+                partOfSpeech: partOfSpeech,
+                nonIndClause: { count: 30, errorItems: [] },
+                indClause: { count: 50, errorItems: [] }
+            };
+            const result = _calcPhraseAndClauseProgress(input);
+            const expected: Progress[keyof Progress] = {
+                percentage: (50 + Math.pow(0.3, 0.4) * 100) / 2,
+                errorItems: []
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("with error items", () => {
+            const input: ProgressPreOutput = {
+                wordCount: 100,
+                partOfSpeech: partOfSpeech,
+                nonIndClause: { count: 40, errorItems: ["a"] },
+                indClause: { count: 80, errorItems: ["b", "c"] }
+            };
+            const result = _calcPhraseAndClauseProgress(input);
+            result.percentage = Math.round(result.percentage * 100) / 100;
+            const expected: Progress[keyof Progress] = {
+                percentage: (80 * Math.pow(0.9, 2) + Math.pow(40 / 100 * Math.pow(0.9, 1), 0.4) * 100) / 2,
+                errorItems: ["a", "b", "c"]
+            };
+            expected.percentage = Math.round(expected.percentage * 100) / 100;
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("indClause complete - errors in nonIndClause", () => {
+            const input: ProgressPreOutput = {
+                wordCount: 100,
+                partOfSpeech: partOfSpeech,
+                nonIndClause: { count: 10, errorItems: ["a", "b"] },
+                indClause: { count: 100, errorItems: [] }
+            };
+            const result = _calcPhraseAndClauseProgress(input);
+            const expected: Progress[keyof Progress] = {
+                percentage: 50 + Math.pow(10 / 100 * Math.pow(0.9, 2), 0.4) * 50,
+                errorItems: ["a", "b"]
+            };
+            assert.deepStrictEqual(result, expected);
+        });
     });
 
     describe("WordRange - expand", () => {

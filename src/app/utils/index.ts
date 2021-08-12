@@ -4,6 +4,7 @@ export * from "./hooks";
 export * from "./diagram-state";
 export * from "./history-state";
 export { DisplayModel, WordRange } from "./display-model";
+export type { Progress } from "./display-model";
 export type { ElementCategory, WordIndices, DisplayModelElement, TypedDisplayModelElement } from "./display-model";
 export * from "./diagram-state-context";
 export * from "./word-view-context";
