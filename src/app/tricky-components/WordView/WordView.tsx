@@ -5,6 +5,7 @@ import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
 
 type ElementFilterFunction = (cat: ElementCategory) => boolean;
+export type BuildFunction = (Component: RefComponent<HTMLSpanElement>, data: ElementData) => RefComponent<HTMLSpanElement>;
 
 function getLexemes(diagram: DiagramState, index: WordIndices[number]): string[] {
     return (Array.isArray(index) ? WordRange.expand(index) : [index])
@@ -175,12 +176,16 @@ function withSpace(Component: RefComponent<HTMLSpanElement>): RefComponent<HTMLS
     ));
 }
 
-export const WordView = makeRefComponent<HTMLDivElement>("EditDiagram", (_, ref) => {
-    const diagram = useContext(DiagramStateContext);
+export interface WordViewProps {
+    buildFn?: BuildFunction;
+}
+
+export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDiagram", ({ buildFn }, ref) => {
+    const { state, model } = useContext(DiagramStateContext);
     const edContext = useContext(WordViewContext);
     const elementData = getElementData(
-        diagram.state.currState,
-        diagram.model,
+        state,
+        model,
         edContext.category,
         edContext.selectedItem
     );
@@ -207,7 +212,7 @@ export const WordView = makeRefComponent<HTMLDivElement>("EditDiagram", (_, ref)
                 })}
             </WordLabel>
         ));
-        return edContext.buildFn ? edContext.buildFn(output, data) : output;
+        return buildFn ? buildFn(output, data) : output;
     }
 
     return (

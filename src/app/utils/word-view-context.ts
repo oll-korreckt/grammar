@@ -1,4 +1,3 @@
-import { RefComponent } from "@app/utils/hoc";
 import { ElementId, ElementType } from "@domain/language";
 import { createContext } from "react";
 import { WordIndices } from "./display-model";
@@ -43,12 +42,10 @@ export function isTailElementSelectNode(node: ElementSelectNode): node is TailEl
 
 export type SelectedElement = [HeadElementSelectNode, ...TailElementSelectNode[]];
 export type WordViewCategory = "partOfSpeech" | "phraseAndClause";
-export type BuildFunction = (Component: RefComponent<HTMLSpanElement>, data: ElementData) => RefComponent<HTMLSpanElement>;
 
 export interface WordViewContext {
     category: WordViewCategory;
     selectedItem?: SelectedElement;
-    buildFn?: BuildFunction;
 }
 
 export const WordViewContext = createContext<WordViewContext>({
