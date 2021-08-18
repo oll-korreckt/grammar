@@ -31,3 +31,12 @@ export interface WordLabelProps {
 export const WordLabel = makeRefComponent<HTMLSpanElement, WordLabelProps>("WordLabel", ({ color, children }, ref) => {
     return <span className={accessClassName(styles, "wordLabel", color)} ref={ref}>{children}</span>;
 });
+
+export function withSpace(Component: typeof Word): typeof Word {
+    return makeRefComponent("withSpace", (props, ref) => (
+        <>
+            <Component {...props} ref={ref}/>
+            <Space/>
+        </>
+    ));
+}
