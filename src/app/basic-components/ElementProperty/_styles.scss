@@ -1,0 +1,26 @@
+@use "main";
+
+.elementProperty {
+    position: relative;
+    border-style: solid;
+    border-radius: 1rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.selected {
+    border-width: 2px;
+}
+
+.unselected {
+    border-width: 1px;
+}
+
+.error {
+    box-shadow: 0 0 1px 1px red;
+}
