@@ -1,6 +1,7 @@
 import React from "react";
 import { ElementLabel, ElementLabelProps } from "./ElementLabel";
-import { accessClassName, Colors, makeRefComponent, RefComponent, withClassName } from "@app/utils";
+import { accessClassName, Colors } from "@app/utils";
+import { makeRefComponent, RefComponent, withClassName } from "@app/utils/hoc";
 import styles from "./_styles.scss";
 
 type ElementLabelType = typeof ElementLabel;
