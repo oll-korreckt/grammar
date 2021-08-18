@@ -1,0 +1,60 @@
+@use "main";
+
+.propertySelector {
+    position: relative;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    align-items: center;
+}
+
+.containerItem {
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.center {
+    justify-content: center;
+}
+
+.arrow {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 4rem;
+
+    .arrowIcon {
+        @include main.center-content;
+    }
+}
+
+.leftArrow {
+    left: 0;
+    display: grid;
+    grid-template-columns: 70% auto;
+    background-image: linear-gradient(
+        to right,
+        white 70%,
+        transparent
+    );
+}
+
+.rightArrow {
+    right: 0;
+    display: grid;
+    grid-template-columns: auto 70%;
+    background-image: linear-gradient(
+        to left,
+        white 70%,
+        transparent
+    );
+}
+
+.hide {
+    display: none;
+}
