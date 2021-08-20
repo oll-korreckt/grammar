@@ -64,8 +64,23 @@ function getTypedItem<T extends ElementType>(state: DiagramState, type: T, id: E
     return output as TypedDiagramStateItem<T>;
 }
 
-function getElementReferences<T extends Exclude<ElementType, "word">>(type: T, value: ElementMapper<T>): ElementReference[] {
-    const output: ElementReference[] = [];
+function getReferencingProperties(parentType: Exclude<ElementType, "word">, parent: Identifiable, childId: ElementId): [string] | [string, string] {
+    const output: string[] = [];
+    _getElementReferences(parentType, parent as any).forEach(([key, refs]) => {
+        if (refs.map(({ id }) => id).includes(childId)) {
+            output.push(key);
+        }
+    });
+    if (output.length === 0) {
+        throw `Parent '${parent.id}' contains no references to '${childId}'`;
+    } else if (output.length > 2) {
+        throw `Parent '${parent.id}' contains more than 2 references to '${childId}'`;
+    }
+    return output as [string] | [string, string];
+}
+
+function _getElementReferences<T extends Exclude<ElementType, "word">>(type: T, value: ElementMapper<T>): [string, ElementReference[]][] {
+    const output: [string, ElementReference[]][] = [];
     const def = getElementDefinition(type);
     const entries = Object.entries(def);
     for (let index = 0; index < entries.length; index++) {
@@ -75,9 +90,9 @@ function getElementReferences<T extends Exclude<ElementType, "word">>(type: T, v
             continue;
         }
         else if (isArrayReference(isArray, propValue)) {
-            output.push(...propValue);
+            output.push([key, propValue]);
         } else {
-            output.push(propValue);
+            output.push([key, [propValue]]);
         }
     }
     return output;
@@ -164,7 +179,10 @@ function createDeleteItem(state: DiagramState, id: ElementId): AtomicChange[] {
         output.push(deleteParentRef);
     }
     // delete references from any children that are referenced by the item
-    const childIds = getElementReferences(item.type, item.value as any).map((x) => x.id);
+    const childIds = _getElementReferences(item.type, item.value as any)
+        .map(([, refs]) => refs)
+        .flat()
+        .map((ref) => ref.id);
     childIds.forEach((childId) => {
         const currVal = getItem(state, childId).ref;
         output.push(AtomicChange.createDelete(
@@ -412,7 +430,6 @@ export const DiagramState = {
     getWordIndex: getWordIndex,
     getItem: getItem,
     getTypedItem: getTypedItem,
-    getElementReferences: getElementReferences,
     createWordSorter: createWordSorter,
     createAddItem: createAddItem,
     createDeleteItem: createDeleteItem,
@@ -421,5 +438,6 @@ export const DiagramState = {
     createDeleteReference: createDeleteReference,
     createTypedDeleteReference: createTypedDeleteReference,
     setTypedReference: setTypedReference,
-    setReference: setReference
+    setReference: setReference,
+    getReferencingProperties: getReferencingProperties
 };

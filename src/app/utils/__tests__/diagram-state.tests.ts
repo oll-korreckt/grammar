@@ -1,17 +1,7 @@
-import { AdjectivePhrase, ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive } from "@domain/language";
+import { ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive, NounPhrase, RelativeClause, VerbPhrase } from "@domain/language";
 import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
-
-function sortElementReferences(x: ElementReference, y: ElementReference): number {
-    if (x.id > y.id) {
-        return 1;
-    } else if (x.id < y.id) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
 
 function getElementId(key: ChangeKey): string {
     return key[1] as string;
@@ -67,59 +57,63 @@ describe("DiagramState", () => {
         });
     });
 
-    test("getElementReferences", () => {
-        const input: AdjectivePhrase = {
-            id: "0",
-            phraseType: "adjective",
-            head: {
-                type: "adjective",
-                id: "1"
-            },
-            determiner: {
-                type: "determiner",
-                id: "2"
-            },
-            modifiers: [
-                {
-                    type: "adverb",
-                    id: "3"
-                },
-                {
-                    type: "adverbPhrase",
-                    id: "4"
-                }
-            ],
-            complement: {
-                type: "noun",
-                id: "5"
-            }
-        };
-        const result = DiagramState.getElementReferences("adjectivePhrase", input);
-        const expected: ElementReference[] = [
-            {
-                type: "adjective",
-                id: "1"
-            },
-            {
-                type: "determiner",
-                id: "2"
-            },
-            {
-                type: "adverb",
-                id: "3"
-            },
-            {
-                type: "adverbPhrase",
-                id: "4"
-            },
-            {
-                type: "noun",
-                id: "5"
-            }
-        ];
-        result.sort(sortElementReferences);
-        expected.sort(sortElementReferences);
-        assert.deepStrictEqual(result, expected);
+    describe("getReferencingProperties", () => {
+        test("standard - 1", () => {
+            const input: NounPhrase = {
+                id: "input",
+                phraseType: "noun",
+                head: { type: "noun", id: "a" }
+            };
+            const result = DiagramState.getReferencingProperties(
+                "nounPhrase",
+                input,
+                "a"
+            );
+            const expected = ["head"];
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("standard - 2", () => {
+            const input: RelativeClause = {
+                id: "input",
+                clauseType: "relative",
+                dependentWord: { type: "pronoun", id: "a" },
+                subject: { type: "pronoun", id: "a" },
+                predicate: { type: "verbPhrase", id: "b" }
+            };
+            const result = DiagramState.getReferencingProperties(
+                "relativeClause",
+                input,
+                "a"
+            ).sort();
+            const expected = ["dependentWord", "subject"].sort();
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("error - no references", () => {
+            const input: RelativeClause = {
+                id: "input",
+                clauseType: "relative"
+            };
+            assert.throw(
+                () => DiagramState.getReferencingProperties("relativeClause", input, "a"),
+                /no references/i
+            );
+        });
+
+        test("error - more than 2 references", () => {
+            const input: VerbPhrase = {
+                id: "input",
+                phraseType: "verb",
+                head: { id: "a", type: "verb" },
+                headModifier: { id: "a", type: "noun" },
+                headCompl: { id: "a", type: "noun" }
+            };
+            assert.throw(
+                () => DiagramState.getReferencingProperties("verbPhrase", input, "a"),
+                /more than 2 references/i
+            );
+        });
     });
 
     describe("getWordIndex", () => {
