@@ -111,9 +111,14 @@ function _selectedItem(diagram: DiagramState, displayModel: DisplayModel, select
 function _elementFilter(diagram: DiagramState, displayModel: DisplayModel, elementFilter: ElementFilterFunction, output: (ElementData | undefined)[]): void {
     Object.entries(displayModel)
         .filter(([, { category, ref }]) => {
-            return elementFilter(category)
-                && ref !== undefined
-                && !elementFilter(displayModel[ref].category);
+            const correctCategory = elementFilter(category);
+            if (!correctCategory) {
+                return false;
+            }
+            if (ref === undefined) {
+                return true;
+            }
+            return !elementFilter(displayModel[ref].category);
         })
         .forEach(([id]) => _populate(diagram, displayModel, id, undefined, output));
 }
@@ -150,10 +155,13 @@ function createFilterFn(category: WordViewCategory): ElementFilterFunction {
             throw "";
     }
     const filterObj = new Set(filterSet);
-    return (cat) => filterObj.has(cat);
+    return (cat) => {
+        const output = filterObj.has(cat);
+        return output;
+    };
 }
 
-function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewCategory, selectedItem: SelectedElement | undefined): ElementData[] {
+export function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewCategory, selectedItem: SelectedElement | undefined): ElementData[] {
     const output: (ElementData | undefined)[] = diagram.wordOrder.map(() => undefined);
     _elementFilter(
         diagram,
