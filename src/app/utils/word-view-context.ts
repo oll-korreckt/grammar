@@ -18,7 +18,7 @@ export type ElementSelectNode = {
     id: ElementId;
     type: ElementType;
     state: ElementSelectState;
-    property?: string;
+    property?: [string] | [string, string];
 }
 
 export interface HeadElementSelectNode {
@@ -33,7 +33,7 @@ export function isHeadElementSelectNode(node: ElementSelectNode): node is HeadEl
 
 export interface TailElementSelectNode extends HeadElementSelectNode {
     state: ElementSelectState;
-    property: string;
+    property: [string] | [string, string];
 }
 
 export function isTailElementSelectNode(node: ElementSelectNode): node is TailElementSelectNode {
