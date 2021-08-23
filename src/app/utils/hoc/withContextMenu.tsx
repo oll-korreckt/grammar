@@ -2,6 +2,7 @@ import React, { MutableRefObject, Dispatch, SetStateAction, ReactChild, useState
 import { Rect, PartialRect, useClientRect, accessClassName } from "@app/utils";
 import { RefComponent } from "./higher-order-components";
 import styles from "./_styles.scss";
+import { useOutsideClick } from "../hooks";
 
 function callDispatch<TElement extends HTMLElement>(instance: TElement | null, dispatch: MutableRefObject<Dispatch<SetStateAction<Rect | undefined>> | undefined>): void {
     if (instance && dispatch.current) {
@@ -55,7 +56,9 @@ interface ContextMenuContainerProps {
 const ContextMenuContainer: React.VFC<ContextMenuContainerProps> = ({ children, dispatch }) => {
     const [targetRect, setTargetRect] = useState<Rect | undefined>();
     dispatch.current = setTargetRect;
-    const [selfRect, ref] = useClientRect();
+    const [display, setDisplay] = useState(true);
+    const [selfRect, rectRef] = useClientRect();
+    const outsideClickRef = useOutsideClick<HTMLDivElement>(() => display && setDisplay(false));
 
     let style: { top: number; left: number; } | undefined;
     if (targetRect !== undefined && selfRect !== undefined) {
@@ -71,13 +74,19 @@ const ContextMenuContainer: React.VFC<ContextMenuContainerProps> = ({ children, 
         console.log(placement);
         style = { top: placement.top, left: placement.left };
     }
+    const classNames = ["contextMenuContainer"];
+    if (!display) {
+        classNames.push("hide");
+    }
     return (
         <div
-            className={accessClassName(styles, "contextMenuContainer")}
-            ref={ref}
+            className={accessClassName(styles, ...classNames)}
+            ref={rectRef}
             style={style}
         >
-            {children}
+            <div ref={outsideClickRef}>
+                {children}
+            </div>
         </div>
     );
 };
