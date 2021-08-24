@@ -64,7 +64,7 @@ function getTypedItem<T extends ElementType>(state: DiagramState, type: T, id: E
     return output as TypedDiagramStateItem<T>;
 }
 
-function getReferencingProperties(parentType: Exclude<ElementType, "word">, parent: Identifiable, childId: ElementId): [string] | [string, string] {
+function getReferencingProperties(parentType: Exclude<ElementType, "word">, parent: Identifiable, childId: ElementId): undefined | [string] | [string, string] {
     const output: string[] = [];
     Object.entries(getElementReferences(parentType, parent as any)).forEach(([key, refs]) => {
         if (refs.map(({ id }) => id).includes(childId)) {
@@ -72,7 +72,7 @@ function getReferencingProperties(parentType: Exclude<ElementType, "word">, pare
         }
     });
     if (output.length === 0) {
-        throw `Parent '${parent.id}' contains no references to '${childId}'`;
+        return undefined;
     } else if (output.length > 2) {
         throw `Parent '${parent.id}' contains more than 2 references to '${childId}'`;
     }

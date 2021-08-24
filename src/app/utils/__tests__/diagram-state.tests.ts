@@ -135,7 +135,7 @@ describe("DiagramState", () => {
                 input,
                 "a"
             );
-            const expected = ["head"];
+            const expected: [string] = ["head"];
             assert.deepStrictEqual(result, expected);
         });
 
@@ -151,20 +151,22 @@ describe("DiagramState", () => {
                 "relativeClause",
                 input,
                 "a"
-            ).sort();
-            const expected = ["dependentWord", "subject"].sort();
+            );
+            if (result === undefined) {
+                assert.fail();
+            }
+            result.sort();
+            const expected = ["dependentWord", "subject"].sort() as [string, string];
             assert.deepStrictEqual(result, expected);
         });
 
-        test("error - no references", () => {
+        test("no references", () => {
             const input: RelativeClause = {
                 id: "input",
                 clauseType: "relative"
             };
-            assert.throw(
-                () => DiagramState.getReferencingProperties("relativeClause", input, "a"),
-                /no references/i
-            );
+            const result = DiagramState.getReferencingProperties("relativeClause", input, "a");
+            assert.isUndefined(result);
         });
 
         test("error - more than 2 references", () => {
