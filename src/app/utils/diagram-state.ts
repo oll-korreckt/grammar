@@ -66,7 +66,7 @@ function getTypedItem<T extends ElementType>(state: DiagramState, type: T, id: E
 
 function getReferencingProperties(parentType: Exclude<ElementType, "word">, parent: Identifiable, childId: ElementId): [string] | [string, string] {
     const output: string[] = [];
-    _getElementReferences(parentType, parent as any).forEach(([key, refs]) => {
+    Object.entries(getElementReferences(parentType, parent as any)).forEach(([key, refs]) => {
         if (refs.map(({ id }) => id).includes(childId)) {
             output.push(key);
         }
@@ -79,8 +79,14 @@ function getReferencingProperties(parentType: Exclude<ElementType, "word">, pare
     return output as [string] | [string, string];
 }
 
-function _getElementReferences<T extends Exclude<ElementType, "word">>(type: T, value: ElementMapper<T>): [string, ElementReference[]][] {
-    const output: [string, ElementReference[]][] = [];
+export type ReferenceObject = Record<string, ElementReference[]>;
+
+function getTypedElementReferences<T extends Exclude<ElementType, "word">>(type: T, value: ElementMapper<T>): Partial<Record<keyof ElementDefinitionMapper<T>, ElementReference[]>> {
+    return getElementReferences(type, value) as Partial<Record<keyof ElementDefinitionMapper<T>, ElementReference[]>>;
+}
+
+function getElementReferences(type: Exclude<ElementType, "word">, value: Identifiable): ReferenceObject {
+    const output: Record<string, ElementReference[]> = {};
     const def = getElementDefinition(type);
     const entries = Object.entries(def);
     for (let index = 0; index < entries.length; index++) {
@@ -90,9 +96,9 @@ function _getElementReferences<T extends Exclude<ElementType, "word">>(type: T, 
             continue;
         }
         else if (isArrayReference(isArray, propValue)) {
-            output.push([key, propValue]);
+            output[key] = propValue;
         } else {
-            output.push([key, [propValue]]);
+            output[key] = [propValue];
         }
     }
     return output;
@@ -179,7 +185,7 @@ function createDeleteItem(state: DiagramState, id: ElementId): AtomicChange[] {
         output.push(deleteParentRef);
     }
     // delete references from any children that are referenced by the item
-    const childIds = _getElementReferences(item.type, item.value as any)
+    const childIds = Object.entries(getElementReferences(item.type, item.value as any))
         .map(([, refs]) => refs)
         .flat()
         .map((ref) => ref.id);
@@ -439,5 +445,7 @@ export const DiagramState = {
     createTypedDeleteReference: createTypedDeleteReference,
     setTypedReference: setTypedReference,
     setReference: setReference,
-    getReferencingProperties: getReferencingProperties
+    getReferencingProperties: getReferencingProperties,
+    getTypedElementReferences: getTypedElementReferences,
+    getElementReferences: getElementReferences
 };

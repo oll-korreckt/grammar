@@ -1,10 +1,28 @@
-import { ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive, NounPhrase, RelativeClause, VerbPhrase } from "@domain/language";
+import { ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive, NounPhrase, RelativeClause, VerbPhrase, AdjectivePhrase } from "@domain/language";
 import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { assert } from "chai";
-import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
+import { DiagramState, ReferenceObject, TypedDiagramStateItem } from "../diagram-state";
 
 function getElementId(key: ChangeKey): string {
     return key[1] as string;
+}
+
+function sortReferenceObject(obj: ReferenceObject): ReferenceObject {
+    const output: ReferenceObject = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        output[key] = value.sort(sortElementReferences);
+    });
+    return output;
+}
+
+function sortElementReferences(x: ElementReference, y: ElementReference): number {
+    if (x.id > y.id) {
+        return 1;
+    } else if (x.id < y.id) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 describe("DiagramState", () => {
@@ -55,6 +73,54 @@ describe("DiagramState", () => {
                 /does not have type adverbphrase/i
             );
         });
+    });
+
+    test("getElementReferences", () => {
+        const input: AdjectivePhrase = {
+            id: "0",
+            phraseType: "adjective",
+            head: {
+                type: "adjective",
+                id: "1"
+            },
+            determiner: {
+                type: "determiner",
+                id: "2"
+            },
+            modifiers: [
+                {
+                    type: "adverb",
+                    id: "3"
+                },
+                {
+                    type: "adverbPhrase",
+                    id: "4"
+                }
+            ],
+            complement: {
+                type: "noun",
+                id: "5"
+            }
+        };
+        let result = DiagramState.getTypedElementReferences("adjectivePhrase", input);
+        let expected: typeof result = {
+            head: [{ type: "adjective", id: "1" }],
+            determiner: [{ type: "determiner", id: "2" }],
+            modifiers: [
+                {
+                    type: "adverb",
+                    id: "3"
+                },
+                {
+                    type: "adverbPhrase",
+                    id: "4"
+                }
+            ],
+            complement: [{ type: "noun", id: "5" }]
+        };
+        result = sortReferenceObject(result);
+        expected = sortReferenceObject(expected);
+        assert.deepStrictEqual(result, expected);
     });
 
     describe("getReferencingProperties", () => {
