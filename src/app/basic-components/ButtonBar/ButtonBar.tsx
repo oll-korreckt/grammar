@@ -1,44 +1,38 @@
-import { accessClassName, makeRefComponent, RefComponent } from "@app/utils";
+import { accessClassName } from "@app/utils";
+import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import styles from "./_styles.scss";
 
-export interface ButtonBarItemProps {
-    onClick?: () => void;
-    children: string;
-}
-
-export const ButtonBarItem: React.FC<ButtonBarItemProps> = (props) => {
-    const className = accessClassName(styles, "buttonBarItem");
-    return (
-        <div className={className}>
-            <div
-                onClick={() => props.onClick && props.onClick()}
-                className={accessClassName(styles, "interior")}
-            >
-                {props.children}
-            </div>
-        </div>
-    );
-};
-
 export interface ButtonBarProps {
-    children: React.ReactElement<ButtonBarItemProps> | [React.ReactElement<ButtonBarItemProps>, React.ReactElement<ButtonBarItemProps>];
+    itemSelect?: (item: string) => void;
+    children: string | [string, string];
 }
 
-function initChildren(children: ButtonBarProps["children"]): [React.ReactElement, React.ReactElement] {
+function initChildren(children: ButtonBarProps["children"]): string[] {
     if (Array.isArray(children)) {
+        const [left, right] = children;
+        if (left === right) {
+            throw "Items must be unique";
+        }
         return children;
     } else {
-        return [<div className={accessClassName(styles, "empty")} key={0}></div>, children];
+        return [children];
     }
 }
 
-export const ButtonBar: RefComponent<HTMLDivElement, ButtonBarProps> = makeRefComponent("ButtonBar", ({ children }, ref) => {
-    const [left, right] = initChildren(children);
+export const ButtonBar = makeRefComponent<HTMLDivElement, ButtonBarProps>("ButtonBar", ({ children, itemSelect }, ref) => {
+    const childArray = initChildren(children);
     return (
         <div className={accessClassName(styles, "buttonBar")} ref={ref}>
-            {left}
-            {right}
+            {childArray.map((item) => (
+                <div
+                    className={accessClassName(styles, "buttonBarItem")}
+                    key={item}
+                    onClick={() => itemSelect && itemSelect(item)}
+                >
+                    {item}
+                </div>
+            ))}
         </div>
     );
 });
