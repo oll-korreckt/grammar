@@ -3,8 +3,11 @@ import React from "react";
 
 export type RefComponent<TElement extends HTMLElement, TProps = {}> = React.ForwardRefExoticComponent<React.PropsWithoutRef<TProps> & React.RefAttributes<TElement>>;
 type Action<TElement extends HTMLElement, TProps> = (props: TProps, instance: TElement) => void;
+export interface ForwardRefRenderFunction<TElement extends HTMLElement, TProps = {}> extends Pick<React.ForwardRefRenderFunction<TElement, TProps>, "displayName" | "defaultProps" | "propTypes"> {
+    (props: TProps, ref: React.ForwardedRef<TElement>): React.ReactElement | null;
+}
 
-export function makeRefComponent<TElement extends HTMLElement, TProps = {}>(displayName: string, render: React.ForwardRefRenderFunction<TElement, TProps>): RefComponent<TElement, TProps> {
+export function makeRefComponent<TElement extends HTMLElement, TProps = {}>(displayName: string, render: ForwardRefRenderFunction<TElement, TProps>): RefComponent<TElement, TProps> {
     const output = React.forwardRef(render);
     output.displayName = displayName;
     return output;
