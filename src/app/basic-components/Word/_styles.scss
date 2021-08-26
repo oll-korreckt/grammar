@@ -13,6 +13,12 @@ $hl-height: 10px;
         background-color: $main;
         color: $text;
     }
+
+    .color#{$i}Fade {
+        box-shadow: inset 0 0 0 2px $dark;
+        background-color: rgba($main, 0.4);
+        color: $text;
+    }
 }
 
 .word {
@@ -30,6 +36,9 @@ $hl-height: 10px;
     transform: translateY(-100%);
     user-select: none;
     color: black;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .wordLabel {
@@ -37,4 +46,5 @@ $hl-height: 10px;
     cursor: pointer;
     font-size: 24px;
     border-radius: 3px;
+    overflow-x: hidden;
 }
