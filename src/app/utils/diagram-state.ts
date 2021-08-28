@@ -205,7 +205,7 @@ function createDeleteItem(state: DiagramState, id: ElementId): AtomicChange[] {
     return output;
 }
 
-function _addReferenceToParent(state: DiagramState, parentId: ElementId, key: string, childId: ElementId): AtomicChange {
+function _addReferenceToParent(state: DiagramState, parentId: ElementId, key: string, childId: ElementId): AtomicChange[] {
     const parent = getItem(state, parentId);
     const child = getItem(state, childId);
     const parentChangeKey = ["elements", parentId, "value", key];
@@ -220,30 +220,36 @@ function _addReferenceToParent(state: DiagramState, parentId: ElementId, key: st
     const currVal: undefined | ElementReference | ElementReference[] = (parent.value as any)[key];
     if (currVal === undefined) {
         const newVal = isArray ? [newRef] : newRef;
-        return AtomicChange.createSet(
+        return [AtomicChange.createSet(
             parentChangeKey,
             currVal,
             newVal
-        );
+        )];
     } else {
         if (isArrayReference(isArray, currVal)) {
             if (currVal.map((ref) => ref.id).includes(childId)) {
                 throw `'${key}' property of '${parentId}' element of type ${parent.type} already contains a reference to '${childId}' element`;
             }
-            return AtomicChange.createSet(
+            return [AtomicChange.createSet(
                 parentChangeKey,
                 currVal,
                 [...currVal, newRef]
-            );
+            )];
         } else {
             if (currVal.id === childId) {
                 throw `'${key}' property of '${parentId}' element of type ${parent.type} already references '${childId}' element`;
             }
-            return AtomicChange.createSet(
+            const deleteCurrValRef = _deleteReferenceFromChild(
+                state,
+                parentId,
+                currVal.id
+            );
+            const setNewRef = AtomicChange.createSet(
                 parentChangeKey,
                 currVal,
                 newRef
             );
+            return [deleteCurrValRef, setNewRef];
         }
     }
 }
@@ -257,7 +263,7 @@ function _addReferenceToChild(state: DiagramState, childId: ElementId, parentId:
         parentId
     ));
     if (child.ref !== undefined) {
-        output.push(_createDeleteParentReference(state, childId, parentId));
+        output.push(_createDeleteParentReference(state, childId, child.ref));
     }
     return output;
 }
@@ -269,7 +275,7 @@ function createTypedAddReference<TElementType extends Exclude<ElementType, "word
 function createAddReference(state: DiagramState, parentType: Exclude<ElementType, "word">, parentId: ElementId, key: string, childId: ElementId): AtomicChange[] {
     const parentChange = _addReferenceToParent(state, parentId, key as string, childId);
     const childChange = _addReferenceToChild(state, childId, parentId);
-    return [parentChange, ...childChange];
+    return [...parentChange, ...childChange];
 }
 
 function _deleteReferenceFromParent(state: DiagramState, parentId: ElementId, key: string, childId: ElementId): AtomicChange {

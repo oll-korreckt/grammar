@@ -328,6 +328,42 @@ describe("DiagramState", () => {
             assert.deepEqual(result, expected);
         });
 
+        test("switch parent", () => {
+            const word1Id = state.wordOrder[2];
+            const word2Id = state.wordOrder[3];
+            const addInfinitive = DiagramState.createAddItem("infinitive");
+            state = AtomicChange.apply(state, addInfinitive);
+            const infId = getElementId(addInfinitive.key);
+            state = AtomicChange.apply(
+                state,
+                ...DiagramState.createTypedAddReference(
+                    state,
+                    "infinitive",
+                    infId,
+                    "to",
+                    word1Id
+                )
+            );
+            const result = DiagramState.createTypedAddReference(state, "infinitive", infId, "to", word2Id);
+            const expected = [
+                AtomicChange.createDelete(
+                    ["elements", word1Id, "ref"],
+                    infId
+                ),
+                AtomicChange.createSet(
+                    ["elements", infId, "value", "to"],
+                    { id: word1Id, type: "word" },
+                    { id: word2Id, type: "word" }
+                ),
+                AtomicChange.createSet(
+                    ["elements", word2Id, "ref"],
+                    undefined,
+                    infId
+                )
+            ];
+            assert.deepStrictEqual(result, expected);
+        });
+
         test("error - reference not allowed", () => {
             const wordId = state.wordOrder[4];
             const addVerbPhrase = DiagramState.createAddItem("verbPhrase");
