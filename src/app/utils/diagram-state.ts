@@ -437,6 +437,76 @@ function setReference(state: DiagramState, parentType: Exclude<ElementType, "wor
     return output;
 }
 
+function _isEmpty(type: Exclude<ElementType, "word">, value: Record<string, ElementReference | ElementReference[]>): boolean {
+    const keys = Object.keys(getElementDefinition(type));
+    for (let index = 0; index < keys.length; index++) {
+        const key = keys[index];
+        if (value[key] !== undefined) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function _willBeEmpty({ type, value }: DiagramStateItem, childId: ElementId): boolean {
+    const references = getElementReferences(
+        type as Exclude<ElementType, "word">,
+        value
+    );
+    const entries = Object.values(references);
+    for (let index = 0; index < entries.length; index++) {
+        const entry = entries[index];
+        if (entry.length > 1) {
+            /*
+                even if childId is deleted, it would not be enough to make the
+                property empty
+            */
+            return false;
+        }
+        const id = entry[0].id;
+        if (id !== childId) {
+            /*
+                if the value of the property is not equal to the childId, it
+                will not make the property empty
+            */
+            return false;
+        }
+    }
+    return true;
+}
+
+function getEmptyElements(state: DiagramState): ElementId[] {
+    const output = new Set<ElementId>();
+    Object.entries(state.elements)
+        .filter(([, { type, value }]) => {
+            return type !== "word"
+                && _isEmpty(
+                    type,
+                    value as unknown as Record<string, ElementReference | ElementReference[]>
+                );
+        })
+        .forEach(([id, item]) => {
+            output.add(id);
+            let childId = id;
+            let parentId = item.ref;
+            let parentItem: DiagramStateItem;
+            while (parentId !== undefined
+                && _willBeEmpty(parentItem = getItem(state, parentId), childId)) {
+                output.add(parentId);
+                childId = parentId;
+                parentId = parentItem.ref;
+            }
+        });
+    return Array.from(output);
+}
+
+function createDeleteEmptyElements(state: DiagramState): AtomicChange[] {
+    return getEmptyElements(state).map((id) => AtomicChange.createDelete(
+        ["elements", id],
+        state.elements[id]
+    ));
+}
+
 export const DiagramState = {
     fromText: fromText,
     getWordIndex: getWordIndex,
@@ -453,5 +523,7 @@ export const DiagramState = {
     setReference: setReference,
     getReferencingProperties: getReferencingProperties,
     getTypedElementReferences: getTypedElementReferences,
-    getElementReferences: getElementReferences
+    getElementReferences: getElementReferences,
+    getEmptyElements: getEmptyElements,
+    createDeleteEmptyElements: createDeleteEmptyElements
 };

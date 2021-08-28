@@ -799,4 +799,84 @@ describe("DiagramState", () => {
             );
         });
     });
+
+    describe("getEmptyElements", () => {
+        test("all empty", () => {
+            const changes = [
+                DiagramState.createAddItem("infinitive"),
+                DiagramState.createAddItem("noun"),
+                DiagramState.createAddItem("preposition"),
+                DiagramState.createAddItem("pronoun")
+            ];
+            const expected = changes.map(({ key }) => getElementId(key)).sort();
+            state = AtomicChange.apply(state, ...changes);
+            const result = DiagramState.getEmptyElements(state).sort();
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("will be empty", () => {
+            const addNoun = DiagramState.createAddItem("noun");
+            const addNounPhrase = DiagramState.createAddItem("nounPhrase");
+            const addIndClause = DiagramState.createAddItem("independentClause");
+            state = AtomicChange.apply(
+                state,
+                addNoun,
+                addNounPhrase,
+                addIndClause
+            );
+            const nounId = getElementId(addNoun.key);
+            const nounPhraseId = getElementId(addNounPhrase.key);
+            const indClauseId = getElementId(addIndClause.key);
+            state = AtomicChange.apply(
+                state,
+                ...DiagramState.createTypedAddReference(
+                    state,
+                    "nounPhrase",
+                    nounPhraseId,
+                    "head",
+                    nounId
+                )
+            );
+            state = AtomicChange.apply(
+                state,
+                ...DiagramState.createTypedAddReference(
+                    state,
+                    "independentClause",
+                    indClauseId,
+                    "subject",
+                    nounPhraseId
+                )
+            );
+            const expected = [nounId, nounPhraseId, indClauseId].sort();
+            const result = DiagramState.getEmptyElements(state).sort();
+            assert.deepStrictEqual(result, expected);
+        });
+    });
+
+    test("createDeleteEmptyElements", () => {
+        const addNoun = DiagramState.createAddItem("noun");
+        const addNounPhrase = DiagramState.createAddItem("nounPhrase");
+        const addVerb = DiagramState.createAddItem("verb");
+        state = AtomicChange.apply(state, addNoun, addNounPhrase, addVerb);
+        const nounId = getElementId(addNoun.key);
+        const nounPhraseId = getElementId(addNounPhrase.key);
+        const verbId = getElementId(addVerb.key);
+        state = AtomicChange.apply(
+            state,
+            ...DiagramState.createTypedAddReference(
+                state,
+                "nounPhrase",
+                nounPhraseId,
+                "head",
+                nounId
+            )
+        );
+        const keys = [nounId, nounPhraseId, verbId];
+        assert.containsAllKeys(state.elements, keys);
+        state = AtomicChange.apply(
+            state,
+            ...DiagramState.createDeleteEmptyElements(state)
+        );
+        keys.forEach((key) => assert.isUndefined(state.elements[key]));
+    });
 });
