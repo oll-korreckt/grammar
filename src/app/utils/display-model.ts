@@ -1,9 +1,8 @@
-import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, elementTypeLists, getElementDefinition } from "@domain/language";
+import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, ElementCategory, getElementCategory, getElementDefinition } from "@domain/language";
 import { DiagramState, DiagramStateItem } from "./diagram-state";
 import { ElementDisplayInfo } from "./element-display-info";
 import { WordViewCategory } from "./word-view-context";
 
-export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
 export type WordRange = [number, number];
 export type WordIndices = (number | WordRange)[];
 
@@ -45,7 +44,7 @@ function init(state: DiagramState): DisplayModel {
         if (output[key] !== undefined) {
             continue;
         }
-        const category = _getCategory(item.type);
+        const category = getElementCategory(item.type);
         output[key] = {
             category: category,
             type: item.type,
@@ -71,7 +70,7 @@ function _processElement(model: DisplayModel, state: DiagramState, parentRef: El
     }
     model[childId].ref = parentRef;
     const parentItem = DiagramState.getItem(state, parentRef);
-    const parentCategory = _getCategory(parentItem.type);
+    const parentCategory = getElementCategory(parentItem.type);
     if (model[parentRef] === undefined) {
         // create element if it does not exist
         model[parentRef] = {
@@ -116,32 +115,6 @@ export function _appendWord(words: WordIndices, newWord: number): void {
         }
     }
     words.push(newWord);
-}
-
-const posSet = new Set([
-    ...elementTypeLists.partOfSpeech,
-    ...elementTypeLists.coordPartOfSpeech
-]) as Set<string>;
-const phraseSet = new Set([
-    ...elementTypeLists.phrase,
-    ...elementTypeLists.coordPhrase
-]) as Set<string>;
-const clauseSet= new Set([
-    ...elementTypeLists.clause,
-    ...elementTypeLists.coordClause
-]) as Set<string>;
-
-function _getCategory(type: ElementType): ElementCategory {
-    if (type === "word") {
-        return "word";
-    } else if (posSet.has(type)) {
-        return "partOfSpeech";
-    } else if (phraseSet.has(type)) {
-        return "phrase";
-    } else if (clauseSet.has(type)) {
-        return "clause";
-    }
-    throw `Unhandled type '${type}'`;
 }
 
 function _getReferencingProperties(item: DiagramStateItem, id: ElementId): string[] {
