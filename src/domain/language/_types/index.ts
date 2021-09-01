@@ -456,3 +456,29 @@ export const elementTypeLists = {
     coordClause: coordClauseList,
     element: elementTypeList
 };
+
+const posSet = new Set([
+    ...posList,
+    ...coordPosList
+]) as Set<string>;
+const phraseSet = new Set([
+    ...phraseList,
+    ...coordPhraseList
+]) as Set<string>;
+const clauseSet = new Set([
+    ...clauseList,
+    ...coordClauseList
+]) as Set<string>;
+export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
+export function getElementCategory(type: ElementType): ElementCategory {
+    if (type === "word") {
+        return "word";
+    } else if (posSet.has(type)) {
+        return "partOfSpeech";
+    } else if (phraseSet.has(type)) {
+        return "phrase";
+    } else if (clauseSet.has(type)) {
+        return "clause";
+    }
+    throw `Unhandled type '${type}'`;
+}
