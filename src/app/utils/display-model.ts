@@ -1,4 +1,4 @@
-import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, getElementDefinition } from "@domain/language";
+import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, elementTypeLists, getElementDefinition } from "@domain/language";
 import { DiagramState, DiagramStateItem } from "./diagram-state";
 import { ElementDisplayInfo } from "./element-display-info";
 import { WordViewCategory } from "./word-view-context";
@@ -118,61 +118,30 @@ export function _appendWord(words: WordIndices, newWord: number): void {
     words.push(newWord);
 }
 
-type CategoryObj = {
-    [Key in ElementType]: ElementCategory;
-}
+const posSet = new Set([
+    ...elementTypeLists.partOfSpeech,
+    ...elementTypeLists.coordPartOfSpeech
+]) as Set<string>;
+const phraseSet = new Set([
+    ...elementTypeLists.phrase,
+    ...elementTypeLists.coordPhrase
+]) as Set<string>;
+const clauseSet= new Set([
+    ...elementTypeLists.clause,
+    ...elementTypeLists.coordClause
+]) as Set<string>;
 
 function _getCategory(type: ElementType): ElementCategory {
-    const catObj: CategoryObj = {
-        word: "word",
-        noun: "partOfSpeech",
-        coordinatedNoun: "partOfSpeech",
-        pronoun: "partOfSpeech",
-        coordinatedPronoun: "partOfSpeech",
-        verb: "partOfSpeech",
-        coordinatedVerb: "partOfSpeech",
-        infinitive: "partOfSpeech",
-        coordinatedInfinitive: "partOfSpeech",
-        participle: "partOfSpeech",
-        coordinatedParticiple: "partOfSpeech",
-        gerund: "partOfSpeech",
-        coordinatedGerund: "partOfSpeech",
-        adjective: "partOfSpeech",
-        coordinatedAdjective: "partOfSpeech",
-        adverb: "partOfSpeech",
-        coordinatedAdverb: "partOfSpeech",
-        preposition: "partOfSpeech",
-        coordinatedPreposition: "partOfSpeech",
-        determiner: "partOfSpeech",
-        coordinatedDeterminer: "partOfSpeech",
-        coordinator: "partOfSpeech",
-        subordinator: "partOfSpeech",
-        nounPhrase: "phrase",
-        coordinatedNounPhrase: "phrase",
-        verbPhrase: "phrase",
-        coordinatedVerbPhrase: "phrase",
-        adjectivePhrase: "phrase",
-        coordinatedAdjectivePhrase: "phrase",
-        adverbPhrase: "phrase",
-        coordinatedAdverbPhrase: "phrase",
-        prepositionPhrase: "phrase",
-        coordinatedPrepositionPhrase: "phrase",
-        gerundPhrase: "phrase",
-        coordinatedGerundPhrase: "phrase",
-        infinitivePhrase: "phrase",
-        coordinatedInfinitivePhrase: "phrase",
-        participlePhrase: "phrase",
-        coordinatedParticiplePhrase: "phrase",
-        independentClause: "clause",
-        coordinatedIndependentClause: "clause",
-        nounClause: "clause",
-        coordinatedNounClause: "clause",
-        relativeClause: "clause",
-        coordinatedRelativeClause: "clause",
-        adverbialClause: "clause",
-        coordinatedAdverbialClause: "clause"
-    };
-    return catObj[type];
+    if (type === "word") {
+        return "word";
+    } else if (posSet.has(type)) {
+        return "partOfSpeech";
+    } else if (phraseSet.has(type)) {
+        return "phrase";
+    } else if (clauseSet.has(type)) {
+        return "clause";
+    }
+    throw `Unhandled type '${type}'`;
 }
 
 function _getReferencingProperties(item: DiagramStateItem, id: ElementId): string[] {
