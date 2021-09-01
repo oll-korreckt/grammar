@@ -470,7 +470,7 @@ const clauseSet = new Set([
     ...coordClauseList
 ]) as Set<string>;
 export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
-export function getElementCategory(type: ElementType): ElementCategory {
+function getElementCategory(type: ElementType): ElementCategory {
     if (type === "word") {
         return "word";
     } else if (posSet.has(type)) {
@@ -482,3 +482,7 @@ export function getElementCategory(type: ElementType): ElementCategory {
     }
     throw `Unhandled type '${type}'`;
 }
+
+export const ElementCategory = {
+    getElementCategory: getElementCategory
+};

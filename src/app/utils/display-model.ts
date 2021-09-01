@@ -1,4 +1,4 @@
-import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, ElementCategory, getElementCategory, getElementDefinition } from "@domain/language";
+import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, ElementCategory, getElementDefinition } from "@domain/language";
 import { DiagramState, DiagramStateItem } from "./diagram-state";
 import { ElementDisplayInfo } from "./element-display-info";
 import { WordViewCategory } from "./word-view-context";
@@ -44,7 +44,7 @@ function init(state: DiagramState): DisplayModel {
         if (output[key] !== undefined) {
             continue;
         }
-        const category = getElementCategory(item.type);
+        const category = ElementCategory.getElementCategory(item.type);
         output[key] = {
             category: category,
             type: item.type,
@@ -70,7 +70,7 @@ function _processElement(model: DisplayModel, state: DiagramState, parentRef: El
     }
     model[childId].ref = parentRef;
     const parentItem = DiagramState.getItem(state, parentRef);
-    const parentCategory = getElementCategory(parentItem.type);
+    const parentCategory = ElementCategory.getElementCategory(parentItem.type);
     if (model[parentRef] === undefined) {
         // create element if it does not exist
         model[parentRef] = {
