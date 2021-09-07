@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { DiagramState, DiagramStateContext, DisplayModel, ElementCategory, ElementData, ElementDisplayInfo, ElementSelectState, SelectedElement, WordIndices, WordRange, WordViewCategory, WordViewContext } from "@app/utils";
-import { ElementId } from "@domain/language";
+import { DiagramState, DiagramStateContext, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedElement, WordIndices, WordRange, WordViewCategory, WordViewContext } from "@app/utils";
+import { ElementId, ElementCategory } from "@domain/language";
 import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
 
@@ -29,6 +29,9 @@ function _getElementData(diagram: DiagramState, model: DisplayModel, id: Element
     const output: ElementData[] = [];
     const elementType = DiagramState.getItem(diagram, id).type;
     const element = model[id];
+    if (element.words.length === 0) {
+        return [];
+    }
     const headWIndex = element.words[0];
     const headData: ElementData = {
         head: true,
@@ -74,10 +77,10 @@ function _populate(diagram: DiagramState, model: DisplayModel, id: ElementId, se
 
 function _populateExpanded(diagram: DiagramState, displayModel: DisplayModel, id: ElementId, output: (ElementData | undefined)[]): void {
     const displayElement = displayModel[id];
-    if (displayElement.properties === undefined) {
-        throw "";
-    }
-    Object.values(displayElement.properties)
+    const properties: Record<string, ElementId[]> = displayElement.properties
+        ? displayElement.properties
+        : {};
+    Object.values(properties)
         .flat()
         .forEach((childId) => _populate(diagram, displayModel, childId, undefined, output));
 }
