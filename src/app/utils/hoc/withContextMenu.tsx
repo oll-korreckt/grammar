@@ -71,7 +71,6 @@ const ContextMenuContainer: React.VFC<ContextMenuContainerProps> = ({ children, 
             },
             5
         );
-        console.log(placement);
         style = { top: placement.top, left: placement.left };
     }
     const classNames = ["contextMenuContainer"];
