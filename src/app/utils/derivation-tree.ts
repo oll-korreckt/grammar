@@ -25,7 +25,7 @@ export type DerivationTreeItem = {
 }
 
 export type DerivationTarget = {
-    type: ElementType;
+    type: Exclude<ElementType, "word">;
     properties: string[];
 }
 
@@ -75,7 +75,7 @@ function getElementBaseType(value: ElementType): BaseElementType {
     return isBaseElementType(value) ? value : removeCoordinated(value);
 }
 
-function storeTarget(type: ElementType, property: string, output: Record<string, DerivationTreeItem>): void {
+function storeTarget(type: Exclude<ElementType, "word">, property: string, output: Record<string, DerivationTreeItem>): void {
     const baseType = getElementBaseType(type);
     if (output[baseType] === undefined) {
         output[baseType] = { baseType: baseType };

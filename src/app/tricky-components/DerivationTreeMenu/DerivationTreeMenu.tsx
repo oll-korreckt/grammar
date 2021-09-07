@@ -1,4 +1,4 @@
-import { accessClassName, DerivationTarget, DerivationTree, DerivationTreeItem, ElementDisplayInfo } from "@app/utils";
+import { accessClassName, DerivationTarget, DerivationTree, DerivationTreeItem, ElementDisplayInfo, useOutsideClick } from "@app/utils";
 import { ElementType } from "@domain/language";
 import React from "react";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { DerivationContext } from "./derivation-context";
 import styles from "./_styles.scss";
 
 export interface RefinedDerivationTarget {
-    type: ElementType;
+    type: Exclude<ElementType, "word">;
     property: string;
 }
 
@@ -21,12 +21,13 @@ export interface DerivationTreeMenuProps {
 }
 
 export const DerivationTreeMenu: React.VFC<DerivationTreeMenuProps> = ({ children, onSelect, onCancel }) => {
-    const [state, setState] = useState<DerivationTarget>();
     const callOnSelect: OnSelect = (tgt) => onSelect && onSelect(tgt);
     const callOnCancel = () => onCancel && onCancel();
+    const ref = useOutsideClick<HTMLDivElement>(callOnCancel);
+    const [state, setState] = useState<DerivationTarget>();
 
     return (
-        <div className={accessClassName(styles, "menu")}>
+        <div className={accessClassName(styles, "menu")} ref={ref}>
             {state === undefined
                 ?
                 <>
