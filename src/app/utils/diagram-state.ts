@@ -120,18 +120,19 @@ function createWordSorter(state: DiagramState): (x: ElementId, y: ElementId) => 
     };
 }
 
-function createAddItem(type: Exclude<ElementType, "word">): AtomicChange {
-    const id = getNewItemId();
-    const value = initElement(type, id);
+function createAddItem(type: Exclude<ElementType, "word">): [ElementId, AtomicChange] {
+    const idOutput = getNewItemId();
+    const value = initElement(type, idOutput);
     const newValue: DiagramStateItem = {
         value: value,
         type: type
     };
-    return AtomicChange.createSet(
+    const changeOutput = AtomicChange.createSet(
         ["elements", value.id],
         undefined,
         newValue
     );
+    return [idOutput, changeOutput];
 }
 
 function _createDeleteParentReference(state: DiagramState, childId: ElementId, parentId: ElementId): AtomicChange {

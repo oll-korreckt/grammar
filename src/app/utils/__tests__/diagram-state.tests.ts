@@ -3,9 +3,6 @@ import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { assert } from "chai";
 import { DiagramState, ReferenceObject, TypedDiagramStateItem } from "../diagram-state";
 
-function getElementId(key: ChangeKey): string {
-    return key[1] as string;
-}
 
 function sortReferenceObject(obj: ReferenceObject): ReferenceObject {
     const output: ReferenceObject = {};
@@ -207,35 +204,31 @@ describe("DiagramState", () => {
     });
 
     test("createAddItem", () => {
-        const result = DiagramState.createAddItem("adverbPhrase");
-        if (result.type !== ChangeType.Set) {
+        const [id, chg] = DiagramState.createAddItem("adverbPhrase");
+        if (chg.type !== ChangeType.Set) {
             assert.fail();
         }
-        assert.deepStrictEqual(result.key, ["elements", result.key[1]]);
-        assert.isUndefined(result.currVal);
+        assert.deepStrictEqual(chg.key, ["elements", chg.key[1]]);
+        assert.isUndefined(chg.currVal);
         const expected: TypedDiagramStateItem<"adverbPhrase"> = {
             type: "adverbPhrase",
             value: {
-                id: getElementId(result.key),
+                id: id,
                 phraseType: "adverb"
             }
         };
-        assert.deepStrictEqual(result.newVal, expected);
+        assert.deepStrictEqual(chg.newVal, expected);
     });
 
     describe("createDeleteItem", () => {
         test("standard", () => {
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
-            const addNounPhrase = DiagramState.createAddItem("nounPhrase");
-            const nounPhraseId = getElementId(addNounPhrase.key);
+            const [nounPhraseId, addNounPhrase] = DiagramState.createAddItem("nounPhrase");
             state = AtomicChange.apply(state, addNounPhrase);
-            const addAdjectivePhrase = DiagramState.createAddItem("adjectivePhrase");
-            const adjectivePhraseId = getElementId(addAdjectivePhrase.key);
+            const [adjectivePhraseId, addAdjectivePhrase] = DiagramState.createAddItem("adjectivePhrase");
             state = AtomicChange.apply(state, addAdjectivePhrase);
-            const addIndependentClause = DiagramState.createAddItem("independentClause");
-            const independentClauseId = getElementId(addIndependentClause.key);
+            const [independentClauseId, addIndependentClause] = DiagramState.createAddItem("independentClause");
             state = AtomicChange.apply(state, addIndependentClause);
             state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "nounPhrase", nounPhraseId, "head", nounId));
             state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "nounPhrase", nounPhraseId, "modifiers", adjectivePhraseId));
@@ -273,8 +266,7 @@ describe("DiagramState", () => {
         });
 
         test("error - referenced by word", () => {
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, AtomicChange.createSet(
                 ["elements", nounId, "ref"],
@@ -288,10 +280,8 @@ describe("DiagramState", () => {
         });
 
         test("error - parent does not reference", () => {
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
-            const addNounPhrase = DiagramState.createAddItem("nounPhrase");
-            const nounPhraseId = getElementId(addNounPhrase.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
+            const [nounPhraseId, addNounPhrase] = DiagramState.createAddItem("nounPhrase");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, AtomicChange.createSet(
                 ["elements", nounId, "ref"],
@@ -309,9 +299,8 @@ describe("DiagramState", () => {
     describe("createTypedAddReference", () => {
         test("standard", () => {
             const wordId = state.wordOrder[3];
-            const addNoun = DiagramState.createAddItem("noun");
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
-            const nounId = getElementId(addNoun.key);
             const result = DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId);
             const expected = [
                 AtomicChange.createSet(
@@ -331,9 +320,8 @@ describe("DiagramState", () => {
         test("switch parent", () => {
             const word1Id = state.wordOrder[2];
             const word2Id = state.wordOrder[3];
-            const addInfinitive = DiagramState.createAddItem("infinitive");
+            const [infId, addInfinitive] = DiagramState.createAddItem("infinitive");
             state = AtomicChange.apply(state, addInfinitive);
-            const infId = getElementId(addInfinitive.key);
             state = AtomicChange.apply(
                 state,
                 ...DiagramState.createTypedAddReference(
@@ -366,8 +354,7 @@ describe("DiagramState", () => {
 
         test("error - reference not allowed", () => {
             const wordId = state.wordOrder[4];
-            const addVerbPhrase = DiagramState.createAddItem("verbPhrase");
-            const verbPhraseId = getElementId(addVerbPhrase.key);
+            const [verbPhraseId, addVerbPhrase] = DiagramState.createAddItem("verbPhrase");
             state = AtomicChange.apply(state, addVerbPhrase);
             assert.throw(
                 () => DiagramState.createTypedAddReference(state, "verbPhrase", verbPhraseId, "head", wordId),
@@ -377,9 +364,8 @@ describe("DiagramState", () => {
 
         test("error - reference already exists - array property", () => {
             const wordId = state.wordOrder[3];
-            const addNoun = DiagramState.createAddItem("noun");
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
-            const nounId = getElementId(addNoun.key);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             assert.throw(
                 () => DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId),
@@ -388,12 +374,10 @@ describe("DiagramState", () => {
         });
 
         test("error - reference already exists - object property", () => {
-            const addVerb = DiagramState.createAddItem("verb");
+            const [verbId, addVerb] = DiagramState.createAddItem("verb");
             state = AtomicChange.apply(state, addVerb);
-            const verbId = getElementId(addVerb.key);
-            const addVerbPhrase = DiagramState.createAddItem("verbPhrase");
+            const [verbPhraseId, addVerbPhrase] = DiagramState.createAddItem("verbPhrase");
             state = AtomicChange.apply(state, addVerbPhrase);
-            const verbPhraseId = getElementId(addVerbPhrase.key);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "verbPhrase", verbPhraseId, "head", verbId));
             assert.throw(
                 () => DiagramState.createTypedAddReference(state, "verbPhrase", verbPhraseId, "head", verbId),
@@ -405,8 +389,7 @@ describe("DiagramState", () => {
     describe("createTypedDeleteReference", () => {
         test("standard", () => {
             const wordId = state.wordOrder[3];
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             const result = DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", wordId);
@@ -424,8 +407,7 @@ describe("DiagramState", () => {
         });
 
         test("error - no property", () => {
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             assert.throw(
                 () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", ""),
@@ -434,8 +416,7 @@ describe("DiagramState", () => {
         });
 
         test("error - array - parent does not reference", () => {
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", state.wordOrder[3]));
             assert.throw(
@@ -446,8 +427,7 @@ describe("DiagramState", () => {
 
         test("error - array - parent has multiple references", () => {
             const wordId = state.wordOrder[3];
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             state = AtomicChange.apply(state, AtomicChange.createSet(
@@ -471,10 +451,8 @@ describe("DiagramState", () => {
         });
 
         test("error - object - parent does not reference", () => {
-            const addVerb = DiagramState.createAddItem("verb");
-            const addVerbId = getElementId(addVerb.key);
-            const addVerbPhrase = DiagramState.createAddItem("verbPhrase");
-            const addVerbPhraseId = getElementId(addVerbPhrase.key);
+            const [addVerbId, addVerb] = DiagramState.createAddItem("verb");
+            const [addVerbPhraseId, addVerbPhrase] = DiagramState.createAddItem("verbPhrase");
             state = AtomicChange.apply(state, addVerb, addVerbPhrase);
             state = AtomicChange.apply(state, ...DiagramState.createAddReference(state, "verbPhrase", addVerbPhraseId, "head", addVerbId));
             state = AtomicChange.apply(state, AtomicChange.createSet(
@@ -493,8 +471,7 @@ describe("DiagramState", () => {
 
         test("error - child not referenced", () => {
             const wordId = state.wordOrder[3];
-            const addNoun = DiagramState.createAddItem("noun");
-            const nounId = getElementId(addNoun.key);
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
             state = AtomicChange.apply(state, AtomicChange.createDelete(
@@ -808,25 +785,22 @@ describe("DiagramState", () => {
                 DiagramState.createAddItem("preposition"),
                 DiagramState.createAddItem("pronoun")
             ];
-            const expected = changes.map(({ key }) => getElementId(key)).sort();
-            state = AtomicChange.apply(state, ...changes);
+            const expected = changes.map(([id]) => id).sort();
+            state = AtomicChange.apply(state, ...changes.map(([, chg]) => chg));
             const result = DiagramState.getEmptyElements(state).sort();
             assert.deepStrictEqual(result, expected);
         });
 
         test("will be empty", () => {
-            const addNoun = DiagramState.createAddItem("noun");
-            const addNounPhrase = DiagramState.createAddItem("nounPhrase");
-            const addIndClause = DiagramState.createAddItem("independentClause");
+            const [nounId, addNoun] = DiagramState.createAddItem("noun");
+            const [nounPhraseId, addNounPhrase] = DiagramState.createAddItem("nounPhrase");
+            const [indClauseId, addIndClause] = DiagramState.createAddItem("independentClause");
             state = AtomicChange.apply(
                 state,
                 addNoun,
                 addNounPhrase,
                 addIndClause
             );
-            const nounId = getElementId(addNoun.key);
-            const nounPhraseId = getElementId(addNounPhrase.key);
-            const indClauseId = getElementId(addIndClause.key);
             state = AtomicChange.apply(
                 state,
                 ...DiagramState.createTypedAddReference(
@@ -854,13 +828,10 @@ describe("DiagramState", () => {
     });
 
     test("createDeleteEmptyElements", () => {
-        const addNoun = DiagramState.createAddItem("noun");
-        const addNounPhrase = DiagramState.createAddItem("nounPhrase");
-        const addVerb = DiagramState.createAddItem("verb");
+        const [nounId, addNoun] = DiagramState.createAddItem("noun");
+        const [nounPhraseId, addNounPhrase] = DiagramState.createAddItem("nounPhrase");
+        const [verbId, addVerb] = DiagramState.createAddItem("verb");
         state = AtomicChange.apply(state, addNoun, addNounPhrase, addVerb);
-        const nounId = getElementId(addNoun.key);
-        const nounPhraseId = getElementId(addNounPhrase.key);
-        const verbId = getElementId(addVerb.key);
         state = AtomicChange.apply(
             state,
             ...DiagramState.createTypedAddReference(
