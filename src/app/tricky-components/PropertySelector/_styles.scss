@@ -1,0 +1,37 @@
+@use "main";
+
+.property {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 2rem;
+    border-radius: 1rem;
+    border: 2px solid black;
+    padding: 5px;
+    margin: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.label {
+    @include main.center-content;
+    white-space: nowrap;
+}
+
+.icon {
+    @include main.center-content;
+}
+
+.unselected {
+    background-color: white;
+    &:hover {
+        background-color: rgb(245, 245, 245);
+    }
+}
+
+.selected {
+    background-color: rgb(200, 200, 200);
+    &:hover {
+        background-color: rgb(190, 190, 190);
+    }
+}
