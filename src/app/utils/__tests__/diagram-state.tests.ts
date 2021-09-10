@@ -132,7 +132,7 @@ describe("DiagramState", () => {
                 input,
                 "a"
             );
-            const expected: [string] = ["head"];
+            const expected = "head";
             assert.deepStrictEqual(result, expected);
         });
 
@@ -148,7 +148,7 @@ describe("DiagramState", () => {
                 "relativeClause",
                 input,
                 "a"
-            );
+            ) as [string, string];
             if (result === undefined) {
                 assert.fail();
             }

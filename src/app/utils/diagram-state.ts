@@ -64,19 +64,23 @@ function getTypedItem<T extends ElementType>(state: DiagramState, type: T, id: E
     return output as TypedDiagramStateItem<T>;
 }
 
-function getReferencingProperties(parentType: Exclude<ElementType, "word">, parent: Identifiable, childId: ElementId): undefined | [string] | [string, string] {
+function getReferencingProperties(parentType: Exclude<ElementType, "word">, parent: Identifiable, childId: ElementId): undefined | string | [string, string] {
     const output: string[] = [];
     Object.entries(getElementReferences(parentType, parent as any)).forEach(([key, refs]) => {
         if (refs.map(({ id }) => id).includes(childId)) {
             output.push(key);
         }
     });
-    if (output.length === 0) {
-        return undefined;
-    } else if (output.length > 2) {
-        throw `Parent '${parent.id}' contains more than 2 references to '${childId}'`;
+    switch (output.length) {
+        case 0:
+            return undefined;
+        case 1:
+            return output[0];
+        case 2:
+            return output as [string, string];
+        default:
+            throw `Parent '${parent.id}' contains more than 2 references to '${childId}'`;
     }
-    return output as [string] | [string, string];
 }
 
 export type ReferenceObject = Record<string, ElementReference[]>;
