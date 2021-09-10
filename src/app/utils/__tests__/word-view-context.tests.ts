@@ -1,14 +1,31 @@
 import { createState, Ids } from "@app/testing";
 import { assert } from "chai";
-import { DiagramState, SelectedNodeChain } from "..";
+import { DiagramState, SelectedNodeChain, SelectNode } from "..";
 
 describe("word-view-context", () => {
-    describe("generateChain", () => {
-        let state: DiagramState;
-        beforeEach(() => {
-            state = createState();
+    let state: DiagramState;
+    beforeAll(() => {
+        state = createState();
+    });
+
+    describe("SelectNode.getParent", () => {
+        test("has result", () => {
+            const result = SelectNode.getParent(state, Ids.jumpsVerbPhrase);
+            const expected: SelectNode = {
+                id: Ids.indClause,
+                type: "independentClause",
+                state: "expand"
+            };
+            assert.deepStrictEqual(result, expected);
         });
 
+        test("undefined result", () => {
+            const result = SelectNode.getParent(state, Ids.indClause);
+            assert.isUndefined(result);
+        });
+    });
+
+    describe("SelectedNodeChain.generateChain", () => {
         test("5-layer deep", () => {
             const result = SelectedNodeChain.generateChain(state, Ids.brown, "select");
             const expected: SelectedNodeChain = [

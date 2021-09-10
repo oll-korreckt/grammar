@@ -19,8 +19,24 @@ export type SelectNode = {
     id: ElementId;
     type: ElementType;
     state: ElementSelectState;
-    property?: string | [string, string];
 }
+
+function getParent(state: DiagramState, id: ElementId): SelectNode | undefined {
+    const item = DiagramState.getItem(state, id);
+    if (item.ref === undefined) {
+        return undefined;
+    }
+    const parent = DiagramState.getItem(state, item.ref);
+    return {
+        id: item.ref,
+        type: parent.type,
+        state: "expand"
+    };
+}
+
+export const SelectNode = {
+    getParent: getParent
+};
 
 export interface HeadSelectNode {
     id: ElementId;
@@ -28,17 +44,9 @@ export interface HeadSelectNode {
     type: ElementType;
 }
 
-export function isHeadElementSelectNode(node: SelectNode): node is HeadSelectNode {
-    return node.property === undefined;
-}
-
 export interface TailSelectNode extends HeadSelectNode {
     state: ElementSelectState;
     property: string | [string, string];
-}
-
-export function isTailElementSelectNode(node: SelectNode): node is TailSelectNode {
-    return node.property !== undefined;
 }
 
 export type SelectedNodeChain = [HeadSelectNode, ...TailSelectNode[]];
@@ -46,7 +54,7 @@ export type WordViewCategory = "partOfSpeech" | "phraseAndClause";
 
 export interface WordViewContext {
     category: WordViewCategory;
-    selectedItem?: SelectedNodeChain;
+    selectedNode?: SelectNode;
 }
 
 export const WordViewContext = createContext<WordViewContext>({
@@ -54,13 +62,14 @@ export const WordViewContext = createContext<WordViewContext>({
 });
 
 function generateChain(state: DiagramState, id: ElementId, selectState: ElementSelectState): SelectedNodeChain {
-    let output: Omit<SelectNode, "state">[] = [];
+    type OutputNode = Omit<SelectNode, "state"> & { property?: string | [string, string]; };
+    let output: OutputNode[] = [];
     let parentId: ElementId | undefined = id;
     let childId: ElementId | undefined = undefined;
     let childItem: DiagramStateItem | undefined = undefined;
     while (parentId !== undefined) {
         const parentItem = DiagramState.getItem(state, parentId);
-        const newNode: Omit<SelectNode, "state"> = {
+        const newNode: OutputNode = {
             id: parentId,
             type: parentItem.type
         };
