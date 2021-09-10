@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { DiagramState, DiagramStateContext, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedElement, WordIndices, WordRange, WordViewCategory, WordViewContext } from "@app/utils";
+import { DiagramState, DiagramStateContext, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedNodeChain, SelectNode, WordIndices, WordRange, WordViewCategory, WordViewContext } from "@app/utils";
 import { ElementId, ElementCategory } from "@domain/language";
 import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
@@ -91,10 +91,15 @@ function _populateSelected(diagram: DiagramState, displayModel: DisplayModel, id
         .forEach((data) => _placeElementData(data, output));
 }
 
-function _selectedItem(diagram: DiagramState, displayModel: DisplayModel, selectedItem: SelectedElement | undefined, output: (ElementData | undefined)[]): void {
-    if (selectedItem === undefined) {
+function _selectedItem(diagram: DiagramState, displayModel: DisplayModel, selectedNode: SelectNode | undefined, output: (ElementData | undefined)[]): void {
+    if (selectedNode === undefined) {
         return;
     }
+    const selectedItem = SelectedNodeChain.generateChain(
+        diagram,
+        selectedNode.id,
+        selectedNode.state
+    );
     const lastItem = selectedItem[selectedItem.length - 1];
     _populate(diagram, displayModel, lastItem.id, lastItem.state, output);
     for (let index = selectedItem.length - 2; index >= 0; index--) {
@@ -164,7 +169,7 @@ function createFilterFn(category: WordViewCategory): ElementFilterFunction {
     };
 }
 
-export function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewCategory, selectedItem: SelectedElement | undefined): ElementData[] {
+export function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewCategory, selectedNode: SelectNode | undefined): ElementData[] {
     const output: (ElementData | undefined)[] = diagram.wordOrder.map(() => undefined);
     _elementFilter(
         diagram,
@@ -172,7 +177,7 @@ export function getElementData(diagram: DiagramState, displayModel: DisplayModel
         createFilterFn(elementFilter),
         output
     );
-    _selectedItem(diagram, displayModel, selectedItem, output);
+    _selectedItem(diagram, displayModel, selectedNode, output);
     _fillOutput(diagram, displayModel, output);
 
     return output.filter((x) => x !== undefined) as ElementData[];
@@ -198,7 +203,7 @@ export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDia
         state,
         model,
         edContext.category,
-        edContext.selectedItem
+        edContext.selectedNode
     );
 
     function createElement(data: ElementData): RefComponent<HTMLSpanElement> {
