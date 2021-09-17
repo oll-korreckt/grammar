@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 export type RefComponent<TElement extends HTMLElement, TProps = {}> = React.ForwardRefExoticComponent<React.PropsWithoutRef<TProps> & React.RefAttributes<TElement>>;
 type Action<TElement extends HTMLElement, TProps> = (props: TProps, instance: TElement) => void;
@@ -79,4 +79,82 @@ export function withoutClassName<TElement extends HTMLElement, TProps>(
     Component: RefComponent<TElement, TProps>,
     ...classNames: string[]): RefComponent<TElement, TProps> {
     return makeRefHoc(Component, "withoutClassName", (_, instance) => instance.classList.remove(...classNames));
+}
+
+function isValidClassListString(value: string | undefined): value is string {
+    return value !== undefined && value.length > 0;
+}
+
+export function withClassNameProp<TElement extends HTMLElement, TProps = {}>(Component: RefComponent<TElement, TProps>): RefComponent<TElement, TProps & { className?: string; }> {
+    return makeRefComponent<TElement, TProps & { className?: string; }>(`withClassNameProp(${Component.displayName})`, ({ className, ...rest }, ref) => {
+        const localRef = useRef<TElement>(null);
+        const classNameRef = useRef<string>();
+
+        useEffect(() => {
+            if (localRef.current !== null) {
+                const classList = localRef.current.classList;
+                if (isValidClassListString(classNameRef.current)) {
+                    classList.remove(...classNameRef.current.split(" "));
+                }
+                if (isValidClassListString(className)) {
+                    classList.add(...className.split(" "));
+                    classNameRef.current = className;
+                }
+            }
+        }, [className]);
+
+        return <Component ref={mergeRefs(localRef, ref)} {...rest as TProps}/>;
+    });
+}
+
+
+type SupportedEvents = Extract<keyof HTMLElementEventMap, "click">;
+type EventNameMapper<TEvent extends SupportedEvents> =
+    TEvent extends "click" ? "onClick"
+    : never;
+type EventNameMapperObject = {
+    [Key in SupportedEvents]: EventNameMapper<Key>;
+};
+const mapperObj: EventNameMapperObject = {
+    click: "onClick"
+};
+type EventMapper<TEvent extends SupportedEvents> = { [Key in EventNameMapper<TEvent>]?: () => void; };
+
+function extractCallbackProp<TProps extends {}, TEvent extends SupportedEvents>(
+    props: TProps & EventMapper<TEvent>, type: TEvent): [EventMapper<TEvent>[EventNameMapper<TEvent>], TProps] {
+    const propsCopy = { ...props } as Record<string, unknown>;
+    const callbackPropName = mapperObj[type];
+    const callbackProp = propsCopy[callbackPropName] as EventMapper<TEvent>[EventNameMapper<TEvent>];
+    delete propsCopy[callbackPropName];
+    return [callbackProp, propsCopy as TProps];
+}
+
+export function withEventProp<TEvent extends SupportedEvents, TElement extends HTMLElement, TProps = {}>(Component: RefComponent<TElement, TProps>, type: TEvent): RefComponent<TElement, TProps & EventMapper<TEvent>> {
+    const displayName = `with_${type}_EventProp(${Component.displayName})`;
+    return makeRefComponent<TElement, TProps & EventMapper<TEvent>>(displayName, (props, ref) => {
+        const localRef = useRef<TElement>(null);
+        const [callback, cmpProps] = extractCallbackProp<TProps, TEvent>(props, type);
+        useEffect(() => {
+            if (localRef.current !== null) {
+                const event = () => callback && callback();
+                const cleanupVar = localRef.current;
+                cleanupVar.addEventListener(type, event);
+                return () => cleanupVar.removeEventListener(type, event);
+            }
+        }, [callback]);
+
+        return <Component ref={mergeRefs(localRef, ref)} {...cmpProps}/>;
+    });
+}
+
+function mergeRefs<T>(ref1: React.ForwardedRef<T>, ref2: React.ForwardedRef<T>): React.ForwardedRef<T> {
+    return (value) => {
+        [ref1, ref2].forEach((ref) => {
+            if (typeof ref === "function") {
+                ref(value);
+            } else if (ref !== null) {
+                ref.current = value;
+            }
+        });
+    };
 }
