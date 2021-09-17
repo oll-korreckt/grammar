@@ -1,5 +1,5 @@
 import { accessClassName } from "@app/utils";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styles from "./_styles.scss";
 
 export interface CircleProgressProps {
@@ -63,18 +63,30 @@ function calcColor(progress: number, colors: HsvColor[]): HsvColor {
 }
 
 export const CircleProgress: React.FC<CircleProgressProps> = ({ progress, thickness, colors, children }) => {
-    const radius = 50;
-    const circumference = 2 * Math.PI * radius;
-    const dashOffset = (100 - progress) * circumference / 100;
+    const svgRef = useRef<SVGSVGElement>(null);
+    useEffect(() => {
+        if (svgRef.current !== null) {
+            const node = svgRef.current;
+            const { width, height } = node.getBoundingClientRect();
+            if (width !== height) {
+                throw "width and height of body most be equal";
+            }
+            const radius = width / 2;
+            const circumference = 2 * Math.PI * radius;
+            const dashOffset = (100 - progress) * circumference / 100;
+            node.style.strokeDasharray = circumference.toString();
+            node.style.strokeDashoffset = dashOffset.toString();
+        }
+    }, [progress]);
+
     const { hue, saturation, lightness }: HsvColor = colors === undefined
         ? { hue: 0, saturation: 0, lightness: 0 }
         : calcColor(progress, colors);
     const circleStyle: React.CSSProperties = {
-        strokeDasharray: circumference,
-        strokeDashoffset: dashOffset,
         strokeWidth: thickness,
         stroke: `hsl(${hue}deg, ${saturation}%, ${lightness}%)`
     };
+
     return (
         <div
             className={accessClassName(styles, "circleProgress")}
@@ -88,8 +100,8 @@ export const CircleProgress: React.FC<CircleProgressProps> = ({ progress, thickn
                     <svg
                         viewBox="0 0 100 100"
                         xmlns="http://www.w3.org/2000/svg"
-                        vectorEffect="non-scaling-stroke"
                         className={accessClassName(styles, "svg")}
+                        ref={svgRef}
                     >
                         <circle
                             cx="50"

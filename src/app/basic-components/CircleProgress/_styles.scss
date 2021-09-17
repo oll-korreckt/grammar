@@ -28,6 +28,7 @@ $time: 0.5s;
 .circle {
     fill: none;
     stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
     transition: stroke-dashoffset $time, stroke $time;
 }
 
