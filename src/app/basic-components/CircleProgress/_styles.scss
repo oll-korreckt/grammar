@@ -1,0 +1,33 @@
+.circleProgress {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.svgOuterContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.svgInnerContainer {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.svg {
+    overflow: visible;
+}
+
+$time: 0.5s;
+
+.circle {
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset $time, stroke $time;
+}
+
