@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 
 export type RefComponent<TElement extends HTMLElement, TProps = {}> = React.ForwardRefExoticComponent<React.PropsWithoutRef<TProps> & React.RefAttributes<TElement>>;
 type Action<TElement extends HTMLElement, TProps> = (props: TProps, instance: TElement) => void;
@@ -90,7 +90,7 @@ export function withClassNameProp<TElement extends HTMLElement, TProps = {}>(Com
         const localRef = useRef<TElement>(null);
         const classNameRef = useRef<string>();
 
-        useEffect(() => {
+        useLayoutEffect(() => {
             if (localRef.current !== null) {
                 const classList = localRef.current.classList;
                 if (isValidClassListString(classNameRef.current)) {
