@@ -1,5 +1,5 @@
 import { accessClassName } from "@app/utils";
-import React, { useEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import styles from "./_styles.scss";
 
 export interface CircleProgressProps {
@@ -62,9 +62,18 @@ function calcColor(progress: number, colors: HsvColor[]): HsvColor {
     throw "error";
 }
 
+function useIsMounted(): boolean {
+    const [isMounted, setIsMounted] = useState(false);
+    useLayoutEffect(() => {
+        setIsMounted(true);
+    }, []);
+    return isMounted;
+}
+
 export const CircleProgress: React.FC<CircleProgressProps> = ({ progress, thickness, colors, children }) => {
     const svgRef = useRef<SVGSVGElement>(null);
-    useEffect(() => {
+    const isMounted = useIsMounted();
+    useLayoutEffect(() => {
         if (svgRef.current !== null) {
             const node = svgRef.current;
             const { width, height } = node.getBoundingClientRect();
@@ -78,6 +87,13 @@ export const CircleProgress: React.FC<CircleProgressProps> = ({ progress, thickn
             node.style.strokeDashoffset = dashOffset.toString();
         }
     }, [progress]);
+
+    const circleClasses: string[] = ["circle"];
+    if (isMounted) {
+        circleClasses.push("circlePostMount");
+    } else {
+        circleClasses.push("circlePreMount");
+    }
 
     const { hue, saturation, lightness }: HsvColor = colors === undefined
         ? { hue: 0, saturation: 0, lightness: 0 }
@@ -107,7 +123,7 @@ export const CircleProgress: React.FC<CircleProgressProps> = ({ progress, thickn
                             cx="50"
                             cy="50"
                             r="50"
-                            className={accessClassName(styles, "circle")}
+                            className={accessClassName(styles, ...circleClasses)}
                             style={circleStyle}
                             key="circle"
                         />

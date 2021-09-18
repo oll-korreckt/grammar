@@ -32,3 +32,12 @@ $time: 0.5s;
     transition: stroke-dashoffset $time, stroke $time;
 }
 
+.circlePreMount {
+    display: none;
+}
+
+.circlePostMount {
+    transition: stroke-dashoffset $time, stroke $time;
+    display: initial;
+}
+
