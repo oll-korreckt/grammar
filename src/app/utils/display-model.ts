@@ -1,7 +1,7 @@
-import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, ElementCategory, getElementDefinition } from "@domain/language";
+import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, ElementCategory, getElementDefinition, elementTypeLists } from "@domain/language";
 import { DiagramState, DiagramStateItem } from "./diagram-state";
 import { ElementDisplayInfo } from "./element-display-info";
-import { WordViewCategory } from "./word-view-context";
+import { WordViewStage } from "./word-view-context";
 
 export type WordRange = [number, number];
 export type WordIndices = (number | WordRange)[];
@@ -176,7 +176,7 @@ function _isComplete(element: DisplayModelElement): boolean {
 }
 
 export type Progress = {
-    [Key in WordViewCategory]: {
+    [Key in WordViewStage]: {
         percentage: number;
         errorItems: ElementId[];
     };
@@ -189,47 +189,59 @@ type ProgressPreOutputValue = {
 
 export type ProgressPreOutput = {
     wordCount: number;
-    partOfSpeech: ProgressPreOutputValue;
-    nonIndClause: ProgressPreOutputValue;
-    indClause: ProgressPreOutputValue;
+    category: ProgressPreOutputValue;
+    syntax: {
+        nonIndClause: ProgressPreOutputValue;
+        indClause: ProgressPreOutputValue;
+    };
 }
 
 type IdFunction = (element: DisplayModelElement) => boolean;
 
-function _isWord(element: DisplayModelElement): boolean {
-    return element.category === "word";
+function _createWordIdFn(): IdFunction {
+    return (element) => element.type === "word";
 }
 
-function _isPartOfSpeech(element: DisplayModelElement): boolean {
-    return element.category === "partOfSpeech";
+function _createCategoryIdFn(): IdFunction {
+    const catId = new Set<ElementType>([
+        "word",
+        ...elementTypeLists.partOfSpeech
+    ]);
+    return ({ type }) => catId.has(type);
 }
 
-function _isNonIndClause(element: DisplayModelElement): boolean {
-    switch (element.category) {
-        case "phrase":
-        case "clause":
-            // do nothing
-            break;
-        default:
-            return false;
-    }
-    switch (element.type) {
-        case "independentClause":
-        case "coordinatedIndependentClause":
-            return false;
-        default:
-            return true;
-    }
-}
-
-function _isIndClause(element: DisplayModelElement): boolean {
-    switch (element.type) {
+function _isIndClause(type: ElementType): boolean {
+    switch (type) {
         case "independentClause":
         case "coordinatedIndependentClause":
             return true;
         default:
             return false;
     }
+}
+
+function _createSyntaxNonIndClauseIdFn(): IdFunction {
+    const coordPosId = new Set<ElementType>([...elementTypeLists.coordPartOfSpeech]);
+    return (element) => {
+        switch (element.category) {
+            case "partOfSpeech": {
+                return coordPosId.has(element.type);
+            }
+            case "phrase": {
+                return true;
+            }
+            case "clause": {
+                return !_isIndClause(element.type);
+            }
+            default: {
+                return false;
+            }
+        }
+    };
+}
+
+function _createSyntaxIndClauseIdFn(): IdFunction {
+    return ({ type }) => _isIndClause(type);
 }
 
 function _isTopLevel(model: DisplayModel, element: DisplayModelElement, idFn: IdFunction): boolean {
@@ -259,18 +271,18 @@ function _calcProgress(wordCount: number, itemCount: number, errorItemCount: num
     return output;
 }
 
-function _calcPartOfSpeechProgress({ wordCount, partOfSpeech }: ProgressPreOutput): Progress[keyof Progress] {
+function _calcCategoryProgress({ wordCount, category }: ProgressPreOutput): Progress[keyof Progress] {
     return {
         percentage: _calcProgress(
             wordCount,
-            partOfSpeech.count,
-            partOfSpeech.errorItems.length
+            category.count,
+            category.errorItems.length
         ),
-        errorItems: partOfSpeech.errorItems
+        errorItems: category.errorItems
     };
 }
 
-export function _calcPhraseAndClauseProgress({ wordCount, nonIndClause, indClause }: ProgressPreOutput): Progress[keyof Progress] {
+export function _calcSyntaxProgress({ wordCount, syntax: { nonIndClause, indClause } }: ProgressPreOutput): Progress[keyof Progress] {
     const indClausePct = _calcProgress(
         wordCount,
         indClause.count,
@@ -295,53 +307,59 @@ function calcProgress(model: DisplayModel): Progress {
     const elements = Object.entries(model);
     const preOutput: ProgressPreOutput = {
         wordCount: 0,
-        partOfSpeech: {
+        category: {
             count: 0,
             errorItems: []
         },
-        nonIndClause: {
-            count: 0,
-            errorItems: []
-        },
-        indClause: {
-            count: 0,
-            errorItems: []
+        syntax: {
+            nonIndClause: {
+                count: 0,
+                errorItems: []
+            },
+            indClause: {
+                count: 0,
+                errorItems: []
+            }
         }
     };
+    const isWord = _createWordIdFn();
+    const isCategory = _createCategoryIdFn();
+    const isSyntaxNonIndClause = _createSyntaxNonIndClauseIdFn();
+    const isSyntaxIndClause = _createSyntaxIndClauseIdFn();
     for (let index = 0; index < elements.length; index++) {
         const [id, element] = elements[index];
-        if (_isWord(element)) {
+        if (isWord(element)) {
             preOutput.wordCount++;
-        } else if (_isPartOfSpeech(element)) {
+        } else if (isCategory(element)) {
             _updateProgressOutput(
                 model,
                 [id, element],
-                preOutput.partOfSpeech,
-                _isPartOfSpeech
+                preOutput.category,
+                isCategory
             );
-        } else if (_isNonIndClause(element)) {
+        } else if (isSyntaxNonIndClause(element)) {
             _updateProgressOutput(
                 model,
                 [id, element],
-                preOutput.nonIndClause,
-                _isNonIndClause
+                preOutput.syntax.nonIndClause,
+                isSyntaxNonIndClause
             );
-        } else if (_isIndClause(element)) {
+        } else if (isSyntaxIndClause(element)) {
             _updateProgressOutput(
                 model,
                 [id, element],
-                preOutput.indClause,
-                _isIndClause
+                preOutput.syntax.indClause,
+                isSyntaxIndClause
             );
         } else {
             throw `category '${element.category}' is not supported`;
         }
     }
-    const partOfSpeech = _calcPartOfSpeechProgress(preOutput);
-    const phraseAndClause = _calcPhraseAndClauseProgress(preOutput);
+    const category = _calcCategoryProgress(preOutput);
+    const syntax = _calcSyntaxProgress(preOutput);
     return {
-        partOfSpeech: partOfSpeech,
-        phraseAndClause: phraseAndClause
+        category: category,
+        syntax: syntax
     };
 }
 

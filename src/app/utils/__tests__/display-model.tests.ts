@@ -3,7 +3,7 @@ import { ElementType } from "@domain/language";
 import { AtomicChange } from "@lib/utils";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "../diagram-state";
-import { DisplayModel, Progress, TypedDisplayModelElement, WordIndices, WordRange, _appendWord, _calcPhraseAndClauseProgress, ProgressPreOutput } from "../display-model";
+import { DisplayModel, Progress, TypedDisplayModelElement, WordIndices, WordRange, _appendWord, _calcSyntaxProgress, ProgressPreOutput } from "../display-model";
 
 function createElement<Type extends ElementType>(type: Type, element: TypedDisplayModelElement<Type>): TypedDisplayModelElement<Type> {
     return element;
@@ -387,11 +387,11 @@ describe("DisplayModel", () => {
             const input = DisplayModel.init(state);
             const result = DisplayModel.calcProgress(input);
             const expected: Progress = {
-                partOfSpeech: {
+                category: {
                     percentage: 100,
                     errorItems: []
                 },
-                phraseAndClause: {
+                syntax: {
                     percentage: 100,
                     errorItems: []
                 }
@@ -432,11 +432,11 @@ describe("DisplayModel", () => {
             };
             const result = DisplayModel.calcProgress(input);
             const expected: Progress = {
-                partOfSpeech: {
+                category: {
                     percentage: 50 * 0.9,
                     errorItems: ["verb"]
                 },
-                phraseAndClause: {
+                syntax: {
                     percentage: 0,
                     errorItems: []
                 }
@@ -450,11 +450,11 @@ describe("DisplayModel", () => {
             const input = DisplayModel.init(state);
             const result = DisplayModel.calcProgress(input);
             const expected: Progress = {
-                partOfSpeech: {
+                category: {
                     percentage: 100,
                     errorItems: []
                 },
-                phraseAndClause: {
+                syntax: {
                     percentage: (8 / 9) * 50 + Math.pow((8 / 9) * 0.9, 0.4) * 50,
                     errorItems: [Ids.overPrepPhrase]
                 }
@@ -468,11 +468,11 @@ describe("DisplayModel", () => {
             const input = DisplayModel.init(state);
             const result = DisplayModel.calcProgress(input);
             const expected: Progress = {
-                partOfSpeech: {
+                category: {
                     percentage: 100,
                     errorItems: []
                 },
-                phraseAndClause: {
+                syntax: {
                     percentage: (5 / 9) * 50 + 50,
                     errorItems: []
                 }
@@ -482,7 +482,7 @@ describe("DisplayModel", () => {
     });
 
     describe("_calcPhraseAndClauseProgress", () => {
-        const partOfSpeech: ProgressPreOutput["partOfSpeech"] = {
+        const partOfSpeech: ProgressPreOutput["category"] = {
             count: 0,
             errorItems: []
         };
@@ -490,11 +490,13 @@ describe("DisplayModel", () => {
         test("100% - no nonIndClause", () => {
             const input: ProgressPreOutput = {
                 wordCount: 100,
-                partOfSpeech: partOfSpeech,
-                nonIndClause: { count: 0, errorItems: [] },
-                indClause: { count: 100, errorItems: [] }
+                category: partOfSpeech,
+                syntax: {
+                    nonIndClause: { count: 0, errorItems: [] },
+                    indClause: { count: 100, errorItems: [] }
+                }
             };
-            const result = _calcPhraseAndClauseProgress(input);
+            const result = _calcSyntaxProgress(input);
             const expected: Progress[keyof Progress] = {
                 percentage: 100,
                 errorItems: []
@@ -505,11 +507,13 @@ describe("DisplayModel", () => {
         test("100% - both", () => {
             const input: ProgressPreOutput = {
                 wordCount: 100,
-                partOfSpeech: partOfSpeech,
-                nonIndClause: { count: 100, errorItems: [] },
-                indClause: { count: 100, errorItems: [] }
+                category: partOfSpeech,
+                syntax: {
+                    nonIndClause: { count: 100, errorItems: [] },
+                    indClause: { count: 100, errorItems: [] }
+                }
             };
-            const result = _calcPhraseAndClauseProgress(input);
+            const result = _calcSyntaxProgress(input);
             const expected: Progress[keyof Progress] = {
                 percentage: 100,
                 errorItems: []
@@ -520,11 +524,13 @@ describe("DisplayModel", () => {
         test("no indClause", () => {
             const input: ProgressPreOutput = {
                 wordCount: 100,
-                partOfSpeech: partOfSpeech,
-                nonIndClause: { count: 80, errorItems: [] },
-                indClause: { count: 0, errorItems: [] }
+                category: partOfSpeech,
+                syntax: {
+                    nonIndClause: { count: 80, errorItems: [] },
+                    indClause: { count: 0, errorItems: [] }
+                }
             };
-            const result = _calcPhraseAndClauseProgress(input);
+            const result = _calcSyntaxProgress(input);
             const expected: Progress[keyof Progress] = {
                 percentage: Math.pow(0.8, 0.4) * 100 * 0.5,
                 errorItems: []
@@ -535,11 +541,13 @@ describe("DisplayModel", () => {
         test("partial both", () => {
             const input: ProgressPreOutput = {
                 wordCount: 100,
-                partOfSpeech: partOfSpeech,
-                nonIndClause: { count: 30, errorItems: [] },
-                indClause: { count: 50, errorItems: [] }
+                category: partOfSpeech,
+                syntax: {
+                    nonIndClause: { count: 30, errorItems: [] },
+                    indClause: { count: 50, errorItems: [] }
+                }
             };
-            const result = _calcPhraseAndClauseProgress(input);
+            const result = _calcSyntaxProgress(input);
             const expected: Progress[keyof Progress] = {
                 percentage: (50 + Math.pow(0.3, 0.4) * 100) / 2,
                 errorItems: []
@@ -550,11 +558,13 @@ describe("DisplayModel", () => {
         test("with error items", () => {
             const input: ProgressPreOutput = {
                 wordCount: 100,
-                partOfSpeech: partOfSpeech,
-                nonIndClause: { count: 40, errorItems: ["a"] },
-                indClause: { count: 80, errorItems: ["b", "c"] }
+                category: partOfSpeech,
+                syntax: {
+                    nonIndClause: { count: 40, errorItems: ["a"] },
+                    indClause: { count: 80, errorItems: ["b", "c"] }
+                }
             };
-            const result = _calcPhraseAndClauseProgress(input);
+            const result = _calcSyntaxProgress(input);
             result.percentage = Math.round(result.percentage * 100) / 100;
             const expected: Progress[keyof Progress] = {
                 percentage: (80 * Math.pow(0.9, 2) + Math.pow(40 / 100 * Math.pow(0.9, 1), 0.4) * 100) / 2,
@@ -567,11 +577,13 @@ describe("DisplayModel", () => {
         test("indClause complete - errors in nonIndClause", () => {
             const input: ProgressPreOutput = {
                 wordCount: 100,
-                partOfSpeech: partOfSpeech,
-                nonIndClause: { count: 10, errorItems: ["a", "b"] },
-                indClause: { count: 100, errorItems: [] }
+                category: partOfSpeech,
+                syntax: {
+                    nonIndClause: { count: 10, errorItems: ["a", "b"] },
+                    indClause: { count: 100, errorItems: [] }
+                }
             };
-            const result = _calcPhraseAndClauseProgress(input);
+            const result = _calcSyntaxProgress(input);
             const expected: Progress[keyof Progress] = {
                 percentage: 50 + Math.pow(10 / 100 * Math.pow(0.9, 2), 0.4) * 50,
                 errorItems: ["a", "b"]
