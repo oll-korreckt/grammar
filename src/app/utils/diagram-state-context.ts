@@ -14,11 +14,11 @@ const state = {
 };
 const model = DisplayModel.init(state);
 const progress: Progress = {
-    partOfSpeech: {
+    category: {
         percentage: 0,
         errorItems: []
     },
-    phraseAndClause: {
+    syntax: {
         percentage: 0,
         errorItems: []
     }
