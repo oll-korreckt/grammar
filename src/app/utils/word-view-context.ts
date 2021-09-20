@@ -50,15 +50,15 @@ export interface TailSelectNode extends HeadSelectNode {
 }
 
 export type SelectedNodeChain = [HeadSelectNode, ...TailSelectNode[]];
-export type WordViewCategory = "partOfSpeech" | "phraseAndClause";
+export type WordViewStage = "category" | "syntax";
 
 export interface WordViewContext {
-    category: WordViewCategory;
+    stage: WordViewStage;
     selectedNode?: SelectNode;
 }
 
 export const WordViewContext = createContext<WordViewContext>({
-    category: "partOfSpeech"
+    stage: "category"
 });
 
 function generateChain(state: DiagramState, id: ElementId, selectState: ElementSelectState): SelectedNodeChain {
