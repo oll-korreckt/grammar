@@ -1,4 +1,4 @@
-import { accessClassName, DiagramStateContext, WordViewCategory, WordViewContext } from "@app/utils";
+import { accessClassName, DiagramStateContext, WordViewStage, WordViewContext } from "@app/utils";
 import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
 import React, { useContext } from "react";
 import { IconType } from "react-icons";
@@ -7,20 +7,20 @@ import { CircleContainer } from "../CircleContainer";
 import { CircleProgress, HsvColor } from "../CircleProgress/CircleProgress";
 import styles from "./_styles.scss";
 
-export type ModeSelectorState = {
-    category: WordViewCategory;
+
+export type WordViewProgressState = {
+    stage: WordViewStage;
     progress: {
-        partOfSpeech: number;
-        phraseAndClause: number;
+        [Key in WordViewStage]: number;
     };
 }
 
-function getState({ progress }: DiagramStateContext, { category }: WordViewContext): ModeSelectorState {
-    const output: ModeSelectorState = {
-        category: category,
+function getState({ progress }: DiagramStateContext, { stage }: WordViewContext): WordViewProgressState {
+    const output: WordViewProgressState = {
+        stage: stage,
         progress: {
-            partOfSpeech: progress.partOfSpeech.percentage,
-            phraseAndClause: progress.phraseAndClause.percentage
+            category: progress.category.percentage,
+            syntax: progress.syntax.percentage
         }
     };
     return output;
@@ -34,39 +34,39 @@ export const ModeSelector = makeRefComponent<HTMLDivElement>("ModeSelector", (_,
 });
 
 export interface ModeSelectorDisplayProps {
-    children: ModeSelectorState;
-    onCategorySwitch?: (cateogry: WordViewCategory) => void;
+    children: WordViewProgressState;
+    onStageChange?: (stage: WordViewStage) => void;
 }
 
-function checkState(state: ModeSelectorState): void {
+function checkState(state: WordViewProgressState): void {
     function checkProgress(progress: number): void {
         if (progress < 0 || progress > 100) {
             throw `progress must be a value between 0 and 100 (inclusive). received: ${progress}`;
         }
     }
 
-    const { partOfSpeech, phraseAndClause } = state.progress;
-    checkProgress(partOfSpeech);
-    checkProgress(phraseAndClause);
-    if (state.category === "phraseAndClause" && partOfSpeech !== 100) {
-        const partOfSpeechCat: WordViewCategory = "partOfSpeech";
-        throw `cannot be in ${state.category} while ${partOfSpeechCat} is incomplete`;
+    const { category, syntax } = state.progress;
+    checkProgress(category);
+    checkProgress(syntax);
+    if (state.stage === "syntax" && category !== 100) {
+        const categoryName: WordViewStage = "category";
+        throw `cannot be in ${state.stage} while ${categoryName} is incomplete`;
     }
 }
 
-export const ModeSelectorDisplay = makeRefComponent<HTMLDivElement, ModeSelectorDisplayProps>("ModeSelectorDisplay", ({ children, onCategorySwitch }, ref) => {
+export const ModeSelectorDisplay = makeRefComponent<HTMLDivElement, ModeSelectorDisplayProps>("ModeSelectorDisplay", ({ children, onStageChange }, ref) => {
     checkState(children);
     const posClasses: string[] = [];
     const pacClasses: string[] = [];
-    switch (children.category) {
-        case "partOfSpeech":
+    switch (children.stage) {
+        case "category":
             posClasses.push("selected");
             break;
-        case "phraseAndClause":
+        case "syntax":
             pacClasses.push("selected");
             break;
     }
-    if (children.progress.partOfSpeech !== 100) {
+    if (children.progress.category !== 100) {
         pacClasses.push("disabled");
     }
 
@@ -74,16 +74,16 @@ export const ModeSelectorDisplay = makeRefComponent<HTMLDivElement, ModeSelector
         <div ref={ref}>
             <ExtendedModeItem
                 icon={FaSquare}
-                progress={children.progress.partOfSpeech}
-                onClick={() => onCategorySwitch && onCategorySwitch("partOfSpeech")}
+                progress={children.progress.category}
+                onClick={() => onStageChange && onStageChange("category")}
                 className={accessClassName(styles, ...posClasses)}
             >
                 Category
             </ExtendedModeItem>
             <ExtendedModeItem
                 icon={FaSitemap}
-                progress={children.progress.phraseAndClause}
-                onClick={() => onCategorySwitch && onCategorySwitch("phraseAndClause")}
+                progress={children.progress.syntax}
+                onClick={() => onStageChange && onStageChange("syntax")}
                 className={accessClassName(styles, ...pacClasses)}
             >
                 Syntax
