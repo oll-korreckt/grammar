@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import { DiagramState, DiagramStateContext, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedNodeChain, SelectNode, WordIndices, WordRange, WordViewCategory, WordViewContext } from "@app/utils";
-import { ElementId, ElementCategory } from "@domain/language";
+import { DiagramState, DiagramStateContext, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedNodeChain, SelectNode, WordIndices, WordRange, WordViewStage, WordViewContext } from "@app/utils";
+import { ElementId, ElementType, elementTypeLists } from "@domain/language";
 import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
 
-type ElementFilterFunction = (cat: ElementCategory) => boolean;
+type ElementFilterFunction = (eType: ElementType) => boolean;
 export type BuildFunction = (Component: RefComponent<HTMLSpanElement>, data: ElementData) => RefComponent<HTMLSpanElement>;
 
 function getLexemes(diagram: DiagramState, index: WordIndices[number]): string[] {
@@ -118,15 +118,15 @@ function _selectedItem(diagram: DiagramState, displayModel: DisplayModel, select
 
 function _elementFilter(diagram: DiagramState, displayModel: DisplayModel, elementFilter: ElementFilterFunction, output: (ElementData | undefined)[]): void {
     Object.entries(displayModel)
-        .filter(([, { category, ref }]) => {
-            const correctCategory = elementFilter(category);
-            if (!correctCategory) {
+        .filter(([, { type, ref }]) => {
+            const correctType = elementFilter(type);
+            if (!correctType) {
                 return false;
             }
             if (ref === undefined) {
                 return true;
             }
-            return !elementFilter(displayModel[ref].category);
+            return !elementFilter(displayModel[ref].type);
         })
         .forEach(([id]) => _populate(diagram, displayModel, id, undefined, output));
 }
@@ -150,26 +150,24 @@ function _fillOutput(diagram: DiagramState, displayModel: DisplayModel, output: 
     }
 }
 
-function createFilterFn(category: WordViewCategory): ElementFilterFunction {
-    let filterSet: ElementCategory[];
-    switch (category) {
-        case "partOfSpeech":
-            filterSet = ["partOfSpeech", "word"];
-            break;
-        case "phraseAndClause":
-            filterSet = ["clause", "phrase", "partOfSpeech"];
-            break;
+function createFilterFn(stage: WordViewStage): ElementFilterFunction {
+    switch (stage) {
+        case "category": {
+            const filterObj = new Set<ElementType>([
+                "word",
+                ...elementTypeLists.partOfSpeech
+            ]);
+            return (eType) => filterObj.has(eType);
+        }
+        case "syntax": {
+            return (eType) => eType !== "word";
+        }
         default:
-            throw "";
+            throw `unhandled stage '${stage}'`;
     }
-    const filterObj = new Set(filterSet);
-    return (cat) => {
-        const output = filterObj.has(cat);
-        return output;
-    };
 }
 
-export function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewCategory, selectedNode: SelectNode | undefined): ElementData[] {
+export function getElementData(diagram: DiagramState, displayModel: DisplayModel, elementFilter: WordViewStage, selectedNode: SelectNode | undefined): ElementData[] {
     const output: (ElementData | undefined)[] = diagram.wordOrder.map(() => undefined);
     _elementFilter(
         diagram,
@@ -202,7 +200,7 @@ export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDia
     const elementData = getElementData(
         state,
         model,
-        edContext.category,
+        edContext.stage,
         edContext.selectedNode
     );
 
