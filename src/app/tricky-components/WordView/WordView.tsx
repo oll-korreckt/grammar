@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { DiagramState, DiagramStateContext, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedNodeChain, SelectNode, WordIndices, WordRange, WordViewStage, WordViewContext } from "@app/utils";
+import { DiagramState, DisplayModel, ElementData, ElementDisplayInfo, ElementSelectState, SelectedNodeChain, SelectNode, WordIndices, WordRange, WordViewStage, WordViewContext } from "@app/utils";
 import { ElementId, ElementType, elementTypeLists } from "@domain/language";
 import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
@@ -195,14 +195,7 @@ export interface WordViewProps {
 }
 
 export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDiagram", ({ buildFn }, ref) => {
-    const { state, model } = useContext(DiagramStateContext);
-    const edContext = useContext(WordViewContext);
-    const elementData = getElementData(
-        state,
-        model,
-        edContext.stage,
-        edContext.selectedNode
-    );
+    const { visibleElements } = useContext(WordViewContext);
 
     function createElement(data: ElementData): RefComponent<HTMLSpanElement> {
         const displayInfo = ElementDisplayInfo.getDisplayInfo(data.type);
@@ -231,9 +224,9 @@ export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDia
 
     return (
         <div ref={ref}>
-            {elementData.map((data, index) => {
+            {visibleElements.map((data, index) => {
                 let Component = createElement(data);
-                if (index < elementData.length - 1) {
+                if (index < visibleElements.length - 1) {
                     Component = withSpace(Component);
                 }
                 return <Component key={data.key}/>;
