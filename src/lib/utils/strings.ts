@@ -9,6 +9,14 @@ function printArray(strings: string[], delimiter: string): string {
     return output;
 }
 
+function capitalize(value: string): string {
+    if (value.length === 0) {
+        throw "cannot capitalize empty string";
+    }
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 export const Strings = {
-    printArray: printArray
+    printArray: printArray,
+    capitalize: capitalize
 };
