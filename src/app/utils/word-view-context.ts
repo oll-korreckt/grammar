@@ -51,14 +51,17 @@ export interface TailSelectNode extends HeadSelectNode {
 
 export type SelectedNodeChain = [HeadSelectNode, ...TailSelectNode[]];
 export type WordViewStage = "category" | "syntax";
+export type WordViewMode = "navigate" | "label" | "edit" | "delete";
 
 export interface WordViewContext {
     stage: WordViewStage;
+    mode: WordViewMode;
     selectedNode?: SelectNode;
 }
 
 export const WordViewContext = createContext<WordViewContext>({
-    stage: "category"
+    stage: "category",
+    mode: "navigate"
 });
 
 function generateChain(state: DiagramState, id: ElementId, selectState: ElementSelectState): SelectedNodeChain {
