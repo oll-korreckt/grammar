@@ -23,4 +23,27 @@ describe("Strings", () => {
             );
         });
     });
+
+    describe("capitalize", () => {
+        test("starts w/ lowercase letter", () => {
+            const result = Strings.capitalize("what");
+            assert.strictEqual(result, "What");
+        });
+
+        test("starts w/ uppercase letter", () => {
+            const result = Strings.capitalize("What");
+            assert.strictEqual(result, "What");
+        });
+
+        test("starts w/ non-letter", () => {
+            const result = Strings.capitalize("   ");
+            assert.strictEqual(result, "   ");
+        });
+
+        test("error", () => {
+            assert.throw(
+                () => Strings.capitalize("")
+            );
+        });
+    });
 });
