@@ -1,0 +1,58 @@
+@use "main";
+
+.labelSelector {
+    display: grid;
+    grid-template-columns: 7rem auto;
+}
+
+.categorySelector {
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+
+.categoryItem {
+    display: grid;
+    grid-template-rows: 60% 40%;
+}
+
+.elementSelector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+    grid-template-rows: repeat(auto-fill, 5rem);
+    gap: 5px;
+}
+
+.selectedCategoryItem {
+    color: orangered;
+}
+
+.enabledCategoryItem {
+    color: gray;
+}
+
+.disabledCategoryItem {
+    color: lightgray;
+}
+
+.elementItem {
+    display: grid;
+    border: 1px solid black;
+}
+
+.selectedElementItem {
+    color: cadetblue;
+}
+
+.unselectedElementItem {
+    color: grey;
+}
+
+.elementItemHeader {
+    @include main.center-content;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 3rem;
+}
+
+.elementItemText {
+    @include main.center-content;
+}
