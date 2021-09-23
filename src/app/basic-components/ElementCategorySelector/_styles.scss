@@ -1,0 +1,33 @@
+@use "main";
+
+.categorySelector {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.selected {
+    border: 1px solid black;
+}
+
+.unselected {
+    border: none;
+}
+
+.categorySelectorItem {
+    display: grid;
+    grid-template-rows: 80% 20%;
+}
+
+.icon {
+    font-size: 3rem;
+}
+
+.iconText {
+    font-size: 12px;
+}
+
+.center {
+    @include main.center-content;
+}
