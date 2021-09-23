@@ -470,6 +470,43 @@ const clauseSet = new Set([
     ...coordClauseList
 ]) as Set<string>;
 export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
+
+function _wordFilter(category: ElementCategory): boolean {
+    return category === "word";
+}
+
+function _partOfSpeechFilter(category: ElementCategory): boolean {
+    switch (category) {
+        case "word":
+        case "partOfSpeech":
+            return true;
+        default:
+            return false;
+    }
+}
+
+function _phraseFilter(category: ElementCategory): boolean {
+    return category !== "clause";
+}
+
+function _clauseFilter(): boolean {
+    return true;
+}
+
+function getLayerFilter(category: ElementCategory): (category: ElementCategory) => boolean {
+    switch (category) {
+        case "word":
+            return _wordFilter;
+        case "partOfSpeech":
+            return _partOfSpeechFilter;
+        case "phrase":
+            return _phraseFilter;
+        case "clause":
+            return _clauseFilter;
+        default:
+            throw `unsupported category ${category}`;
+    }
+}
 function getElementCategory(type: ElementType): ElementCategory {
     if (type === "word") {
         return "word";
@@ -484,5 +521,6 @@ function getElementCategory(type: ElementType): ElementCategory {
 }
 
 export const ElementCategory = {
+    getLayerFilter: getLayerFilter,
     getElementCategory: getElementCategory
 };

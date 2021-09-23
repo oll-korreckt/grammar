@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { getElementCategory, getElementDefinition } from "../index";
+import { ElementCategory, getElementDefinition } from "../index";
 import { NounPhraseDefinition } from "../phrase";
 import { ElementType } from "../utils";
 
@@ -43,31 +43,68 @@ describe("index", () => {
         assert.notEqual(result2, result1);
     });
 
-    describe("getElementCategory", () => {
-        test("standard", () => {
-            assert.strictEqual(
-                getElementCategory("word"),
-                "word"
+    describe("ElementCategory", () => {
+        test("getLayerFilter", () => {
+            function _runTest(category: ElementCategory, trueCategories: ElementCategory[], falseCategories: ElementCategory[]): void {
+                const filterFn = ElementCategory.getLayerFilter(category);
+                trueCategories.forEach((cat) => {
+                    const result = filterFn(cat);
+                    assert.isTrue(result);
+                });
+                falseCategories.forEach((cat) => {
+                    const result = filterFn(cat);
+                    assert.isFalse(result);
+                });
+            }
+
+            _runTest(
+                "word",
+                ["word"],
+                ["partOfSpeech", "phrase", "clause"]
             );
-            assert.strictEqual(
-                getElementCategory("adjective"),
-                "partOfSpeech"
+            _runTest(
+                "partOfSpeech",
+                ["word", "partOfSpeech"],
+                ["phrase", "clause"]
             );
-            assert.strictEqual(
-                getElementCategory("coordinatedParticiplePhrase"),
-                "phrase"
+            _runTest(
+                "phrase",
+                ["word", "partOfSpeech", "phrase"],
+                ["clause"]
             );
-            assert.strictEqual(
-                getElementCategory("coordinatedRelativeClause"),
-                "clause"
+            _runTest(
+                "clause",
+                ["word", "partOfSpeech", "phrase", "clause"],
+                []
             );
         });
 
-        test("error", () => {
-            assert.throw(
-                () => getElementCategory("what" as ElementType),
-                /unhandled type/i
-            );
+        describe("getElementCategory", () => {
+            test("standard", () => {
+                assert.strictEqual(
+                    ElementCategory.getElementCategory("word"),
+                    "word"
+                );
+                assert.strictEqual(
+                    ElementCategory.getElementCategory("adjective"),
+                    "partOfSpeech"
+                );
+                assert.strictEqual(
+                    ElementCategory.getElementCategory("coordinatedParticiplePhrase"),
+                    "phrase"
+                );
+                assert.strictEqual(
+                    ElementCategory.getElementCategory("coordinatedRelativeClause"),
+                    "clause"
+                );
+            });
+
+            test("error", () => {
+                assert.throw(
+                    () => ElementCategory.getElementCategory("what" as ElementType),
+                    /unhandled type/i
+                );
+            });
         });
     });
 });
