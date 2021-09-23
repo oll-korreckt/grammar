@@ -1,0 +1,16 @@
+.upLevel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 2rem;
+    height: 2.2rem;
+}
+
+.arrow {
+    cursor: pointer;
+}
+
+.text {
+    margin-left: 10px;
+    user-select: none;
+}
