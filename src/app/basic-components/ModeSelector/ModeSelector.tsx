@@ -1,6 +1,6 @@
-import { accessClassName, WordViewContext, WordViewMode } from "@app/utils";
+import { accessClassName, WordViewMode } from "@app/utils";
 import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
-import React, { useContext } from "react";
+import React from "react";
 import { IconType } from "react-icons";
 import { FaSitemap, FaTags, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
@@ -11,6 +11,7 @@ type ModeChange = (mode: WordViewMode) => void;
 
 export interface ModeSelectorProps {
     onModeChange?: ModeChange;
+    mode: WordViewMode;
 }
 
 type ButtonData = {
@@ -22,8 +23,8 @@ function createOnClick(callback: ModeChange | undefined, mode: WordViewMode): ()
     return () => callback && callback(mode);
 }
 
-export const ModeSelector = makeRefComponent<HTMLDivElement, ModeSelectorProps>("ModeSelector", ({ onModeChange }, ref) => {
-    const activeMode = useContext(WordViewContext).mode;
+export const ModeSelector = makeRefComponent<HTMLDivElement, ModeSelectorProps>("ModeSelector", ({ onModeChange, ...rest }, ref) => {
+    const activeMode = rest.mode;
     const data: ButtonData[] = [
         { icon: FaSitemap, mode: "navigate" },
         { icon: FaTags, mode: "label" },
