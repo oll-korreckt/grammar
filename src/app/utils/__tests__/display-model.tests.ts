@@ -379,7 +379,7 @@ describe("DisplayModel", () => {
                 }
             })
         };
-        assert.deepStrictEqual(result.elements, expected.elements);
+        assert.deepStrictEqual(result, expected);
     });
 
     describe("calcProgress", () => {
