@@ -1,0 +1,15 @@
+.overlay {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.upLevel {
+    display: initial;
+}
+
+.disable {
+    color: gray;
+    pointer-events: none;
+}
