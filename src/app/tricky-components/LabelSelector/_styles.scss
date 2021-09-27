@@ -26,11 +26,16 @@
     color: orangered;
 }
 
+.containingCategoryItem {
+    text-decoration: underline;
+}
+
 .enabledCategoryItem {
     color: gray;
 }
 
 .disabledCategoryItem {
+    pointer-events: none;
     color: lightgray;
 }
 
@@ -40,6 +45,7 @@
 }
 
 .selectedElementItem {
+    pointer-events: none;
     color: cadetblue;
 }
 

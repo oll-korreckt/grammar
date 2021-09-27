@@ -1,6 +1,7 @@
 import { DerivationTree, ElementData } from "@app/utils";
-import { ElementType, elementTypeLists } from "@domain/language";
-import { LabelCategory } from "./hooks";
+import { ElementCategory, ElementType, elementTypeLists } from "@domain/language";
+
+export type LabelCategory = (keyof DerivationTree) | "coordinated";
 
 export type DeriveData = {
     baseType: Exclude<ElementType, "word">;
@@ -86,6 +87,52 @@ function getAvailableTypes(visibleElements: ElementData[]): AvailableTypes {
     return derive(preOutput);
 }
 
+function _getFirstCategory(availableTypes: AvailableTypes): LabelCategory {
+    const categories: LabelCategory[] = [
+        "partOfSpeech",
+        "phrase",
+        "clause",
+        "coordinated"
+    ];
+    for (let index = 0; index < categories.length; index++) {
+        const category = categories[index];
+        if (availableTypes[category] !== undefined) {
+            return category;
+        }
+    }
+    throw "category not found";
+}
+
+function _getsearchCategory(elementType: ElementType): LabelCategory {
+    if (elementType.startsWith("coordinated")) {
+        return "coordinated";
+    }
+    const output = ElementCategory.getElementCategory(elementType);
+    if (output === "word") {
+        throw "cannot return word";
+    }
+    return output;
+}
+
+function getSelectedCategory(availableTypes: AvailableTypes, elementType: ElementType | undefined): LabelCategory | undefined {
+    if (elementType === undefined) {
+        return _getFirstCategory(availableTypes);
+    }
+    const searchCategory = _getsearchCategory(elementType);
+    const deriveData = availableTypes[searchCategory];
+    if (deriveData === undefined) {
+        return undefined;
+    }
+    for (let index = 0; index < deriveData.length; index++) {
+        const { type } = deriveData[index];
+        if (type === elementType) {
+            return searchCategory;
+        }
+    }
+    return undefined;
+}
+
 export const AvailableTypes = {
-    getAvailableTypes: getAvailableTypes
+    getAvailableTypes: getAvailableTypes,
+    getSelectedCategory: getSelectedCategory
 };

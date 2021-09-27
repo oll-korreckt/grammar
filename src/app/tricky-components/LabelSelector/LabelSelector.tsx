@@ -1,11 +1,10 @@
 import { accessClassName, ElementDisplayInfo, WordViewContext } from "@app/utils";
 import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
 import { ElementType } from "@domain/language";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { FaLink, FaLayerGroup } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
-import { AvailableTypes, DeriveData } from "./available-types";
-import { LabelCategory, LabelSelectorAction, LabelSelectorState } from "./hooks";
+import { AvailableTypes, DeriveData, LabelCategory } from "./available-types";
 import styles from "./_styles.scss";
 
 
@@ -16,15 +15,39 @@ type CategoryButtonData = {
 }
 
 export interface LabelSelectorProps {
-    state?: LabelSelectorState;
-    dispatch?: React.Dispatch<LabelSelectorAction>;
+    elementType?: Exclude<ElementType, "word">;
+    onElementTypeSelect?: (elementType: Exclude<ElementType, "word">) => void;
 }
 
-export const LabelSelector: React.VFC<LabelSelectorProps> = ({ state, dispatch }) => {
+export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onElementTypeSelect }) => {
     const context = useContext(WordViewContext);
-    const availableTypes = AvailableTypes.getAvailableTypes(context.visibleElements);
-    const useableState: LabelSelectorState = state !== undefined ? state : {};
-    const useableDispatch: React.Dispatch<LabelSelectorAction> = (action) => dispatch && dispatch(action);
+    const [category, setCategory] = useState<LabelCategory | undefined>();
+    const availableTypes = useMemo(() => {
+        return AvailableTypes.getAvailableTypes(context.visibleElements);
+    }, [context.visibleElements]);
+    const containingCategory = useMemo(() => {
+        return AvailableTypes.getSelectedCategory(availableTypes, elementType);
+    }, [availableTypes, elementType]);
+
+    useEffect(() => {
+        setCategory(containingCategory);
+    }, [containingCategory]);
+
+    function getCategorySelectorClass(selectorCategory: LabelCategory): string[] {
+        const output: string[] = [];
+        if (selectorCategory === category) {
+            output.push("selectedCategoryItem");
+        } else if (availableTypes[selectorCategory] !== undefined) {
+            output.push("enabledCategoryItem");
+        } else {
+            output.push("disabledCategoryItem");
+        }
+
+        if (selectorCategory === containingCategory) {
+            output.push("containingCategoryItem");
+        }
+        return output;
+    }
 
     const categoryData: CategoryButtonData[] = [
         {
@@ -49,25 +72,21 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ state, dispatch }
         }
     ];
 
-    const deriveData: DeriveData[] = useableState.selectedCategory !== undefined && availableTypes[useableState.selectedCategory] !== undefined
-        ? availableTypes[useableState.selectedCategory] as DeriveData[]
+    const deriveData: DeriveData[] = category !== undefined && availableTypes[category] !== undefined
+        ? availableTypes[category] as DeriveData[]
         : [];
 
     return (
         <div className={accessClassName(styles, "labelSelector")}>
             <div className={accessClassName(styles, "categorySelector")}>
                 {categoryData.map((item) => {
-                    const className = item.category === useableState.selectedCategory
-                        ? "selectedCategoryItem"
-                        : availableTypes[item.category] !== undefined
-                            ? "enabledCategoryItem"
-                            : "disabledCategoryItem";
+                    const classNames = getCategorySelectorClass(item.category);
                     return (
                         <ExtendedCategorySelectorItem
                             key={item.category}
                             icon={item.icon}
-                            className={accessClassName(styles, className)}
-                            onClick={() => useableDispatch({ type: "selectedCategory", selectedCategory: item.category })}
+                            className={accessClassName(styles, ...classNames)}
+                            onClick={() => setCategory(item.category)}
                         >
                             {item.text}
                         </ExtendedCategorySelectorItem>
@@ -76,15 +95,14 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ state, dispatch }
             </div>
             <div className={accessClassName(styles, "elementSelector")}>
                 {deriveData.map((data) => {
-                    // const classNames: string[] = [];
-                    const className = data.type === useableState.selectedType
+                    const className = data.type === elementType
                         ? "selectedElementItem"
                         : "unselectedElementItem";
                     return (
                         <ExtendedElementItem
                             key={data.baseType}
                             className={accessClassName(styles, className)}
-                            onClick={() => useableDispatch({ type: "selectedType", selectedType: data.type })}
+                            onClick={() => onElementTypeSelect && onElementTypeSelect(data.type)}
                         >
                             {data.baseType}
                         </ExtendedElementItem>
