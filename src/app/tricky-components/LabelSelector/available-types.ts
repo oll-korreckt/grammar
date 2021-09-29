@@ -103,7 +103,7 @@ function _getFirstCategory(availableTypes: AvailableTypes): LabelCategory {
     throw "category not found";
 }
 
-function _getsearchCategory(elementType: ElementType): LabelCategory {
+function _getSearchCategory(elementType: ElementType): LabelCategory {
     if (elementType.startsWith("coordinated")) {
         return "coordinated";
     }
@@ -114,25 +114,33 @@ function _getsearchCategory(elementType: ElementType): LabelCategory {
     return output;
 }
 
-function getSelectedCategory(availableTypes: AvailableTypes, elementType: ElementType | undefined): LabelCategory | undefined {
+type SelectedCategories = [
+    selected: LabelCategory | undefined,
+    containing: LabelCategory | undefined
+];
+
+function getSelectedCategories(availableTypes: AvailableTypes, elementType: ElementType | undefined): SelectedCategories {
     if (elementType === undefined) {
-        return _getFirstCategory(availableTypes);
+        return [
+            _getFirstCategory(availableTypes),
+            undefined
+        ];
     }
-    const searchCategory = _getsearchCategory(elementType);
+    const searchCategory = _getSearchCategory(elementType);
     const deriveData = availableTypes[searchCategory];
     if (deriveData === undefined) {
-        return undefined;
+        throw `category '${searchCategory}' is not available`;
     }
     for (let index = 0; index < deriveData.length; index++) {
         const { type } = deriveData[index];
         if (type === elementType) {
-            return searchCategory;
+            return [searchCategory, searchCategory];
         }
     }
-    return undefined;
+    return [undefined, searchCategory];
 }
 
 export const AvailableTypes = {
     getAvailableTypes: getAvailableTypes,
-    getSelectedCategory: getSelectedCategory
+    getSelectedCategory: getSelectedCategories
 };

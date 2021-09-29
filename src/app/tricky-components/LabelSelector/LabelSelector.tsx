@@ -21,21 +21,21 @@ export interface LabelSelectorProps {
 
 export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onElementTypeSelect }) => {
     const context = useContext(WordViewContext);
-    const [category, setCategory] = useState<LabelCategory | undefined>();
+    const [selectedCategory, setSelectedCategory] = useState<LabelCategory | undefined>();
     const availableTypes = useMemo(() => {
         return AvailableTypes.getAvailableTypes(context.visibleElements);
     }, [context.visibleElements]);
-    const containingCategory = useMemo(() => {
+    const [initialCategory, containingCategory] = useMemo(() => {
         return AvailableTypes.getSelectedCategory(availableTypes, elementType);
     }, [availableTypes, elementType]);
 
     useEffect(() => {
-        setCategory(containingCategory);
-    }, [containingCategory]);
+        setSelectedCategory(initialCategory);
+    }, [initialCategory]);
 
     function getCategorySelectorClass(selectorCategory: LabelCategory): string[] {
         const output: string[] = [];
-        if (selectorCategory === category) {
+        if (selectorCategory === selectedCategory) {
             output.push("selectedCategoryItem");
         } else if (availableTypes[selectorCategory] !== undefined) {
             output.push("enabledCategoryItem");
@@ -72,8 +72,8 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onEl
         }
     ];
 
-    const deriveData: DeriveData[] = category !== undefined && availableTypes[category] !== undefined
-        ? availableTypes[category] as DeriveData[]
+    const deriveData: DeriveData[] = selectedCategory !== undefined && availableTypes[selectedCategory] !== undefined
+        ? availableTypes[selectedCategory] as DeriveData[]
         : [];
 
     return (
@@ -86,7 +86,7 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onEl
                             key={item.category}
                             icon={item.icon}
                             className={accessClassName(styles, ...classNames)}
-                            onClick={() => setCategory(item.category)}
+                            onClick={() => setSelectedCategory(item.category)}
                         >
                             {item.text}
                         </ExtendedCategorySelectorItem>
