@@ -2,10 +2,9 @@ import { accessClassName, WordViewMode } from "@app/utils";
 import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
 import React from "react";
 import { IconType } from "react-icons";
-import { FaSitemap, FaTags, FaTrashAlt } from "react-icons/fa";
+import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
 import styles from "./_styles.scss";
-import { Strings } from "@lib/utils";
 
 type ModeChange = (mode: WordViewMode) => void;
 
@@ -17,6 +16,7 @@ export interface ModeSelectorProps {
 type ButtonData = {
     icon: IconType;
     mode: WordViewMode;
+    text: string;
 };
 
 function createOnClick(callback: ModeChange | undefined, mode: WordViewMode): () => void {
@@ -26,15 +26,14 @@ function createOnClick(callback: ModeChange | undefined, mode: WordViewMode): ()
 export const ModeSelector = makeRefComponent<HTMLDivElement, ModeSelectorProps>("ModeSelector", ({ onModeChange, ...rest }, ref) => {
     const activeMode = rest.mode;
     const data: ButtonData[] = [
-        { icon: FaSitemap, mode: "navigate" },
-        { icon: FaTags, mode: "label" },
-        { icon: RiEdit2Fill, mode: "edit" },
-        { icon: FaTrashAlt, mode: "delete" }
+        { icon: FaSitemap, mode: "navigate", text: "Navigate" },
+        { icon: FaPlus, mode: "add", text: "Add" },
+        { icon: RiEdit2Fill, mode: "edit.browse", text: "Edit" },
+        { icon: FaTrashAlt, mode: "delete", text: "Delete" }
     ];
     return (
         <div ref={ref} className={accessClassName(styles, "modeSelector")}>
-            {data.map(({ icon, mode }) => {
-                const text = Strings.capitalize(mode);
+            {data.map(({ icon, mode, text }) => {
                 const callback = createOnClick(onModeChange, mode);
                 const className = mode === activeMode ? "selected" : "notSelected";
                 return (
