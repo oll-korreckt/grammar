@@ -431,7 +431,22 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
     return output[type];
 }
 
+function getPrimaryProperty(type: ElementType): string;
+function getPrimaryProperty(info: ElementDisplayInfo): string;
+function getPrimaryProperty(data: ElementType | ElementDisplayInfo): string {
+    const { properties }: ElementDisplayInfo = typeof data === "object" ? data : getDisplayInfo(data);
+    const entries = Object.entries(properties);
+    for (let index = 0; index < entries.length; index++) {
+        const [property, { displayOrder }] = entries[index];
+        if (displayOrder === 0) {
+            return property;
+        }
+    }
+    throw "primary property not found";
+}
+
 export const ElementDisplayInfo = {
+    getPrimaryProperty: getPrimaryProperty,
     getDisplayInfo: getDisplayInfo,
     getAbbreviatedName: getAbbreviatedName
 };
