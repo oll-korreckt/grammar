@@ -1,5 +1,5 @@
 import { createWordViewContext, DiagramState, DiagramStateContext, DisplayModel, ElementDisplayInfo, HistoryState, WordViewContext, WordViewMode } from "@app/utils";
-import { ElementType, getElementDefinition } from "@domain/language";
+import { ElementCategory, ElementType, getElementDefinition } from "@domain/language";
 import { AtomicChange } from "@lib/utils";
 import React, { useReducer } from "react";
 import { Action, EditActiveState, AddState, State, StateBase, EditBrowseState } from "./types";
@@ -34,6 +34,40 @@ function extractContextData(context: WordViewContext): Omit<WordViewContext, "vi
         output.selectedElement = context.selectedElement;
     }
     return output;
+}
+
+function getElementCategory(elementType: Exclude<ElementType, "word">): ElementCategory {
+    const def = getElementDefinition(elementType);
+    const propTypes = Object.values(def).map(([, types]) => types).flat();
+    const uniquePropTypes = Array.from(new Set<ElementType>(propTypes));
+    type CategoryLevel = { [Key in ElementCategory]: number; };
+    const catLevels: CategoryLevel = {
+        word: 0,
+        partOfSpeech: 1,
+        phrase: 2,
+        clause: 3
+    };
+    const elementCat = ElementCategory.getElementCategory(elementType);
+    const elementCatLvl = catLevels[elementCat];
+    let maxCat: ElementCategory | undefined = undefined;
+    let maxCatLvl: number | undefined = undefined;
+    for (let index = 0; index < uniquePropTypes.length; index++) {
+        const propType = uniquePropTypes[index];
+        const propCat = ElementCategory.getElementCategory(propType);
+        const propCatLvl = catLevels[propCat];
+        if (maxCatLvl === undefined
+            || propCatLvl > maxCatLvl) {
+            maxCat = propCat;
+            maxCatLvl = propCatLvl;
+        }
+        if (maxCatLvl === 3) {
+            break;
+        }
+    }
+    if (maxCat === undefined || maxCatLvl === undefined) {
+        throw `No category found for '${elementType}'`;
+    }
+    return maxCatLvl > elementCatLvl ? maxCat : elementCat;
 }
 
 function reducer(state: State, action: Action): State {
@@ -97,9 +131,10 @@ function reducer(state: State, action: Action): State {
                 throw "invalid state";
             }
             const editHistory = HistoryState.createChild(editState.history);
+            const elementType = DiagramState.getItem(editState.diagramStateContext.state, action.id).type;
             const newWordViewContext = createWordViewContext(
                 editState.diagramStateContext,
-                editState.wordViewContext.elementCategory,
+                getElementCategory(elementType as Exclude<ElementType, "word">),
                 action.id
             );
             return {
@@ -143,6 +178,11 @@ function reducer(state: State, action: Action): State {
             );
             const acceptDiagramState = createDiagramStateContext(acceptHistory.currState);
             const { priorState } = editState;
+            const priorWordViewContext = createWordViewContext(
+                acceptDiagramState,
+                priorState.contextData.elementCategory,
+                priorState.contextData.selectedElement
+            );
             switch (priorState.type) {
                 case "add": {
                     const output: AddState = {
@@ -150,7 +190,7 @@ function reducer(state: State, action: Action): State {
                         addElementType: editState.addElementType,
                         history: acceptHistory,
                         diagramStateContext: acceptDiagramState,
-                        wordViewContext: editState.wordViewContext
+                        wordViewContext: priorWordViewContext
                     };
                     return output;
                 }
@@ -160,7 +200,7 @@ function reducer(state: State, action: Action): State {
                         addElementType: editState.addElementType,
                         history: acceptHistory,
                         diagramStateContext: acceptDiagramState,
-                        wordViewContext: editState.wordViewContext
+                        wordViewContext: priorWordViewContext
                     };
                     return output;
                 }
