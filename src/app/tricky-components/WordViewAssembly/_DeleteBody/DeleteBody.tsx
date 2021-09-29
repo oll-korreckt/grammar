@@ -1,4 +1,3 @@
-import { ModeSelector } from "@app/basic-components/ModeSelector";
 import { BuildFunction, WordView } from "@app/tricky-components";
 import { accessClassName } from "@app/utils";
 import { withClassName, withEventListener } from "@app/utils/hoc";
