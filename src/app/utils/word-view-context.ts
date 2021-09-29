@@ -19,7 +19,12 @@ export interface ChainItem {
 }
 
 export type SelectedElementChain = ChainItem[];
-export type WordViewMode = "navigate" | "label" | "edit" | "delete";
+export type WordViewMode =
+    | "navigate"
+    | "add"
+    | "edit.browse"
+    | "edit.active"
+    | "delete";
 
 export interface WordViewContext {
     elementCategory: ElementCategory;
