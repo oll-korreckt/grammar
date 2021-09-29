@@ -1,7 +1,6 @@
 import { ElementDefinitionMapper, ElementId, ElementReference, ElementType, ElementCategory, getElementDefinition, elementTypeLists } from "@domain/language";
 import { DiagramState, DiagramStateItem } from "./diagram-state";
 import { ElementDisplayInfo } from "./element-display-info";
-import { WordViewStage } from "./word-view-context";
 
 export type WordRange = [number, number];
 export type WordIndices = (number | WordRange)[];
@@ -176,7 +175,7 @@ function _isComplete(element: DisplayModelElement): boolean {
 }
 
 export type Progress = {
-    [Key in WordViewStage]: {
+    [Key in "category" | "syntax"]: {
         percentage: number;
         errorItems: ElementId[];
     };
