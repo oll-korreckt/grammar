@@ -8,6 +8,7 @@ export interface StateBase {
     history: HistoryState<DiagramState>;
     diagramStateContext: DiagramStateContext;
     wordViewContext: WordViewContext;
+    addElementType: Exclude<ElementType, "word"> | undefined;
 }
 
 export interface TypedStateBase<T extends WordViewMode> extends StateBase {
@@ -16,16 +17,20 @@ export interface TypedStateBase<T extends WordViewMode> extends StateBase {
 
 export type NavigateState = TypedStateBase<"navigate">;
 
-export interface LabelState extends TypedStateBase<"label"> {
-    labelType?: Exclude<ElementType, "word">;
+export type AddState = TypedStateBase<"add">;
+
+export type EditBrowseState = TypedStateBase<"edit.browse">;
+
+type PriorStateData = {
+    type: Extract<WordViewMode, "add">;
+    contextData: Omit<WordViewContext, "visibleElements">;
+} | {
+    type: Extract<WordViewMode, "edit.browse">;
+    contextData: Omit<WordViewContext, "visibleElements">;
 }
 
-export interface EditBrowseState extends TypedStateBase<"edit"> {
-    editState: "browse";
-}
-
-export interface EditActiveState extends TypedStateBase<"edit"> {
-    editState: "active";
+export interface EditActiveState extends TypedStateBase<"edit.active"> {
+    priorState: PriorStateData;
     editHistory: HistoryState<DiagramState>;
     id: ElementId;
     property?: string;
@@ -35,7 +40,7 @@ export type EditState = EditBrowseState | EditActiveState;
 
 export type DeleteState = TypedStateBase<"delete">;
 
-export type State =  NavigateState | LabelState | EditState | DeleteState;
+export type State =  NavigateState | AddState | EditState | DeleteState;
 
 export type Action = {
     type: "switch mode";
@@ -47,31 +52,30 @@ export type Action = {
     type: "navigate: elementCategory";
     elementCategory: ElementCategory;
 } | {
-    type: "label: labelType";
-    labelType: Exclude<ElementType, "word"> | undefined;
+    type: "add: elementType";
+    elementType: Exclude<ElementType, "word"> | undefined;
 } | {
-    type: "label: Apply";
+    type: "add: Enter edit.active";
+} | {
+    type: "edit.browse: Enter edit.active";
     id: ElementId;
 } | {
-    type: "edit: Enter";
-    id: ElementId;
+    type: "edit.active: Done";
 } | {
-    type: "edit: Done";
+    type: "edit.active: Cancel";
 } | {
-    type: "edit: Cancel";
-} | {
-    type: "edit: Submit Change";
+    type: "edit.active: Submit Change";
     change: AtomicChange[];
 } | {
-    type: "edit: Add child reference";
+    type: "edit.active: Add child reference";
     property: string;
     childId: ElementId;
 } | {
-    type: "edit: Remove child reference";
+    type: "edit.active: Remove child reference";
     property: string;
     childId: ElementId;
 } | {
-    type: "edit: Select property";
+    type: "edit.active: Select property";
     property: string | undefined;
 } | {
     type: "delete";

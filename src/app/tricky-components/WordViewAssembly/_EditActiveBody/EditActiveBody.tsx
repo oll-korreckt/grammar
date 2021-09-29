@@ -1,11 +1,12 @@
+import { withDisable, withFade } from "@app/basic-components/Word";
+import { BuildFunction, WordView } from "@app/tricky-components";
+import { PropertySelector } from "@app/tricky-components/PropertySelector";
 import { DiagramState, DiagramStateItem, ElementData, ElementDisplayInfo, ReferenceObject } from "@app/utils";
 import { withEventListener } from "@app/utils/hoc";
 import { ElementId, ElementReference, ElementType, getElementDefinition } from "@domain/language";
-import { Dispatch } from "react";
-import { BuildFunction } from "../WordView/WordView";
-import { Action, EditState } from "./types";
-import { withPropertyHeader } from "./high-order-component";
-import { withDisable, withFade } from "@app/basic-components/Word";
+import React from "react";
+import { withPropertyHeader } from "../_utils/high-order-component";
+import { Action, EditActiveState } from "../_utils/types";
 
 type PropertyIdentifier = (id: ElementId) => undefined | string;
 
@@ -52,7 +53,7 @@ function createPropertyChecker({ value, type }: DiagramStateItem, property: stri
     };
 }
 
-export function getEditBuildFn(state: EditState, dispatch: Dispatch<Action>): BuildFunction {
+export function createBuildFn(state: EditActiveState, dispatch: React.Dispatch<Action>): BuildFunction {
     const { diagramStateContext, id, property } = state;
     const parentItem = DiagramState.getItem(diagramStateContext.state, id);
     if (parentItem.type === "word") {
@@ -73,10 +74,11 @@ export function getEditBuildFn(state: EditState, dispatch: Dispatch<Action>): Bu
         buildFn = (Component, data) => {
             let output = Component;
             const result = propertyChecker(data);
+            console.log(result, data.id);
             switch (result) {
                 case "assigned":
                     output = withEventListener(output, "click", () => dispatch({
-                        type: "edit: Remove child reference",
+                        type: "edit.active: Remove child reference",
                         property: property,
                         childId: data.id
                     }));
@@ -84,7 +86,7 @@ export function getEditBuildFn(state: EditState, dispatch: Dispatch<Action>): Bu
                 case "validType":
                     output = withFade(output);
                     output = withEventListener(output, "click", () => dispatch({
-                        type: "edit: Add child reference",
+                        type: "edit.active: Add child reference",
                         property: property,
                         childId: data.id
                     }));
@@ -100,3 +102,26 @@ export function getEditBuildFn(state: EditState, dispatch: Dispatch<Action>): Bu
     }
     return buildFn;
 }
+
+export interface EditBodyProps {
+    state: EditActiveState;
+    dispatch: React.Dispatch<Action>;
+}
+
+export const EditActiveBody: React.VFC<EditBodyProps> = ({ state, dispatch }) => {
+    const buildFn = createBuildFn(state, dispatch);
+    const item = DiagramState.getItem(
+        state.diagramStateContext.state,
+        state.id
+    );
+    return (
+        <>
+            <WordView buildFn={buildFn}/>
+            <PropertySelector
+                item={item}
+                selectedProperty={state.property}
+                onSelectChange={(property) => dispatch({ type: "edit.active: Select property", property: property })}
+            />
+        </>
+    );
+};
