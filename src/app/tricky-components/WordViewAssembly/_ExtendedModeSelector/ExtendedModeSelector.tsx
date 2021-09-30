@@ -6,7 +6,6 @@ import styles from "./_styles.scss";
 
 export const ExtendedModeSelector = makeRefComponent<HTMLDivElement, ModeSelectorProps>("ExtendedModeSelector", (props, ref) => {
     const { progress } = useContext(DiagramStateContext);
-    console.log(progress);
     const percentage = progress.category.percentage * 0.4 + progress.syntax.percentage * 0.6;
     return (
         <div className={accessClassName(styles, "modeSelector")} ref={ref}>

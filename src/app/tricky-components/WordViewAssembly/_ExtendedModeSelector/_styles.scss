@@ -1,16 +1,20 @@
 .modeSelector {
     position: absolute;
     bottom: 0;
+    width: 100%;
 }
+
+$height: 10px;
 
 .progress {
     width: 100%;
-    height: 5px;
+    height: $height;
     background-color: gray;
+    margin-bottom: 3px;
 }
 
 .percentage {
-    height: 5px;
+    height: $height;
     background-image: linear-gradient(
         to right,
         hsl(252, 100%, 50%),
