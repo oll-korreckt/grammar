@@ -129,7 +129,10 @@ function getSelectedCategories(availableTypes: AvailableTypes, elementType: Elem
     const searchCategory = _getSearchCategory(elementType);
     const deriveData = availableTypes[searchCategory];
     if (deriveData === undefined) {
-        throw `category '${searchCategory}' is not available`;
+        return [
+            _getFirstCategory(availableTypes),
+            undefined
+        ];
     }
     for (let index = 0; index < deriveData.length; index++) {
         const { type } = deriveData[index];
