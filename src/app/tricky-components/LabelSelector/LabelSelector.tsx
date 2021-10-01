@@ -6,7 +6,7 @@ import { FaLink, FaLayerGroup } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 import { AvailableTypes, DeriveData, LabelCategory } from "./available-types";
 import styles from "./_styles.scss";
-
+import { CSSTransition } from "react-transition-group";
 
 type CategoryButtonData = {
     category: LabelCategory;
@@ -17,9 +17,10 @@ type CategoryButtonData = {
 export interface LabelSelectorProps {
     elementType?: Exclude<ElementType, "word">;
     onElementTypeSelect?: (elementType: Exclude<ElementType, "word">) => void;
+    onAddClick?: () => void;
 }
 
-export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onElementTypeSelect }) => {
+export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onElementTypeSelect, onAddClick }) => {
     const context = useContext(WordViewContext);
     const [selectedCategory, setSelectedCategory] = useState<LabelCategory | undefined>();
     const availableTypes = useMemo(() => {
@@ -53,7 +54,7 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onEl
         {
             category: "partOfSpeech",
             icon: FaLayerGroup,
-            text: "Part of Speech"
+            text: "Category"
         },
         {
             category: "phrase",
@@ -93,21 +94,26 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onEl
                     );
                 })}
             </div>
-            <div className={accessClassName(styles, "elementSelector")}>
-                {deriveData.map((data) => {
-                    const className = data.type === elementType
-                        ? "selectedElementItem"
-                        : "unselectedElementItem";
-                    return (
-                        <ExtendedElementItem
-                            key={data.baseType}
-                            className={accessClassName(styles, className)}
-                            onClick={() => onElementTypeSelect && onElementTypeSelect(data.type)}
-                        >
-                            {data.baseType}
-                        </ExtendedElementItem>
-                    );
-                })}
+            <div className={accessClassName(styles, "elementSelectorContainer")}>
+                <div className={accessClassName(styles, "elementSelector")}>
+                    {deriveData.map((data) => {
+                        const selected = data.type === elementType;
+                        const onClick: () => void = selected
+                            ? () => onAddClick && onAddClick()
+                            : () => onElementTypeSelect && onElementTypeSelect(data.type);
+
+                        return (
+                            <ExtendedElementItem
+                                key={data.baseType}
+                                className={accessClassName(styles, "unselectedElementItem")}
+                                onClick={onClick}
+                                selected={selected}
+                            >
+                                {data.baseType}
+                            </ExtendedElementItem>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
@@ -121,11 +127,11 @@ interface CategorySelectorItemProps {
 const CategorySelectorItem = makeRefComponent<HTMLDivElement, CategorySelectorItemProps>("LabelSelectorItem", ({ children, icon }, ref) => {
     const Icon = icon;
     return (
-        <div ref={ref}>
-            <div>
+        <div className={accessClassName(styles, "categoryItem")} ref={ref}>
+            <div className={accessClassName(styles, "categoryItemIcon")}>
                 <Icon/>
             </div>
-            <div>
+            <div className={accessClassName(styles, "categoryItemText")}>
                 {children}
             </div>
         </div>
@@ -136,9 +142,10 @@ const ExtendedCategorySelectorItem = withEventProp(withClassNameProp(CategorySel
 
 interface ElementItemProps {
     children: ElementType;
+    selected?: boolean | undefined;
 }
 
-const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementItem", ({ children }, ref) => {
+const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementItem", ({ children, selected }, ref) => {
     const displayInfo = ElementDisplayInfo.getDisplayInfo(children);
     const abrName = ElementDisplayInfo.getAbbreviatedName(displayInfo).split(" ")[0].replaceAll(".", "");
 
@@ -153,6 +160,20 @@ const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementI
             <div className={accessClassName(styles, "elementItemText")}>
                 {abrName}
             </div>
+            <CSSTransition
+                in={selected}
+                timeout={400}
+                classNames={{
+                    enter: accessClassName(styles, "addEnter"),
+                    enterActive: accessClassName(styles, "addEnterActive"),
+                    exit: accessClassName(styles, "addExit")
+                }}
+                unmountOnExit
+            >
+                <div className={accessClassName(styles, "add")}>
+                    Add
+                </div>
+            </CSSTransition>
         </div>
     );
 });

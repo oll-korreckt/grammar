@@ -1,33 +1,77 @@
 @use "main";
 
 .labelSelector {
-    display: grid;
-    grid-template-columns: 7rem auto;
+    display: flex;
+    flex-direction: row;
+    height: 40vh;
 }
 
 .categorySelector {
-    display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    box-sizing: content-box;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-around;
+    border: 1px solid black;
 }
 
 .categoryItem {
-    display: grid;
-    grid-template-rows: 60% 40%;
+    display: inline-block;
+    padding: 5px 5px;
+    user-select: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.categoryItemIcon {
+    @include main.center-content;
+    font-size: 30px;
+}
+
+.categoryItemText {
+    @include main.center-content;
+    font-size: 10px;
+}
+
+$es-margin: 5px;
+
+.elementSelectorContainer {
+    width: calc(100% - 2 * #{$es-margin});
+    height: 100%;
+    padding: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 5px;
+    border: 1px solid grey;
+    border-radius: 5px;
+    box-shadow: 0 0 2px 0px grey;
 }
 
 .elementSelector {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
-    grid-template-rows: repeat(auto-fill, 5rem);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 5px;
+    overflow-y: auto;
 }
 
 .selectedCategoryItem {
     color: orangered;
 }
 
-.containingCategoryItem {
-    text-decoration: underline;
+$dot-height: 10px;
+$half-dot-height: $dot-height / 2;
+
+.containingCategoryItem::before {
+    content: '';
+    background-color: orangered;
+    position: absolute;
+    height: $dot-height;
+    width: $dot-height;
+    border-radius: 50%;
+    left: -$half-dot-height;
+    top: calc(50% - #{$half-dot-height});
 }
 
 .enabledCategoryItem {
@@ -40,25 +84,57 @@
 }
 
 .elementItem {
-    display: grid;
-    border: 1px solid black;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid grey;
+    text-align: center;
+    overflow: hidden;
+    user-select: none;
+    color: grey;
+    transition: box-shadow 0.2s;
+    width: 70px;
+    height: 70px;
+    background-color: white;
 }
 
 .selectedElementItem {
-    pointer-events: none;
-    color: cadetblue;
+    box-shadow: 2px 2px 3px grey;
 }
 
 .unselectedElementItem {
-    color: grey;
+    box-shadow: 0 0 0 grey;
 }
 
 .elementItemHeader {
-    @include main.center-content;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 3rem;
+    font-size: 2.5rem;
 }
 
 .elementItemText {
-    @include main.center-content;
+    font-size: 12px;
+}
+
+.add {
+    position: absolute;
+    background-color: red;
+    color: white;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    height: 20px;
+}
+
+.addEnter {
+    transform: translateY(-110%);
+}
+
+.addEnterActive {
+    transform: translateY(0%);
+    transition: transform 400ms;
+}
+
+.addExit {
+    display: none;
 }
