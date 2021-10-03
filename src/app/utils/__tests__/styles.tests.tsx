@@ -20,7 +20,17 @@ describe("styles", () => {
         });
 
         test("error - does not exist", () => {
-            assert.throw(() => accessClassName(styles, "does not exist"), /does not exist/i);
+            assert.throw(
+                () => accessClassName(styles, "does not exist"),
+                /does not exist/i
+            );
+        });
+
+        test("error - empty class name", () => {
+            assert.throw(
+                () => accessClassName(styles, ""),
+                /empty class name/i
+            );
         });
     });
 

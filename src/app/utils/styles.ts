@@ -35,6 +35,9 @@ export function appendClassName(className: string, styles: Styles, newClassName:
 }
 
 function getClassName(styles: Styles, className: string): string {
+    if (className.length === 0) {
+        throw "cannot access empty class name";
+    }
     const output = styles[className];
     if (output === undefined) {
         throw `Class name '${className}' does not exist`;
