@@ -29,3 +29,7 @@ $height: 10px;
     );
     transition: width 0.3s;
 }
+
+.roundedEdges {
+    border-radius: 0 $height / 2 $height / 2 0;
+}
