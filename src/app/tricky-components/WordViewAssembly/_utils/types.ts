@@ -78,8 +78,10 @@ export type Action = {
     type: "edit.active: Select property";
     property: string | undefined;
 } | {
-    type: "delete";
+    type: "delete: element";
     id: ElementId;
+} | {
+    type: "delete: all";
 }
 
 export interface WordViewAssemblyContext {

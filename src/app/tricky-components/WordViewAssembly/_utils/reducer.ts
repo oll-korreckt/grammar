@@ -305,12 +305,46 @@ function reducer(state: State, action: Action): State {
                 property: action.property
             };
         }
-        case "delete": {
+        case "delete: element": {
             const currState = state.diagramStateContext.state;
             const change = DiagramState.createDeleteItem(currState, action.id);
             const newHistory = HistoryState.stageChange(
                 state.history,
                 ...change
+            );
+            const newDiagramStateContext = createDiagramStateContext(newHistory.currState);
+            const { elementCategory, selectedElement } = state.wordViewContext;
+            return {
+                type: "delete",
+                addElementType: state.addElementType,
+                history: newHistory,
+                diagramStateContext: newDiagramStateContext,
+                wordViewContext: createWordViewContext(newDiagramStateContext, elementCategory, selectedElement)
+            };
+        }
+        case "delete: all": {
+            const currState = state.diagramStateContext.state;
+            const changes: AtomicChange[] = [];
+            Object.entries(currState.elements).forEach(([key, element]) => {
+                if (element.type !== "word") {
+                    changes.push(AtomicChange.createDelete(
+                        ["elements", key],
+                        element
+                    ));
+                }
+            });
+            currState.wordOrder.forEach((id) => {
+                const word = currState.elements[id];
+                if (word.ref !== undefined) {
+                    changes.push(AtomicChange.createDelete(
+                        ["elements", id, "ref"],
+                        word.ref
+                    ));
+                }
+            });
+            const newHistory = HistoryState.stageChange(
+                state.history,
+                ...changes
             );
             const newDiagramStateContext = createDiagramStateContext(newHistory.currState);
             const { elementCategory, selectedElement } = state.wordViewContext;
