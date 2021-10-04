@@ -11,6 +11,7 @@ export type ElementData = {
     lexemes: string[];
     selected: boolean;
     index: WordIndices[number];
+    ref?: ElementId;
 }
 
 export interface ChainItem {
@@ -57,9 +58,15 @@ function _placeElementData(data: ElementData, output: (ElementData | undefined)[
     }
 }
 
+function _addRef(data: ElementData, ref: ElementId | undefined): void {
+    if (ref !== undefined) {
+        data.ref = ref;
+    }
+}
+
 function _getElementData(diagram: DiagramState, model: DisplayModel, id: ElementId): ElementData[] {
     const output: ElementData[] = [];
-    const elementType = DiagramState.getItem(diagram, id).type;
+    const { type, ref } = DiagramState.getItem(diagram, id);
     const element = model[id];
     if (element.words.length === 0) {
         return [];
@@ -71,9 +78,10 @@ function _getElementData(diagram: DiagramState, model: DisplayModel, id: Element
         id: id,
         key: `${id}-0`,
         lexemes: getLexemes(diagram, headWIndex),
-        type: elementType,
+        type: type,
         index: headWIndex
     };
+    _addRef(headData, ref);
     output.push(headData);
     for (let i = 1; i < element.words.length; i++) {
         const tailWIndex = element.words[i];
@@ -83,9 +91,10 @@ function _getElementData(diagram: DiagramState, model: DisplayModel, id: Element
             id: id,
             key: `${id}-${i}`,
             lexemes: getLexemes(diagram, tailWIndex),
-            type: elementType,
+            type: type,
             index: tailWIndex
         };
+        _addRef(tailData, ref);
         output.push(tailData);
     }
     return output;
