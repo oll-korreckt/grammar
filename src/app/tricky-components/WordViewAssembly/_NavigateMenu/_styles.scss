@@ -1,0 +1,59 @@
+@use "main";
+
+.navigateMenu {
+    display: grid;
+    grid-template-columns: 1fr 8fr;
+    border: 1px solid grey;
+    box-shadow: 0 0 3px grey;
+    padding: 5px 0;
+    border-radius: 5px;
+}
+
+.upLevelSection {
+    display: flex;
+    justify-content: center;
+    border-right: 1px solid grey;
+}
+
+.categorySelector {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.labeledIcon {
+    @include main.center-content;
+}
+
+.labeledIconBody {
+    display: inline-block;
+    font-size: 10px;
+    text-align: center;
+}
+
+.icon {
+    display: inline-block;
+    font-size: 35px;
+}
+
+.label {
+    display: block;
+}
+
+.activeColor {
+    color: black;
+}
+
+.inactiveColor {
+    color: grey;
+}
+
+.enableState {
+    cursor: pointer;
+}
+
+.disableState {
+    cursor: default;
+    pointer-events: none;
+}
