@@ -15,7 +15,7 @@ function createBuildFn(dispatch: React.Dispatch<Action>): BuildFunction {
         let output = Component;
         if (data.type !== "word") {
             output = withEventListener(output, "click", () => dispatch({
-                type: "delete",
+                type: "delete: element",
                 id: data.id
             }));
         } else {
@@ -27,9 +27,5 @@ function createBuildFn(dispatch: React.Dispatch<Action>): BuildFunction {
 
 export const DeleteBody: React.VFC<DeleteBodyProps> = ({ dispatch }) => {
     const buildFn = createBuildFn(dispatch);
-    return (
-        <>
-            <WordView buildFn={buildFn}/>
-        </>
-    );
+    return <WordView buildFn={buildFn}/>;
 };
