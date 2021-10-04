@@ -34,7 +34,7 @@ export const Word = makeRefComponent<HTMLSpanElement, WordProps>("Word", ({ chil
 ));
 
 export interface HeadLabelProps {
-    children: string;
+    children: ReactNode;
 }
 
 export const HeadLabel = makeRefComponent<HTMLDivElement, HeadLabelProps>("HeadLabel", ({ children }, ref) => (

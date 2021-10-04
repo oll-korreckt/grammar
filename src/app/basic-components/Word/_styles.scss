@@ -39,6 +39,10 @@ $hl-height: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    svg {
+        font-size: calc(#{$hl-height} - 2px);
+    }
 }
 
 .wordLabel {

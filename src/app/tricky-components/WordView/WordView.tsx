@@ -1,7 +1,9 @@
 import React, { useContext } from "react";
-import { ElementData, ElementDisplayInfo, WordViewContext } from "@app/utils";
+import { accessClassName, DiagramStateContext, ElementData, ElementDisplayInfo, WordViewContext } from "@app/utils";
 import { HeadLabel, Space, WordLabel, Word } from "@app/basic-components/Word";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
+import { FaExternalLinkAlt } from "react-icons/fa";
+// import { FiExternalLink } from "react-icons/fi";
 
 export type BuildFunction = (Component: RefComponent<HTMLSpanElement>, data: ElementData) => RefComponent<HTMLSpanElement>;
 
@@ -18,6 +20,13 @@ export interface WordViewProps {
     buildFn?: BuildFunction;
 }
 
+const LinkIcon: React.VFC = () => (
+    <>
+        &nbsp;
+        <FaExternalLinkAlt/>
+    </>
+);
+
 export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDiagram", ({ buildFn }, ref) => {
     const { visibleElements } = useContext(WordViewContext);
 
@@ -30,7 +39,13 @@ export const WordView = makeRefComponent<HTMLDivElement, WordViewProps>("EditDia
                     let Component = makeRefComponent<HTMLSpanElement>("", (_1, ref1) => (
                         <Word ref={ref1}>
                             {(data.head && index === 0) &&
-                                <HeadLabel>{displayInfo.header}</HeadLabel>
+                                <HeadLabel>
+                                    {displayInfo.header}
+                                    {data.ref !== undefined
+                                        ? <LinkIcon/>
+                                        : ""
+                                    }
+                                </HeadLabel>
                             }
                             {lexeme}
                         </Word>
