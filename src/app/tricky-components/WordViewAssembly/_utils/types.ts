@@ -44,7 +44,7 @@ export type State =  NavigateState | AddState | EditState | DeleteState;
 
 export type Action = {
     type: "switch mode";
-    target: WordViewMode;
+    target: Exclude<WordViewMode, "edit.active">;
 } | {
     type: "navigate: selectedItem";
     selectedElement: ElementId | undefined;
@@ -77,6 +77,9 @@ export type Action = {
 } | {
     type: "edit.active: Select property";
     property: string | undefined;
+} | {
+    type: "edit.active: Switch mode";
+    target: Exclude<WordViewMode, "edit.active">;
 } | {
     type: "delete: element";
     id: ElementId;

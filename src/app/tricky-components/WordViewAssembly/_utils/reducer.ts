@@ -4,19 +4,33 @@ import { AtomicChange } from "@lib/utils";
 import React, { useReducer } from "react";
 import { Action, EditActiveState, AddState, State, StateBase, EditBrowseState } from "./types";
 
-function switchMode(state: State, mode: WordViewMode): State {
-    const stateBaseKeys: (keyof StateBase)[] = [
+function extractCancelData(state: EditActiveState): Omit<StateBase, "type"> {
+    const diagramStateContext = createDiagramStateContext(state.history.currState);
+    const { priorState } = state;
+    const wordViewContext = createWordViewContext(
+        diagramStateContext,
+        priorState.contextData.elementCategory,
+        priorState.contextData.selectedElement
+    );
+    return {
+        history: state.history,
+        diagramStateContext: diagramStateContext,
+        wordViewContext: wordViewContext,
+        addElementType: state.addElementType
+    };
+}
+
+function switchMode(state: Omit<StateBase, "type">, mode: Exclude<WordViewMode, "edit.active">): Exclude<State, EditActiveState> {
+    const keys: (keyof Omit<StateBase, "type">)[] = [
         "history",
         "diagramStateContext",
         "wordViewContext",
         "addElementType"
     ];
-    const output: Partial<StateBase> = {};
-    stateBaseKeys.forEach((key) => {
-        output[key] = state[key] as any;
-    });
+    const output: Partial<Exclude<State, EditActiveState>> = {};
+    keys.forEach((key) => output[key] = state[key] as any);
     output.type = mode;
-    return output as State;
+    return output as Exclude<State, EditActiveState>;
 }
 
 function checkEditActive(state: State): EditActiveState {
@@ -121,7 +135,7 @@ function reducer(state: State, action: Action): State {
                 diagramStateContext: createDiagramStateContext(newHistory.currState),
                 wordViewContext: wordViewContext,
                 id: newItemId,
-                editHistory: newHistory,
+                editHistory: HistoryState.createChild(newHistory),
                 property: ElementDisplayInfo.getPrimaryProperty(addElementType)
             };
         }
@@ -183,55 +197,18 @@ function reducer(state: State, action: Action): State {
                 priorState.contextData.elementCategory,
                 priorState.contextData.selectedElement
             );
-            switch (priorState.type) {
-                case "add": {
-                    const output: AddState = {
-                        type: "add",
-                        addElementType: editState.addElementType,
-                        history: acceptHistory,
-                        diagramStateContext: acceptDiagramState,
-                        wordViewContext: priorWordViewContext
-                    };
-                    return output;
-                }
-                case "edit.browse": {
-                    const output: EditBrowseState = {
-                        type: "edit.browse",
-                        addElementType: editState.addElementType,
-                        history: acceptHistory,
-                        diagramStateContext: acceptDiagramState,
-                        wordViewContext: priorWordViewContext
-                    };
-                    return output;
-                }
-            }
+            const data: Omit<StateBase, "type"> = {
+                history: acceptHistory,
+                diagramStateContext: acceptDiagramState,
+                wordViewContext: priorWordViewContext,
+                addElementType: editState.addElementType
+            };
+            return switchMode(data, editState.priorState.type);
         }
         case "edit.active: Cancel": {
             const editState = checkEditActive(state);
-            const newDiagramStateContext = createDiagramStateContext(editState.editHistory.baseState);
-            const { priorState } = editState;
-            switch (priorState.type) {
-                case "add": {
-                    const output: AddState = {
-                        type: "add",
-                        addElementType: editState.addElementType,
-                        history: editState.history,
-                        diagramStateContext: newDiagramStateContext,
-                        wordViewContext: editState.wordViewContext
-                    };
-                    return output;
-                }
-                case "edit.browse": {
-                    const output: EditBrowseState = {
-                        type: "edit.browse",
-                        addElementType: editState.addElementType,
-                        history: editState.history,
-                        diagramStateContext: newDiagramStateContext,
-                        wordViewContext: editState.wordViewContext
-                    };
-                    return output;
-                }
-            }
+            const data = extractCancelData(editState);
+            return switchMode(data, editState.priorState.type);
         }
         case "edit.active: Add child reference": {
             const editState = checkEditActive(state);
@@ -304,6 +281,11 @@ function reducer(state: State, action: Action): State {
                 ...editState,
                 property: action.property
             };
+        }
+        case "edit.active: Switch mode": {
+            const editState = checkEditActive(state);
+            const data = extractCancelData(editState);
+            return switchMode(data, action.target);
         }
         case "delete: element": {
             const currState = state.diagramStateContext.state;
