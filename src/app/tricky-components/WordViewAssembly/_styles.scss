@@ -1,3 +1,5 @@
+@use "main";
+
 .disable {
     pointer-events: none;
 }
@@ -16,4 +18,78 @@
 .disableDone {
     cursor: auto;
     color: grey;
+}
+
+.center {
+    @include main.center-content;
+}
+
+.navMenu {
+    margin: auto;
+    max-width: 1000px;
+}
+
+.clearContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-right: 10%;
+    width: 100%;
+}
+
+.enableClear {
+    cursor: pointer;
+}
+
+.disableClear {
+    cursor: default;
+    pointer-events: none;
+    color: grey;
+}
+
+$transition: 2000ms;
+
+.fromLeftEnter {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-110vw);
+}
+
+.fromRightEnter {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(110vw);
+}
+
+.enterActive {
+    transform: translateX(0);
+    transition: transform $transition;
+}
+
+.exit {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(0);
+}
+
+.fromLeftExitActive {
+    transform: translateX(110vw);
+    transition: transform $transition;
+}
+
+.fromRightExitActive {
+    transform: translateX(-110vw);
+    transition: transform $transition;
+}
+
+.children {
+    position: relative;
+    overflow-x: hidden;
+}
+
+.container {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding: 5px 0;
+    width: 100vw;
 }
