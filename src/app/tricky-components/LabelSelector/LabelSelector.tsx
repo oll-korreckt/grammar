@@ -6,7 +6,6 @@ import { FaLink, FaLayerGroup } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 import { AvailableTypes, DeriveData, LabelCategory } from "./available-types";
 import styles from "./_styles.scss";
-import { CSSTransition } from "react-transition-group";
 
 type CategoryButtonData = {
     category: LabelCategory;
@@ -16,11 +15,10 @@ type CategoryButtonData = {
 
 export interface LabelSelectorProps {
     elementType?: Exclude<ElementType, "word">;
-    onElementTypeSelect?: (elementType: Exclude<ElementType, "word">) => void;
-    onAddClick?: () => void;
+    onAddClick?: (elementType: Exclude<ElementType, "word">) => void;
 }
 
-export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onElementTypeSelect, onAddClick }) => {
+export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onAddClick }) => {
     const context = useContext(WordViewContext);
     const [selectedCategory, setSelectedCategory] = useState<LabelCategory | undefined>();
     const availableTypes = useMemo(() => {
@@ -98,15 +96,11 @@ export const LabelSelector: React.VFC<LabelSelectorProps> = ({ elementType, onEl
                 <div className={accessClassName(styles, "elementSelector")}>
                     {deriveData.map((data) => {
                         const selected = data.type === elementType;
-                        const onClick: () => void = selected
-                            ? () => onAddClick && onAddClick()
-                            : () => onElementTypeSelect && onElementTypeSelect(data.type);
-
                         return (
                             <ExtendedElementItem
                                 key={data.baseType}
                                 className={accessClassName(styles, "unselectedElementItem")}
-                                onClick={onClick}
+                                onClick={() => onAddClick && onAddClick(data.type)}
                                 selected={selected}
                             >
                                 {data.baseType}
@@ -148,10 +142,14 @@ interface ElementItemProps {
 const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementItem", ({ children, selected }, ref) => {
     const displayInfo = ElementDisplayInfo.getDisplayInfo(children);
     const abrName = ElementDisplayInfo.getAbbreviatedName(displayInfo).split(" ")[0].replaceAll(".", "");
+    const classNames = ["elementItem"];
+    if (selected) {
+        classNames.push("selected");
+    }
 
     return (
         <div
-            className={accessClassName(styles, "elementItem")}
+            className={accessClassName(styles, ...classNames)}
             ref={ref}
         >
             <div className={accessClassName(styles, "elementItemHeader")}>
@@ -160,7 +158,7 @@ const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementI
             <div className={accessClassName(styles, "elementItemText")}>
                 {abrName}
             </div>
-            <CSSTransition
+            {/* <CSSTransition
                 in={selected}
                 timeout={400}
                 classNames={{
@@ -173,7 +171,7 @@ const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementI
                 <div className={accessClassName(styles, "add")}>
                     Add
                 </div>
-            </CSSTransition>
+            </CSSTransition> */}
         </div>
     );
 });

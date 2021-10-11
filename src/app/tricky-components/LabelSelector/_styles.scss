@@ -116,25 +116,7 @@ $half-dot-height: $dot-height / 2;
     font-size: 12px;
 }
 
-.add {
-    position: absolute;
-    background-color: red;
-    color: white;
-    top: 0;
-    width: 100%;
-    text-align: center;
-    height: 20px;
-}
-
-.addEnter {
-    transform: translateY(-110%);
-}
-
-.addEnterActive {
-    transform: translateY(0%);
-    transition: transform 400ms;
-}
-
-.addExit {
-    display: none;
+.selected {
+    border: 2px solid orangered !important;
+    color: orangered;
 }
