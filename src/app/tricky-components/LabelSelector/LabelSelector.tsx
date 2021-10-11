@@ -158,20 +158,6 @@ const ElementItem = makeRefComponent<HTMLDivElement, ElementItemProps>("ElementI
             <div className={accessClassName(styles, "elementItemText")}>
                 {abrName}
             </div>
-            {/* <CSSTransition
-                in={selected}
-                timeout={400}
-                classNames={{
-                    enter: accessClassName(styles, "addEnter"),
-                    enterActive: accessClassName(styles, "addEnterActive"),
-                    exit: accessClassName(styles, "addExit")
-                }}
-                unmountOnExit
-            >
-                <div className={accessClassName(styles, "add")}>
-                    Add
-                </div>
-            </CSSTransition> */}
         </div>
     );
 });
