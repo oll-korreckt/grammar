@@ -6,22 +6,18 @@ import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
 import styles from "./_styles.scss";
 
-type ModeChange = (mode: WordViewMode) => void;
+type ModeChange = (mode: Exclude<WordViewMode, "edit.active">) => void;
 
 export interface ModeSelectorProps {
     onModeChange?: ModeChange;
-    mode: WordViewMode;
+    mode: Exclude<WordViewMode, "edit.active">;
 }
 
 type ButtonData = {
     icon: IconType;
-    mode: WordViewMode;
+    mode: Exclude<WordViewMode, "edit.active">;
     text: string;
 };
-
-function createOnClick(callback: ModeChange | undefined, mode: WordViewMode): () => void {
-    return () => callback && callback(mode);
-}
 
 export const ModeSelector = makeRefComponent<HTMLDivElement, ModeSelectorProps>("ModeSelector", ({ onModeChange, ...rest }, ref) => {
     const activeMode = rest.mode;
@@ -34,14 +30,13 @@ export const ModeSelector = makeRefComponent<HTMLDivElement, ModeSelectorProps>(
     return (
         <div ref={ref} className={accessClassName(styles, "modeSelector")}>
             {data.map(({ icon, mode, text }) => {
-                const callback = createOnClick(onModeChange, mode);
                 const className = mode === activeMode ? "selected" : "notSelected";
                 return (
                     <ExtendedModeSelectorItem
                         key={mode}
                         icon={icon}
                         className={accessClassName(styles, className)}
-                        onClick={callback}
+                        onClick={() => onModeChange && onModeChange(mode)}
                     >
                         {text}
                     </ExtendedModeSelectorItem>
