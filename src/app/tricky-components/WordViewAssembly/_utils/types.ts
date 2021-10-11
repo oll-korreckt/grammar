@@ -52,10 +52,8 @@ export type Action = {
     type: "navigate: elementCategory";
     elementCategory: ElementCategory;
 } | {
-    type: "add: elementType";
-    elementType: Exclude<ElementType, "word"> | undefined;
-} | {
     type: "add: Enter edit.active";
+    elementType: Exclude<ElementType, "word">;
 } | {
     type: "edit.browse: Enter edit.active";
     id: ElementId;

@@ -111,13 +111,9 @@ function reducer(state: State, action: Action): State {
                 wordViewContext: newWVContext
             };
         }
-        case "add: elementType": {
-            const output = { ...state as AddState };
-            output.addElementType = action.elementType;
-            return output;
-        }
         case "add: Enter edit.active": {
-            const { wordViewContext, history, addElementType } = state as AddState;
+            const { wordViewContext, history } = state as AddState;
+            const addElementType = action.elementType;
             if (addElementType === undefined) {
                 throw "cannot apply label without labelType selected";
             }
