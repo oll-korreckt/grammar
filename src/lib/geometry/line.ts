@@ -89,7 +89,7 @@ function intersect(line1: Line, line2: Line): IntersectOutput {
             // line2: slope-intercept
             return _intersectMixed(
                 line2 as SlopeInterceptForm,
-                line2 as VerticalLine
+                line1 as VerticalLine
             );
         case line1SlopeIntercept | line2SlopeIntercept:
             // both slope-intercept

@@ -203,4 +203,34 @@ describe("Polygon", () => {
             segmentsEqual(result2, expected);
         });
     });
+
+    describe("scale", () => {
+        const square = [
+            Point.init(0, 0),
+            Point.init(10, 0),
+            Point.init(10, 10),
+            Point.init(0, 10)
+        ];
+        test("bigger", () => {
+            const result = Polygon.scale(square, 1);
+            const expected = [
+                Point.init(-1, -1),
+                Point.init(11, -1),
+                Point.init(11, 11),
+                Point.init(-1, 11)
+            ];
+            assert.isTrue(Polygon.equals(result, expected));
+        });
+
+        test("smaller", () => {
+            const result = Polygon.scale(square, -2);
+            const expected = [
+                Point.init(2, 2),
+                Point.init(8, 2),
+                Point.init(8, 8),
+                Point.init(2, 8)
+            ];
+            assert.isTrue(Polygon.equals(result, expected));
+        });
+    });
 });

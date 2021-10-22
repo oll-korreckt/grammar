@@ -48,6 +48,10 @@ function angle(pointA: Point, pointB: Point, pointC: Point): number {
     return outputRadians * 180 / Math.PI;
 }
 
+function move(point: Point, xOffset: number, yOffset: number): Point {
+    return Point.init(point.x + xOffset, point.y + yOffset);
+}
+
 export const Point = {
     init: init,
     isPoint: Utils.createTypeGuard<Point>("point"),
@@ -55,5 +59,6 @@ export const Point = {
     distance: distance,
     add: add,
     subtract: subtract,
-    angle: angle
+    angle: angle,
+    move: move
 };

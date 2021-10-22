@@ -155,6 +155,14 @@ function equals(seg1: Segment, seg2: Segment): boolean {
         && Point.equals(seg1.point2, seg2.point2);
 }
 
+function move(seg: Segment, xOffset: number, yOffset: number): Segment {
+    const { point1, point2 } = seg;
+    return Segment.init(
+        Point.move(point1, xOffset, yOffset),
+        Point.move(point2, xOffset, yOffset)
+    );
+}
+
 export const Segment = {
     init: init,
     isSegment: Utils.createTypeGuard<Segment>("segment"),
@@ -165,5 +173,6 @@ export const Segment = {
     toLine: toLine,
     collision: collision,
     equals: equals,
-    pathToPoint: pathToPoint
+    pathToPoint: pathToPoint,
+    move: move
 };
