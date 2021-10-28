@@ -137,9 +137,39 @@ function containsPoint(polygon: Point[], point: Point): boolean {
     return count % 2 !== 0;
 }
 
-function move(polygon: Point[], x: number, y: number): Point[] {
+function translateLinear(polygon: Point[], x: number, y: number): Point[] {
     const offset = Point.init(x, y);
     return polygon.map((point) => Point.add(point, offset));
+}
+
+function average(polygon: Point[]): Point {
+    let sumX = 0;
+    let sumY = 0;
+    polygon.forEach(({ x, y }) => {
+        sumX += x;
+        sumY += y;
+    });
+    return Point.init(
+        sumX / polygon.length,
+        sumY / polygon.length
+    );
+}
+
+function translateRotate(polygon: Point[], origin: Point, angleDegrees: number): Point[] {
+    const center = average(polygon);
+    const vector = Vector2D.subtract(
+        Vector2D.init(center.x, center.y),
+        Vector2D.init(origin.x, origin.y)
+    );
+    const radians = angleDegrees * Math.PI / 180;
+    const sinAngle = Math.sin(radians);
+    const cosAngle = Math.cos(radians);
+    const rotatedVector = Vector2D.init(
+        cosAngle * vector.x - sinAngle * vector.y,
+        sinAngle * vector.x + cosAngle * vector.y
+    );
+    const path = Vector2D.subtract(rotatedVector, vector);
+    return translateLinear(polygon, path.x, path.y);
 }
 
 function scale(polygon: Point[], offset: number): Point[] {
@@ -219,7 +249,9 @@ export const Polygon = {
     containsPoint: containsPoint,
     pathToPoint: pathToPoint,
     pathToPolygon: pathToPolygon,
-    move: move,
+    translateLinear: translateLinear,
+    translateRotate: translateRotate,
+    average: average,
     scale: scale,
     equals: equals
 };

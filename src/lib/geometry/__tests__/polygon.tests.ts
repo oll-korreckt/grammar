@@ -233,4 +233,61 @@ describe("Polygon", () => {
             assert.isTrue(Polygon.equals(result, expected));
         });
     });
+
+    describe("translateLinear", () => {
+        test("simple", () => {
+            const square = [
+                Point.init(0, 0),
+                Point.init(10, 0),
+                Point.init(10, 10),
+                Point.init(0, 10)
+            ];
+            const result = Polygon.translateLinear(square, 10, -10);
+            const expected = [
+                Point.init(10, -10),
+                Point.init(20, -10),
+                Point.init(20, 0),
+                Point.init(10, 0)
+            ];
+            assert.isTrue(Polygon.equals(result, expected));
+        });
+    });
+
+    describe("translateRotate", () => {
+        const square = [
+            Point.init(9, 1),
+            Point.init(11, 1),
+            Point.init(11, -1),
+            Point.init(9, -1)
+        ];
+
+        test("ccw 90", () => {
+            const result = Polygon.translateRotate(
+                square,
+                Point.init(5, 0),
+                90
+            );
+            const expected = [
+                Point.init(4, 6),
+                Point.init(6, 6),
+                Point.init(6, 4),
+                Point.init(4, 4)
+            ];
+            assert.isTrue(Polygon.equals(result, expected));
+        });
+
+        test("cw/ccw 180", () => {
+            const origin = Point.init(0, 0);
+            const cwResult = Polygon.translateRotate(square, origin, -180);
+            const ccwResult = Polygon.translateRotate(square, origin, 180);
+            const expected = [
+                Point.init(-11, 1),
+                Point.init(-9, 1),
+                Point.init(-9, -1),
+                Point.init(-11, -1)
+            ];
+            assert.isTrue(Polygon.equals(cwResult, expected));
+            assert.isTrue(Polygon.equals(ccwResult, expected));
+        });
+    });
 });
