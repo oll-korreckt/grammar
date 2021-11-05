@@ -1,0 +1,43 @@
+.fadeIn, .fadeOut, .fadeInDebug, .fadeOutDebug {
+    position: absolute;
+}
+
+.fadeIn, .fadeOut {
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+
+.fadeIn {
+    z-index: 3;
+    width: 500px;
+    height: 500px;
+}
+
+.fadeOut {
+    z-index: 1;
+}
+
+.fadeInDebug {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 500px;
+    height: 500px;
+}
+
+.fadeOutDebug {
+    top: 0;
+    left: 500px;
+    z-index: 3;
+}
+
+.fadeOutHide {
+    width: 0;
+    height: 0;
+}
+
+.fadeOutShow {
+    width: 500px;
+    height: 500px;
+}

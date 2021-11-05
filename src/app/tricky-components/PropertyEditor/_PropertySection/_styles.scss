@@ -1,0 +1,13 @@
+.container {
+    display: block;
+}
+
+.header {
+    display: block;
+}
+
+.items {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}

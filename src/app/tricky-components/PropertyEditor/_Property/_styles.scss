@@ -1,0 +1,29 @@
+@use "main";
+
+.property {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    background-color: black;
+    border-radius: 5px;
+    z-index: 4;
+    position: relative;
+}
+
+.keep {
+    z-index: 4;
+}
+
+.propertyText {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.xContainer {
+    @include main.center-content;
+    height: 100%;
+    padding-left: 2px;
+    padding-right: 10px;
+    cursor: pointer;
+}
