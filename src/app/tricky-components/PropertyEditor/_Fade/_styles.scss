@@ -1,21 +1,37 @@
-.fadeIn, .fadeOut, .fadeInDebug, .fadeOutDebug {
+.canvas, .fadeIn, .fadeOut, .fadeInDebug, .fadeOutDebug {
     position: absolute;
+}
+
+.canvas {
+    top: 500px;
+    left: 500px;
+    width: 500px;
+    height: 500px;
+    background-color: red;
+}
+
+.canvasHiZ {
+    z-index: 1;
 }
 
 .fadeIn, .fadeOut {
     top: 0;
-    left: 0;
-    background-color: white;
+    // left: 0;
+    // background-color: white;
 }
 
 .fadeIn {
-    z-index: 3;
+    z-index: 1;
+    left: 0;
     width: 500px;
     height: 500px;
+    background-color: blue;
 }
 
 .fadeOut {
     z-index: 1;
+    left: 500px;
+    background-color: blue;
 }
 
 .fadeInDebug {

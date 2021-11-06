@@ -2,7 +2,7 @@ import { accessClassName } from "@app/utils";
 import { motion, useIsPresent, Variants, useCycle, usePresence, useAnimation } from "framer-motion";
 import { AnimationDefinition } from "framer-motion/types/render/utils/animation";
 import React, { useReducer, useRef, useState } from "react";
-import { ChildVariants, DURATION } from "../types";
+import { ChildVariants, DURATION, EVENTS } from "../types";
 import styles from "./_styles.scss";
 
 export type FadeType = "fade in" | "fade out";
@@ -11,35 +11,6 @@ export interface FadeProperties {
     firstMount?: boolean | undefined;
 }
 
-
-// const fadeInVariants: ChildVariants = {
-//     // hidden: {
-//     //     opacity: 1
-//     // },
-//     hidden: () => {
-//         console.log("fade in - hidden");
-//         return { opacity: 1 };
-//     },
-//     show: () => {
-//         console.log("fade in - show");
-//         return { opacity: 0 };
-//     }
-// };
-
-const fadeOutVariants: ChildVariants = {
-    hidden: () => {
-        console.log("hidden");
-        return { opacity: 1, zIndex: 1 };
-    },
-    show: (v) => {
-        console.log("show", v);
-        return { opacity: 0, zIndex: 2 };
-    },
-    exit: () => {
-        console.log("exit");
-        return { opacity: 1, zIndex: 3 };
-    }
-};
 
 type State = "mount" | "display" | "unmount";
 type Action = "start" | "complete";
@@ -185,11 +156,9 @@ export const DoubleFade: React.VFC = () => {
     );
 };
 
-type FadeInCyle = "0" | "hidden";
-
-const duration = 100;
-
 export const FadeIn: React.VFC = () => {
+    const [showFade, setShowFade] = useState(false);
+
     const variants: ChildVariants = {
         hidden: () => {
             console.log("FadeIn - hidden");
@@ -201,43 +170,133 @@ export const FadeIn: React.VFC = () => {
         }
     };
 
+    function invokeDelay(): void {
+        setTimeout(() => setShowFade(true), DURATION * 1000 / 2);
+    }
+
     return (
         <motion.div
-            className={accessClassName(styles, "fadeIn")}
+            className={accessClassName(
+                styles,
+                "fadeIn",
+                showFade ? "fadeOutShow" : "fadeOutHide"
+            )}
             variants={variants}
-            transition={{ duration: DURATION }}
+            {...EVENTS}
+            onAnimationStart={() => {
+                console.log("FadeIn - onAnimationStart");
+                invokeDelay();
+            }}
+            transition={{ delay: DURATION / 2,  duration: DURATION / 2 }}
         >
+            FadeIn
         </motion.div>
     );
 };
 
-export const FadeOut: React.VFC = () => {
-    const isPresent = useIsPresent();
+type EventName = keyof ChildVariants;
 
-    const classes = ["fadeOut"];
-    if (isPresent) {
-        classes.push("fadeOutHide");
-    } else {
-        classes.push("fadeOutShow");
+export const FadeOut: React.VFC = () => {
+    const [showFadeOut, setShowFadeOut] = useState(false);
+    const eventRef = useRef<EventName | undefined>();
+
+    function setFirstEvent(e: EventName): void {
+        if (eventRef.current === undefined) {
+            eventRef.current = e;
+        }
     }
 
     const variants: ChildVariants = {
-        show: () => {
-            console.log("FadeOut - show");
+        hidden: () => {
+            console.log("FadeOut - hidden");
+            setFirstEvent("hidden");
+            return {};
+        },
+        show: (fm) => {
+            console.log("FadeOut - show", fm);
+            setFirstEvent("show");
             return { opacity: 0 };
         },
-        exit: () => {
-            console.log("FadeOut - exit");
+        exit: (fm) => {
+            console.log("FadeOut - exit", fm);
             return { opacity: 1 };
+        }
+    };
+
+    // const eventName = eventRef.current;
+
+    return (
+        <motion.div
+            className={accessClassName(
+                styles,
+                "fadeOut",
+                // "fadeOutHide"
+                showFadeOut ? "fadeOutShow" : "fadeOutHide"
+            )}
+            {...EVENTS}
+            // animate="show"
+            // exit="exit"
+            onAnimationStart={() => {
+                console.log("FadeOut - onAnimationStart", eventRef.current);
+                if (eventRef.current === "show") {
+                    setShowFadeOut(true);
+                }
+            }}
+            onAnimationComplete={() => {
+                console.log("FadeOut - onAnimationComplete", eventRef.current);
+                if (eventRef.current === "hidden") {
+                    eventRef.current = "show";
+                } else if (eventRef.current === "show") {
+                    setShowFadeOut(false);
+                }
+            }}
+            variants={variants}
+            transition={{ duration: DURATION / 2 }}
+        >
+            FadeOut
+        </motion.div>
+    );
+};
+
+export const Canvas: React.FC = ({ children }) => {
+    const [hiZ, setHiZ] = useState(false);
+
+    const classes = ["canvas"];
+    if (hiZ) {
+        classes.push("canvasHiZ");
+    }
+
+    function invokeDelay(): void {
+        if (hiZ) {
+            return;
+        }
+        setTimeout(() => setHiZ(true), DURATION * 1000 / 2);
+    }
+
+    const variants: ChildVariants = {
+        hidden: () => {
+            console.log("Canvas - hidden");
+            return { };
+
+        },
+        show: () => {
+            console.log("Canvas - show");
+            return { };
         }
     };
 
     return (
         <motion.div
             className={accessClassName(styles, ...classes)}
+            transition={{ duration: DURATION / 2 }}
+            onAnimationStart={() => {
+                console.log("Canvas - onAnimationStart");
+                invokeDelay();
+            }}
+            {...EVENTS}
             variants={variants}
-            transition={{ duration: DURATION }}
         >
+            {children}
         </motion.div>
     );
 };

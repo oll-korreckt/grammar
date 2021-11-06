@@ -3,7 +3,7 @@ import { ElementReference, ElementType } from "@domain/language";
 import { AnimatePresence, AnimateSharedLayout, motion, usePresence } from "framer-motion";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { createInvoke, INVALID_PROPERTY, PropertyContext, PropertyData, PropertyEditorAction } from "./types";
+import { createInvoke, EVENTS, INVALID_PROPERTY, PropertyContext, PropertyData, PropertyEditorAction } from "./types";
 import { Display } from "./_Display/Display";
 import { Property } from "./_Property/Property";
 import { PropertySection, PropertySectionProps } from "./_PropertySection/PropertySection";
@@ -90,9 +90,7 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ type, item, pro
                         <motion.div
                             key={key}
                             className={accessClassName(styles, ...displayClasses)}
-                            initial="hidden"
-                            animate="show"
-                            exit="exit"
+                            {...EVENTS}
                             onAnimationStart={() => console.log("display start:", key)}
                             onAnimationComplete={() => console.log("animation complte")}
                             // transition={{ duration: 5 }}
@@ -109,9 +107,7 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ type, item, pro
                             key={key}
                             className={accessClassName(styles, ...editClasses)}
                             onAnimationStart={() => console.log("edit start:", key)}
-                            initial="hidden"
-                            animate="show"
-                            exit="exit"
+                            {...EVENTS}
                         >
                             <FaArrowLeft
                                 onClick={() => invokeAction({

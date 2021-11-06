@@ -35,6 +35,12 @@ export type ChildVariants = {
     exit?: Variant;
 }
 
+export const EVENTS = {
+    initial: "hidden",
+    animate: "show",
+    exit: "exit"
+};
+
 export const DURATION = 10;
 
 // export const PropertyContext = createContext<PropertyContext>({ motionProperty: INVALID_PROPERTY });
