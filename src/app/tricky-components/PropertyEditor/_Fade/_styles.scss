@@ -3,11 +3,9 @@
 }
 
 .canvas {
-    top: 500px;
-    left: 500px;
     width: 500px;
     height: 500px;
-    background-color: red;
+    background-color: white;
 }
 
 .canvasHiZ {
@@ -15,23 +13,20 @@
 }
 
 .fadeIn, .fadeOut {
-    top: 0;
     // left: 0;
     // background-color: white;
 }
 
 .fadeIn {
-    z-index: 1;
-    left: 0;
+    z-index: 2;
     width: 500px;
     height: 500px;
-    background-color: blue;
+    background-color: white;
 }
 
 .fadeOut {
-    z-index: 1;
-    left: 500px;
-    background-color: blue;
+    z-index: 2;
+    background-color: white;
 }
 
 .fadeInDebug {

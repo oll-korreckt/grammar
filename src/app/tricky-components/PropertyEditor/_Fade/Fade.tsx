@@ -189,7 +189,6 @@ export const FadeIn: React.VFC = () => {
             }}
             transition={{ delay: DURATION / 2,  duration: DURATION / 2 }}
         >
-            FadeIn
         </motion.div>
     );
 };
@@ -251,9 +250,8 @@ export const FadeOut: React.VFC = () => {
                 }
             }}
             variants={variants}
-            transition={{ duration: DURATION / 2 }}
+            transition={{ duration: DURATION * 0.51 }}
         >
-            FadeOut
         </motion.div>
     );
 };
@@ -268,6 +266,7 @@ export const Canvas: React.FC = ({ children }) => {
 
     function invokeDelay(): void {
         if (hiZ) {
+            // setHiZ(false);
             return;
         }
         setTimeout(() => setHiZ(true), DURATION * 1000 / 2);
@@ -282,6 +281,10 @@ export const Canvas: React.FC = ({ children }) => {
         show: () => {
             console.log("Canvas - show");
             return { };
+        },
+        exit: () => {
+            console.log("Canvas - exit");
+            return { };
         }
     };
 
@@ -293,6 +296,11 @@ export const Canvas: React.FC = ({ children }) => {
                 console.log("Canvas - onAnimationStart");
                 invokeDelay();
             }}
+            // onAnimationComplete={(d) => {
+            //     if (d === "exit") {
+                    
+            //     }
+            // }}
             {...EVENTS}
             variants={variants}
         >
