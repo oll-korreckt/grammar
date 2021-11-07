@@ -1,9 +1,13 @@
 import React from "react";
 import { Canvas, FadeIn, FadeOut } from "../_Fade/Fade";
 
-export const FadeContainer: React.FC = ({ children }) => {
+export interface FadeContainerProps {
+    firstMount: boolean;
+}
+
+export const FadeContainer: React.FC<FadeContainerProps> = ({ children, firstMount }) => {
     return (
-        <Canvas>
+        <Canvas firstMount={firstMount}>
             <FadeIn/>
             <FadeOut/>
             {children}

@@ -250,14 +250,18 @@ export const FadeOut: React.VFC = () => {
                 }
             }}
             variants={variants}
-            transition={{ duration: DURATION * 0.51 }}
+            transition={{ duration: DURATION * 0.55 }}
         >
         </motion.div>
     );
 };
 
-export const Canvas: React.FC = ({ children }) => {
-    const [hiZ, setHiZ] = useState(false);
+export interface CanvasProps {
+    firstMount: boolean;
+}
+
+export const Canvas: React.FC<CanvasProps> = ({ children, firstMount }) => {
+    const [hiZ, setHiZ] = useState(firstMount);
 
     const classes = ["canvas"];
     if (hiZ) {
@@ -266,7 +270,6 @@ export const Canvas: React.FC = ({ children }) => {
 
     function invokeDelay(): void {
         if (hiZ) {
-            // setHiZ(false);
             return;
         }
         setTimeout(() => setHiZ(true), DURATION * 1000 / 2);

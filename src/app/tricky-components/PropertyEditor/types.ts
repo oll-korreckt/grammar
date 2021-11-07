@@ -41,6 +41,11 @@ export const EVENTS = {
     exit: "exit"
 };
 
-export const DURATION = 2;
+export const DURATION = 0.6;
 
-// export const PropertyContext = createContext<PropertyContext>({ motionProperty: INVALID_PROPERTY });
+export interface AnimationContext {
+    activeProperty?: string;
+    firstMount: boolean;
+}
+
+export const AnimationContext = createContext<AnimationContext>({ firstMount: true });

@@ -1,8 +1,8 @@
 import { accessClassName } from "@app/utils";
 import { motion, useIsPresent } from "framer-motion";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaTimes } from "react-icons/fa";
-import { ChildVariants, DURATION } from "../types";
+import { AnimationContext, ChildVariants, DURATION } from "../types";
 import styles from "./_styles.scss";
 
 export interface PropertyProps {
@@ -18,6 +18,7 @@ function getVariants(property: string | undefined, setKeep?: (value: boolean) =>
     }
     return {
         show: (p) => {
+            console.log("custom value", p);
             if (p === property) {
                 return { zIndex: 2 };
             }
@@ -35,10 +36,10 @@ function getVariants(property: string | undefined, setKeep?: (value: boolean) =>
 }
 
 export const Property: React.VFC<PropertyProps> = ({ onClick, onCancel, children, propertyKey }) => {
-    const [keep, setKeep] = useState(false);
-    const isPresent = useIsPresent();
+    const { activeProperty } = useContext(AnimationContext);
+    // const isPresent = useIsPresent();
     const classes = ["property"];
-    if (!isPresent) {
+    if (propertyKey !== undefined && activeProperty === propertyKey) {
         classes.push("keep");
     }
     console.log(classes);
@@ -49,12 +50,20 @@ export const Property: React.VFC<PropertyProps> = ({ onClick, onCancel, children
             layoutId={propertyKey}
             variants={{
                 show: () => {
-                    console.log("Property - show");
-                    return { zIndex: 4 };
+                    console.log("Property - show", activeProperty);
+                    // return { zIndex: 3 };
+                    return {};
                 },
                 exit: () => {
-                    console.log("Property - exit");
-                    return { zIndex: 4 };
+                    console.log("Property - exit", activeProperty);
+                    return {};
+                    // return propertyKey !== undefined && p === propertyKey
+                    //     ? { zIndex: 3 }
+                    //     : { };
+                    // if (p === propertyKey) {
+                        
+                    // }
+                    // return { zIndex: 3 };
                 }
             }}
             // variants={getVariants(propertyKey, setKeep)}
