@@ -114,7 +114,7 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ type, item, pro
                                     type: "exit edit"
                                 })}
                             />
-                            <Property propertyKey={property}>
+                            <Property propertyId={property}>
                                 {ElementDisplayInfo.getDisplayInfo(type).properties[property as string].fullName}
                             </Property>
                         </motion.div>

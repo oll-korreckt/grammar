@@ -41,7 +41,7 @@ export const EVENTS = {
     exit: "exit"
 };
 
-export const DURATION = 0.6;
+export const DURATION = 0.5;
 
 export interface AnimationContext {
     activeProperty?: string;

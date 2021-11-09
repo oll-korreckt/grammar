@@ -1,28 +1,44 @@
 @use "main";
 
+$height: 40px;
+$padding: 10px;
+
 .property {
     display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    color: white;
-    background-color: black;
-    border-radius: 5px;
     position: relative;
-}
-
-.keep {
-    z-index: 4;
+    flex-direction: row;
+    border: 2px solid black;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: white;
+    * {
+        background-color: white;
+    }
 }
 
 .propertyText {
-    padding: 10px;
-    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: $height;
+    line-height: $height;
+    padding: $padding;
+    color: black;
+    white-space: nowrap;
+    z-index: 1;
 }
 
-.xContainer {
+.propertyCancel {
+    display: inline-block;
+    position: relative;
+    font-size: $height;
+    line-height: $height;
+    padding: $padding;
+    &:hover {
+        color: red;
+    }
+}
+
+.faTimes {
     @include main.center-content;
-    height: 100%;
-    padding-left: 2px;
-    padding-right: 10px;
-    cursor: pointer;
 }

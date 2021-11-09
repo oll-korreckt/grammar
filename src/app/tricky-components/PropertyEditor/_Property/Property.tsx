@@ -1,92 +1,128 @@
 import { accessClassName } from "@app/utils";
-import { motion, useIsPresent } from "framer-motion";
-import React, { useContext, useState } from "react";
+import { motion, Transition, useIsPresent } from "framer-motion";
+import React, { useContext, useLayoutEffect, useRef, useState } from "react";
 import { FaTimes } from "react-icons/fa";
-import { AnimationContext, ChildVariants, DURATION } from "../types";
+import { AnimationContext, ChildVariants, DURATION, EVENTS } from "../types";
 import styles from "./_styles.scss";
 
+type PropertyClick = (id: string) => void;
+
 export interface PropertyProps {
-    onClick?: () => void;
-    onCancel?: () => void;
-    propertyKey?: string;
+    onSelect?: PropertyClick;
+    onCancel?: PropertyClick;
+    propertyId?: string;
     children: string;
 }
 
-function getVariants(property: string | undefined, setKeep?: (value: boolean) => void): ChildVariants {
-    if (property === undefined) {
-        return {};
+interface Widths {
+    total: number;
+    text: number;
+    cancel: number;
+}
+
+interface PropertyVariants {
+    text: ChildVariants;
+    cancel: ChildVariants;
+}
+
+function getVariants(widths: Widths | undefined, hasCancel: boolean): PropertyVariants {
+    let left: number;
+    let opacity: number;
+    if (widths === undefined || hasCancel) {
+        left = 0;
+        opacity = 1;
+    } else {
+        left = widths.cancel / 2;
+        opacity = 0;
     }
+
+    const immediate: Transition = { duration: DURATION };
+    const delayed: Transition = { duration: DURATION / 2, delay: DURATION / 2 };
+
+    let textTransition: Transition;
+    let cancelTransition: Transition;
+    if (!hasCancel) {
+        textTransition = immediate;
+        cancelTransition = delayed;
+    } else {
+        textTransition = delayed;
+        cancelTransition = immediate;
+    }
+
     return {
-        show: (p) => {
-            console.log("custom value", p);
-            if (p === property) {
-                return { zIndex: 2 };
+        text: {
+            exit: (a) => {
+                console.log("text exit:", a);
+                return {
+                    opacity: 0,
+                    transition: textTransition
+                };
             }
-            return {};
         },
-        exit: (p) => {
-            console.log("exit triggered");
-            if (p === property) {
-                setKeep && setKeep(true);
-                return { zIndex: 2 };
+        cancel: {
+            exit: (a) => {
+                console.log("cancel exit:", a);
+                return {
+                    opacity,
+                    transition: cancelTransition
+                };
             }
-            return {  };
         }
     };
 }
 
-export const Property: React.VFC<PropertyProps> = ({ onClick, onCancel, children, propertyKey }) => {
+export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, children, propertyId }) => {
+    const textRef = useRef<HTMLDivElement>(null);
+    const cancelRef = useRef<HTMLDivElement>(null);
+    const [widths, setWidths] = useState<Widths>();
     const { activeProperty } = useContext(AnimationContext);
-    // const isPresent = useIsPresent();
-    const classes = ["property"];
-    if (propertyKey !== undefined && activeProperty === propertyKey) {
-        classes.push("keep");
-    }
-    console.log(classes);
+
+    useLayoutEffect(() => {
+        if (textRef.current === null || cancelRef.current === null) {
+            throw "refs not defined";
+        }
+        const textWidth = textRef.current.getBoundingClientRect().width;
+        const cancelWidth = cancelRef.current.getBoundingClientRect().width;
+        setWidths({
+            total: textWidth + cancelWidth,
+            text: textWidth,
+            cancel: cancelWidth
+        });
+    }, []);
+
+    const hasCancel = onCancel !== undefined;
+    const id = propertyId !== undefined ? propertyId : children;
+    const zIndex = activeProperty === id ? 3 : 0;
 
     return (
         <motion.div
-            className={accessClassName(styles, ...classes)}
-            layoutId={propertyKey}
-            variants={{
-                show: () => {
-                    console.log("Property - show", activeProperty);
-                    // return { zIndex: 3 };
-                    return {};
-                },
-                exit: () => {
-                    console.log("Property - exit", activeProperty);
-                    return {};
-                    // return propertyKey !== undefined && p === propertyKey
-                    //     ? { zIndex: 3 }
-                    //     : { };
-                    // if (p === propertyKey) {
-                        
-                    // }
-                    // return { zIndex: 3 };
-                }
-            }}
-            // variants={getVariants(propertyKey, setKeep)}
+            className={accessClassName(styles, "property")}
             transition={{ duration: DURATION }}
-            onUpdate={(d) => console.log("Property", d)}
+            style={{ zIndex }}
+            layoutId={id}
             layout
         >
-            <span
-                key="text"
+            <motion.div
+                ref={textRef}
+                style={{
+                    left: !hasCancel && widths ? widths.cancel / 2 : 0
+                }}
                 className={accessClassName(styles, "propertyText")}
-                onClick={() => onClick && onClick()}
+                onClick={() => onSelect && onSelect(id)}
             >
                 {children}
-            </span>
-            {onCancel &&
-                <motion.div
-                    key="x"
-                    className={accessClassName(styles, "xContainer")}
-                    onClick={onCancel}
-                >
-                    <FaTimes/>
-                </motion.div>
-            }
+            </motion.div>
+            <motion.div
+                ref={cancelRef}
+                style={{
+                    opacity: hasCancel ? 1 : 0,
+                    pointerEvents: hasCancel ? "initial" : "none"
+                }}
+                className={accessClassName(styles, "propertyCancel")}
+                onClick={() => onCancel && onCancel(id)}
+            >
+                <FaTimes className={accessClassName(styles, "faTimes")} />
+            </motion.div>
         </motion.div>
     );
 };

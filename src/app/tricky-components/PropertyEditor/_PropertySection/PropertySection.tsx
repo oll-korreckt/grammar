@@ -29,8 +29,8 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, pro
                     return (
                         <Property
                             key={key}
-                            propertyKey={key}
-                            onClick={() => onAction({
+                            propertyId={key}
+                            onSelect={() => onAction({
                                 type: "property edit",
                                 property: key
                             })}
