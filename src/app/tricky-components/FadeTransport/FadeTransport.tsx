@@ -1,5 +1,5 @@
 import { accessClassName } from "@app/utils";
-import { motion } from "framer-motion";
+import { motion, useIsPresent } from "framer-motion";
 import React, { useContext } from "react";
 import { FadeSwitchContext } from "../FadeSwitch/FadeSwitch";
 import styles from "./_styles.scss";
@@ -10,10 +10,13 @@ export interface FadeTransportProps {
 
 export const FadeTransport: React.FC<FadeTransportProps> = ({ children, transportId }) => {
     const ctx = useContext(FadeSwitchContext);
-    console.log(`context: ${ctx.transportId}, child: ${transportId}`);
+    const isPresent = useIsPresent();
     const classes = ["transport"];
     if (transportId === ctx.transportId) {
         classes.push("keep");
+    }
+    if (!isPresent) {
+        classes.push("hide");
     }
 
     return (
@@ -21,7 +24,7 @@ export const FadeTransport: React.FC<FadeTransportProps> = ({ children, transpor
             className={accessClassName(styles, ...classes)}
             transition={{ duration: ctx.duration }}
             layoutId={transportId}
-            layout
+            layout="position"
         >
             {children}
         </motion.div>
