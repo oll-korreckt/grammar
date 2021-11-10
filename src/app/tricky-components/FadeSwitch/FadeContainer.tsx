@@ -33,11 +33,7 @@ const FadeIn: React.VFC<FadeProps> = ({ width, height }) => {
 
     return (
         <motion.div
-            className={accessClassName(
-                styles,
-                "fadeIn",
-                showFade ? "fadeOutShow" : "fadeOutHide"
-            )}
+            className={accessClassName(styles, "fadeIn")}
             style={getSize(showFade, width, height)}
             variants={variants}
             {...EVENTS}
@@ -79,11 +75,7 @@ const FadeOut: React.VFC<FadeProps> = ({ width, height }) => {
 
     return (
         <motion.div
-            className={accessClassName(
-                styles,
-                "fadeOut",
-                showFadeOut ? "fadeOutShow" : "fadeOutHide"
-            )}
+            className={accessClassName(styles, "fadeOut")}
             style={getSize(showFadeOut, width, height)}
             {...EVENTS}
             onAnimationStart={() => {
