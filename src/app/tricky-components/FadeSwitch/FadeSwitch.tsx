@@ -41,7 +41,7 @@ const EXIT_COMPLETE = 1 << 1;
 
 
 
-export const FadeSwitch: React.FC<FadeSwitchProps> = ({ transportId, activeChild, duration, children }) => {
+export const FadeSwitch: React.VFC<FadeSwitchProps> = ({ transportId, activeChild, duration, children }) => {
     const definedDuration = duration !== undefined ? duration : DEFAULT_DURATION;
     const definedActiveChild = activeChild !== undefined ? activeChild : 0;
     const [firstMount, setFirstMount] = useState(true);
