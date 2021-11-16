@@ -24,8 +24,8 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
                     let onCancel: (() => void) | undefined = undefined;
                     if (type === "Assigned") {
                         onCancel = () => dispatch({
-                            type: "property cancel",
-                            property: prop
+                            type: "property delete",
+                            property: prop.propertyKey
                         });
                     }
                     const displayText = prop.displayName !== undefined
@@ -36,9 +36,9 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
                             <Property
                                 onSelect={() => dispatch({
                                     type: "property select",
-                                    property: prop
+                                    property: prop.propertyKey
                                 })}
-                                onCancel={onCancel}
+                                onDelete={onCancel}
                                 satisfied={prop.satisfied}
                                 required={prop.required}
                             >

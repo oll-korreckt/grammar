@@ -8,15 +8,15 @@ type PropertyClick = () => void;
 
 export interface PropertyProps extends Pick<PropertyState, "required" | "satisfied"> {
     onSelect?: PropertyClick;
-    onCancel?: PropertyClick;
+    onDelete?: PropertyClick;
     children: string;
     required?: boolean | undefined;
     satisfied?: boolean | undefined;
 }
 
-export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, children, required, satisfied }) => {
+export const Property: React.VFC<PropertyProps> = ({ onSelect, onDelete, children, required, satisfied }) => {
     const hasSelect = onSelect !== undefined;
-    const hasCancel = onCancel !== undefined;
+    const hasDelete = onDelete !== undefined;
 
     const bodyClasses = ["property"];
     if (satisfied) {
@@ -31,10 +31,10 @@ export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, childre
     if (hasSelect) {
         textClasses.push("hasSelect");
     }
-    if (hasCancel) {
-        textClasses.push("withCancel");
+    if (hasDelete) {
+        textClasses.push("withDelete");
     } else {
-        textClasses.push("noCancel");
+        textClasses.push("noDelete");
     }
 
     return (
@@ -47,10 +47,10 @@ export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, childre
             >
                 {children}
             </div>
-            {hasCancel &&
+            {hasDelete &&
                 <div
-                    className={accessClassName(styles, "propertyCancel")}
-                    onClick={() => onCancel && onCancel()}
+                    className={accessClassName(styles, "propertyDelete")}
+                    onClick={() => onDelete && onDelete()}
                 >
                     <FaTimes className={accessClassName(styles, "faTimes")} />
                 </div>

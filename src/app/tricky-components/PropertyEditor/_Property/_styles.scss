@@ -50,15 +50,15 @@ $required: rgb(175, 76, 76);
     cursor: pointer;
 }
 
-.noCancel {
+.noDelete {
     padding: $padding;
 }
 
-.withCancel {
+.withDelete {
     padding: $padding calc(#{$padding} / 2) $padding $padding;
 }
 
-.propertyCancel {
+.propertyDelete {
     display: inline-block;
     font-size: $height;
     line-height: $height;

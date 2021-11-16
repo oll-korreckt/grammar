@@ -2,7 +2,7 @@ export type PropertyEditorAction = {
     type: "property select";
     property: string;
 } | {
-    type: "property cancel";
+    type: "property delete";
     property: string;
 } | {
     type: "exit edit";
