@@ -45,6 +45,7 @@ export const FadeTransport: React.FC<FadeTransportProps> = ({ children, transpor
                     transition={{ duration: switchContext.duration }}
                     layoutId={transportId}
                     layout="position"
+                    id={`motion-${containerContext.index}-${transportId}`}
                 >
                     {children}
                 </motion.div>
