@@ -1,43 +1,49 @@
+import { FadeTransport } from "@app/tricky-components/FadeTransport";
 import { accessClassName } from "@app/utils";
 import React from "react";
-import { ActionDispatch, PropertyData } from "../types";
+import { ActionDispatch, PropertyState } from "../types";
 import { Property } from "../_Property/Property";
 import styles from "./_styles.scss";
 
 export interface PropertySectionProps {
-    children: "Assigned" | "Unassigned";
-    properties: PropertyData[];
-    onAction: ActionDispatch;
+    type: "Assigned" | "Unassigned";
+    children: PropertyState[];
+    dispatch: ActionDispatch;
 }
 
-export const PropertySection: React.VFC<PropertySectionProps> = ({ children, properties, onAction }) => {
+export const PropertySection: React.VFC<PropertySectionProps> = ({ children, type, dispatch }) => {
 
     return (
         <div className={accessClassName(styles, "container")}>
-            <div>
-                {children}
+            <div className={accessClassName(styles, "header")}>
+                <span>{type}</span>
+                <div className={accessClassName(styles, "headerLine")}/>
             </div>
             <div className={accessClassName(styles, "items")}>
-                {properties.map(({ key, fullName }) => {
+                {children.map((prop) => {
                     let onCancel: (() => void) | undefined = undefined;
-                    if (children === "Assigned") {
-                        onCancel = () => onAction({
+                    if (type === "Assigned") {
+                        onCancel = () => dispatch({
                             type: "property cancel",
-                            property: key
+                            property: prop
                         });
                     }
+                    const displayText = prop.displayName !== undefined
+                        ? prop.displayName
+                        : prop.propertyKey;
+                    console.log("display:", prop.propertyKey);
                     return (
-                        <Property
-                            key={key}
-                            propertyId={key}
-                            onSelect={() => onAction({
-                                type: "property edit",
-                                property: key
-                            })}
-                            onCancel={onCancel}
-                        >
-                            {fullName}
-                        </Property>
+                        <FadeTransport key={prop.propertyKey} transportId={prop.propertyKey}>
+                            <Property
+                                onSelect={() => dispatch({
+                                    type: "property select",
+                                    property: prop
+                                })}
+                                onCancel={onCancel}
+                            >
+                                {displayText}
+                            </Property>
+                        </FadeTransport>
                     );
                 })}
             </div>

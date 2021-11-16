@@ -1,126 +1,130 @@
-import { accessClassName, ElementDisplayInfo } from "@app/utils";
-import { ElementReference, ElementType } from "@domain/language";
-import { AnimatePresence, AnimateSharedLayout, motion, usePresence } from "framer-motion";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
-import { createInvoke, EVENTS, INVALID_PROPERTY, PropertyContext, PropertyData, PropertyEditorAction } from "./types";
-import { Display } from "./_Display/Display";
+import { accessClassName } from "@app/utils";
+import React, { useRef } from "react";
+import { FaArrowLeft, FaTimes } from "react-icons/fa";
+import { FadeSwitch } from "../FadeSwitch";
+import { FadeTransport } from "../FadeTransport";
+import { ActionDispatch, PropertyEditorAction, PropertyState } from "./types";
 import { Property } from "./_Property/Property";
-import { PropertySection, PropertySectionProps } from "./_PropertySection/PropertySection";
 import styles from "./_styles.scss";
 
+
 export interface PropertyEditorProps {
-    type: Exclude<ElementType, "word">;
-    item: Record<string, ElementReference | ElementReference[]>;
-    property?: string;
-    onAction?: (action: PropertyEditorAction) => void;
+    state: PropertyEditorState;
+    dispatch?: ActionDispatch;
+    duration?: number;
 }
 
-interface Properties {
-    assigned: PropertyData[];
-    unassigned: PropertyData[];
+export interface PropertyEditorDisplayState {
+    type: "display";
+    assigned: PropertyState[];
+    unassigned: PropertyState[];
 }
 
-function getMotionProperty(previous: string | undefined, current: string | undefined): string {
-    const prevBit = 1 << 0;
-    const currBit = 1 << 1;
-    let state = 0;
-    if (previous !== undefined) {
-        state |= prevBit;
-    }
-    if (current !== undefined) {
-        state |= currBit;
-    }
-    switch (state) {
-        case prevBit:
-            return previous as string;
-        case currBit:
-            return current as string;
-        default:
-            throw "unhandled state";
-    }
+export interface PropertyEditorEditState {
+    type: "edit";
+    property: PropertyState;
 }
 
-function getProperties(type: Exclude<ElementType, "word">, item: Record<string, ElementReference | ElementReference[]>): Properties {
-    const output: Properties = { assigned: [], unassigned: [] };
-    Object.entries(ElementDisplayInfo.getDisplayInfo(type).properties)
-        .sort(([, a], [, b]) => a.displayOrder - b.displayOrder)
-        .forEach(([key, value]) => {
-            const data: PropertyData = { ...value, key };
-            if (item[key] !== undefined) {
-                output.assigned.push(data);
-            } else {
-                output.unassigned.push(data);
+export type PropertyEditorState = PropertyEditorDisplayState | PropertyEditorEditState;
+
+interface DisplayBodyProps {
+    state?: PropertyEditorDisplayState;
+    dispatch: ActionDispatch;
+}
+
+function getState<T>(oldState: T | undefined, newState: T | undefined): T | undefined {
+    if (newState !== undefined) {
+        return newState;
+    } else if (oldState !== undefined) {
+        return oldState;
+    }
+    return undefined;
+}
+
+const DisplayBody: React.VFC<DisplayBodyProps> = ({ state, dispatch }) => {
+    const oldState = useRef(state);
+    const displayState = getState(oldState.current, state);
+    oldState.current = displayState;
+
+    return (
+        <div style={{ position: "absolute", top: 300, display: "flex", flexDirection: "row" }}>
+            {displayState !== undefined &&
+                displayState.unassigned.map((prop) => {
+                    console.log("display key", prop.propertyKey);
+                    return (
+                        <FadeTransport key={prop.propertyKey} transportId={prop.propertyKey}>
+                            <Property onSelect={() => dispatch({ type: "property select", property: prop })}>
+                                {prop.displayName as string}
+                            </Property>
+                        </FadeTransport>
+                    );
+                })
             }
-        });
-    return output;
+        </div>
+    );
+};
+
+interface EditBodyProps {
+    state?: PropertyEditorEditState;
+    dispatch: ActionDispatch;
 }
 
-export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ type, item, property, onAction }) => {
-    const [firstMount, setFirstMount] = useState(true);
-    const invokeAction = createInvoke(onAction);
-    const { assigned, unassigned } = getProperties(type, item);
+const EditBody: React.VFC<EditBodyProps> = ({ state, dispatch }) => {
+    const oldState = useRef(state);
+    const editState = getState(oldState.current, state);
+    oldState.current = editState;
 
-    const displayClasses = ["layout"];
-    const editClasses = ["layout"];
+    return (
+        <div>
+            {editState !== undefined &&
+                <FadeTransport transportId={editState.property.propertyKey}>
+                    <Property>
+                        {editState.property.displayName as string}
+                    </Property>
+                </FadeTransport>
+            }
+            <div style={{ width: 100, height: 100, backgroundColor: "blue" }}></div>
+        </div>
+    );
+};
 
-    const key: "display" | "edit" = property === undefined ? "display" : "edit";
-    if (!firstMount) {
-        switch (key) {
-            case "display":
-                displayClasses.push("z2");
-                break;
-            case "edit":
-                editClasses.push("z2");
-                break;
-        }
+export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, dispatch, duration }) => {
+    const invokeDispatch = (action: PropertyEditorAction) => dispatch && dispatch(action);
+    const prevState = useRef(state);
+    const transportId = useRef<string>();
+    const displayState: PropertyEditorDisplayState | undefined = state.type === "display" ? state : undefined;
+    const editState: PropertyEditorEditState | undefined = state.type === "edit" ? state : undefined;
+    const activeChild = state.type === "display" ? 0 : 1;
+
+    if (state.type === "edit"
+        && prevState.current.type === "display") {
+        transportId.current = state.property.propertyKey;
     }
-
-
-    useEffect(() => setFirstMount(false), []);
+    prevState.current = state;
 
     return (
         <div className={accessClassName(styles, "container")}>
-            <AnimateSharedLayout type="crossfade">
-                <AnimatePresence
-                    initial={false}
-                    custom={property}
+            <div className={accessClassName(styles, "bar")}>
+                {state.type === "edit" &&
+                    <FaArrowLeft
+                        className={accessClassName(styles, "back")}
+                        onClick={() => invokeDispatch({ type: "exit edit" })}
+                    />
+                }
+                <FaTimes className={accessClassName(styles, "close")} />
+            </div>
+            <div className={accessClassName(styles, "body")}>
+                <FadeSwitch
+                    activeChild={activeChild}
+                    duration={duration !== undefined ? duration : 1}
+                    transportId={transportId.current}
                 >
-                    {key === "display" &&
-                        <motion.div
-                            key={key}
-                            className={accessClassName(styles, ...displayClasses)}
-                            {...EVENTS}
-                            onAnimationStart={() => console.log("display start:", key)}
-                            onAnimationComplete={() => console.log("animation complte")}
-                            // transition={{ duration: 5 }}
-                        >
-                            <Display
-                                assigned={assigned}
-                                unassigned={unassigned}
-                                actionDispatch={invokeAction}
-                            />
-                        </motion.div>
-                    }
-                    {key === "edit" &&
-                        <motion.div
-                            key={key}
-                            className={accessClassName(styles, ...editClasses)}
-                            onAnimationStart={() => console.log("edit start:", key)}
-                            {...EVENTS}
-                        >
-                            <FaArrowLeft
-                                onClick={() => invokeAction({
-                                    type: "exit edit"
-                                })}
-                            />
-                            <Property propertyId={property}>
-                                {ElementDisplayInfo.getDisplayInfo(type).properties[property as string].fullName}
-                            </Property>
-                        </motion.div>
-                    }
-                </AnimatePresence>
-            </AnimateSharedLayout>
+                    {[
+                        <DisplayBody key="0" state={displayState} dispatch={invokeDispatch} />,
+                        <EditBody key="1" state={editState} dispatch={invokeDispatch} />
+                    ]}
+                </FadeSwitch>
+            </div>
         </div>
     );
 };

@@ -1,36 +1,50 @@
+@use "main";
+
 .container {
     width: 500px;
     height: 500px;
     position: relative;
+    display: grid;
+    grid-template-rows: 30px auto;
+}
+
+.bar {
+    display: block;
+    font-size: 20px;
+    line-height: 20px;
+    padding: 5px 20px 5px 20px;
+}
+
+.back, .close {
+    cursor: pointer;
+}
+
+.back {
+    float: left;
+}
+
+.close {
+    float: right;
+}
+
+.body {
+    display: block;
+}
+
+.display {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.displayDivider {
+    height: 15px;
 }
 
 .layout {
     position: absolute;
     width: 100%;
     height: 100%;
-}
-
-.red {
-    background-color: red;
-    width: 500px;
-    height: 500px;
-}
-
-.blue {
-    background-color: blue;
-    width: 500px;
-    height: 500px;
-}
-
-.assigned {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-}
-
-.yo {
-    display: inline-block;
-    border: 1px solid black;
 }
 
 .moveProperty {

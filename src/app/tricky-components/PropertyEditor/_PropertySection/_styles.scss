@@ -3,11 +3,26 @@
 }
 
 .header {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+}
+
+.headerLine {
+    display: inline-block;
+    height: 2px;
+    width: 100%;
+    background-color: grey;
+    margin: auto;
 }
 
 .items {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 5px;
+    margin-top: 5px;
+    min-height: 10px;
+    padding: 5px;
 }

@@ -1,6 +1,6 @@
 @use "main";
 
-$height: 40px;
+$height: 18px;
 $padding: 10px;
 
 .property {
@@ -10,30 +10,32 @@ $padding: 10px;
     border: 2px solid black;
     border-radius: 10px;
     overflow: hidden;
-    cursor: pointer;
     background-color: white;
-    * {
-        background-color: white;
-    }
 }
 
 .propertyText {
     display: inline-block;
-    position: relative;
     font-size: $height;
     line-height: $height;
-    padding: $padding;
     color: black;
     white-space: nowrap;
-    z-index: 1;
+    cursor: pointer;
+}
+
+.noCancel {
+    padding: $padding;
+}
+
+.withCancel {
+    padding: $padding calc(#{$padding} / 2) $padding $padding;
 }
 
 .propertyCancel {
     display: inline-block;
-    position: relative;
     font-size: $height;
     line-height: $height;
-    padding: $padding;
+    padding: $padding $padding $padding calc(#{$padding} / 2);
+    cursor: pointer;
     &:hover {
         color: red;
     }
