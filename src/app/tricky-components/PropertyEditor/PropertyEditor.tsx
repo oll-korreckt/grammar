@@ -5,6 +5,7 @@ import { FadeSwitch } from "../FadeSwitch";
 import { FadeTransport } from "../FadeTransport";
 import { ActionDispatch, PropertyEditorAction, PropertyState } from "./types";
 import { Property } from "./_Property/Property";
+import { PropertySection } from "./_PropertySection/PropertySection";
 import styles from "./_styles.scss";
 
 
@@ -47,18 +48,16 @@ const DisplayBody: React.VFC<DisplayBodyProps> = ({ state, dispatch }) => {
     oldState.current = displayState;
 
     return (
-        <div style={{ position: "absolute", top: 300, display: "flex", flexDirection: "row" }}>
+        <div className={accessClassName(styles, "display")}>
             {displayState !== undefined &&
-                displayState.unassigned.map((prop) => {
-                    console.log("display key", prop.propertyKey);
-                    return (
-                        <FadeTransport key={prop.propertyKey} transportId={prop.propertyKey}>
-                            <Property onSelect={() => dispatch({ type: "property select", property: prop })}>
-                                {prop.displayName as string}
-                            </Property>
-                        </FadeTransport>
-                    );
-                })
+                <>
+                    <PropertySection type="Assigned" dispatch={dispatch}>
+                        {displayState.assigned}
+                    </PropertySection>
+                    <PropertySection type="Unassigned" dispatch={dispatch}>
+                        {displayState.unassigned}
+                    </PropertySection>
+                </>
             }
         </div>
     );
@@ -66,24 +65,26 @@ const DisplayBody: React.VFC<DisplayBodyProps> = ({ state, dispatch }) => {
 
 interface EditBodyProps {
     state?: PropertyEditorEditState;
-    dispatch: ActionDispatch;
 }
 
-const EditBody: React.VFC<EditBodyProps> = ({ state, dispatch }) => {
+const EditBody: React.VFC<EditBodyProps> = ({ state }) => {
     const oldState = useRef(state);
     const editState = getState(oldState.current, state);
     oldState.current = editState;
+    const property = editState?.property;
 
     return (
-        <div>
-            {editState !== undefined &&
-                <FadeTransport transportId={editState.property.propertyKey}>
-                    <Property>
-                        {editState.property.displayName as string}
+        <div className={accessClassName(styles, "edit")}>
+            {property !== undefined &&
+                <FadeTransport transportId={property.propertyKey}>
+                    <Property
+                        required={property.required}
+                        satisfied={property.satisfied}
+                    >
+                        {property.displayName as string}
                     </Property>
                 </FadeTransport>
             }
-            <div style={{ width: 100, height: 100, backgroundColor: "blue" }}></div>
         </div>
     );
 };
@@ -116,12 +117,12 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, dispatch
             <div className={accessClassName(styles, "body")}>
                 <FadeSwitch
                     activeChild={activeChild}
-                    duration={duration !== undefined ? duration : 1}
+                    duration={duration !== undefined ? duration : 0.4}
                     transportId={transportId.current}
                 >
                     {[
                         <DisplayBody key="0" state={displayState} dispatch={invokeDispatch} />,
-                        <EditBody key="1" state={editState} dispatch={invokeDispatch} />
+                        <EditBody key="1" state={editState} />
                     ]}
                 </FadeSwitch>
             </div>

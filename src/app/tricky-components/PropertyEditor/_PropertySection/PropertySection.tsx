@@ -31,7 +31,6 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
                     const displayText = prop.displayName !== undefined
                         ? prop.displayName
                         : prop.propertyKey;
-                    console.log("display:", prop.propertyKey);
                     return (
                         <FadeTransport key={prop.propertyKey} transportId={prop.propertyKey}>
                             <Property
@@ -40,6 +39,8 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
                                     property: prop
                                 })}
                                 onCancel={onCancel}
+                                satisfied={prop.satisfied}
+                                required={prop.required}
                             >
                                 {displayText}
                             </Property>

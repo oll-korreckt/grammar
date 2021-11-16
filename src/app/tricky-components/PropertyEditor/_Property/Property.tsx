@@ -10,12 +10,27 @@ export interface PropertyProps extends Pick<PropertyState, "required" | "satisfi
     onSelect?: PropertyClick;
     onCancel?: PropertyClick;
     children: string;
+    required?: boolean | undefined;
+    satisfied?: boolean | undefined;
 }
 
-export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, children }) => {
+export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, children, required, satisfied }) => {
+    const hasSelect = onSelect !== undefined;
     const hasCancel = onCancel !== undefined;
 
+    const bodyClasses = ["property"];
+    if (satisfied) {
+        bodyClasses.push("satisfied");
+    } else if (required) {
+        bodyClasses.push("required");
+    } else {
+        bodyClasses.push("default");
+    }
+
     const textClasses = ["propertyText"];
+    if (hasSelect) {
+        textClasses.push("hasSelect");
+    }
     if (hasCancel) {
         textClasses.push("withCancel");
     } else {
@@ -24,7 +39,7 @@ export const Property: React.VFC<PropertyProps> = ({ onSelect, onCancel, childre
 
     return (
         <div
-            className={accessClassName(styles, "property")}
+            className={accessClassName(styles, ...bodyClasses)}
         >
             <div
                 className={accessClassName(styles, ...textClasses)}

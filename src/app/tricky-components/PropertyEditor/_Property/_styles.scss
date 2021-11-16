@@ -11,6 +11,31 @@ $padding: 10px;
     border-radius: 10px;
     overflow: hidden;
     background-color: white;
+    user-select: none;
+}
+
+$default: rgb(231, 231, 231);
+.default {
+    background-color: $default;
+    &:hover {
+        background-color: lighten($default, 10%);
+    }
+}
+
+$satisfied: rgb(0, 107, 0);
+.satisfied {
+    background-color: $satisfied;
+    &:hover {
+        background-color: lighten($satisfied, 10%);
+    }
+}
+
+$required: rgb(175, 76, 76);
+.required {
+    background-color: $required;
+    &:hover {
+        background-color: lighten($required, 10%);
+    }
 }
 
 .propertyText {
@@ -19,6 +44,9 @@ $padding: 10px;
     line-height: $height;
     color: black;
     white-space: nowrap;
+}
+
+.hasSelect {
     cursor: pointer;
 }
 
