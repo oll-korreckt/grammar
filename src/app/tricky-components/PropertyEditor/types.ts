@@ -1,9 +1,9 @@
 export type PropertyEditorAction = {
     type: "property select";
-    property: PropertyState;
+    property: string;
 } | {
     type: "property cancel";
-    property: PropertyState;
+    property: string;
 } | {
     type: "exit edit";
 }
