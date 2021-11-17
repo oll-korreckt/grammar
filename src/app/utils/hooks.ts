@@ -27,3 +27,21 @@ export function useClientRect<TRef extends HTMLElement>(): [Rect | undefined, Re
     }, []);
     return [rect, ref];
 }
+
+export function useResize<TRef extends HTMLElement>(callback: (e: TRef) => void): React.MutableRefObject<TRef | null> {
+    const ref = useRef<TRef>(null);
+    useEffect(() => {
+        if (ref.current !== null) {
+            const obs = new ResizeObserver((entries) => {
+                if (entries.length !== 1) {
+                    throw `unanticiplated number of entries: ${entries.length}`;
+                }
+                const [{ target }] = entries;
+                callback(target as TRef);
+            });
+            obs.observe(ref.current);
+            return () => obs.disconnect();
+        }
+    });
+    return ref;
+}
