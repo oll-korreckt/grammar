@@ -6,6 +6,10 @@ export type PropertyEditorAction = {
     property: string;
 } | {
     type: "exit edit";
+} | {
+    type: "close";
+} | {
+    type: "submit";
 }
 
 export type PropertyStatus = "assigned" | "unassigned" | "editing";

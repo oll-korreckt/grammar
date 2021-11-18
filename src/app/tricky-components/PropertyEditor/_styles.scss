@@ -5,9 +5,10 @@
     height: 30vh;
     position: relative;
     display: grid;
-    grid-template-rows: 30px auto;
+    grid-template-rows: 30px auto 40px;
     border: 1px solid grey;
     box-shadow: 0 0 3px grey;
+    user-select: none;
 }
 
 .header {
@@ -28,6 +29,8 @@
     font-size: 20px;
     line-height: 20px;
     padding: 5px 20px 5px 20px;
+    border-bottom: 1px solid grey;
+    box-shadow: 0 0 3px grey;
 }
 
 .back, .close {
@@ -45,8 +48,10 @@
 .body {
     @include main.center-content;
     position: relative;
-    width: calc(100% - 2px);
+    width: calc(100% - 20px);
+    margin: auto;
     height: calc(100% - 2px);
+    overflow-y: auto;
 }
 
 .edit {
@@ -76,10 +81,33 @@
     position: absolute;
 }
 
-.color {
-    background-color: bl;
-}
-
 .z2 {
     z-index: 2;
+}
+
+.bottom {
+    display: block;
+    border-top: 1px solid grey;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-shadow: 0 0 3px grey;
+}
+
+.submit {
+    border-radius: 3px;
+    border: none;
+    padding: 5px;
+    float: right;
+}
+
+.submitEnabled {
+    background-color: blue;
+    color: white;
+    cursor: pointer;
+}
+
+.submitDisabled {
+    background-color: lightgrey;
+    color: grey;
+    pointer-events: none;
 }

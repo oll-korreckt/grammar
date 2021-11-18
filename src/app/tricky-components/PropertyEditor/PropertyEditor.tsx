@@ -19,12 +19,14 @@ export interface PropertyEditorProps {
 
 export interface PropertyEditorDisplayState {
     type: "display";
+    allowSubmit?: boolean | undefined;
     assigned: PropertyState[];
     unassigned: PropertyState[];
 }
 
 export interface PropertyEditorEditState {
     type: "edit";
+    allowSubmit?: boolean | undefined;
     property: PropertyState;
 }
 
@@ -91,6 +93,15 @@ const EditBody: React.VFC<EditBodyProps> = ({ state }) => {
     );
 };
 
+function getSubmitClass(allowSubmit: boolean | undefined): string {
+    const submitEnabled = "submitEnabled";
+    const submitDisabled = "submitDisabled";
+    if (allowSubmit === undefined) {
+        return submitEnabled;
+    }
+    return allowSubmit ? submitEnabled : submitDisabled;
+}
+
 export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementType, dispatch, duration }) => {
     const invokeDispatch = (action: PropertyEditorAction) => dispatch && dispatch(action);
     const prevState = useRef(state);
@@ -118,7 +129,10 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementT
                 <div className={accessClassName(styles, "header")}>
                     {header}
                 </div>
-                <FaTimes className={accessClassName(styles, "close")} />
+                <FaTimes
+                    className={accessClassName(styles, "close")}
+                    onClick={() => invokeDispatch({ type: "close" })}
+                />
             </div>
             <div className={accessClassName(styles, "body")}>
                 <FadeSwitch
@@ -131,6 +145,14 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementT
                         <EditBody key="1" state={editState} />
                     ]}
                 </FadeSwitch>
+            </div>
+            <div className={accessClassName(styles, "bottom")}>
+                <button
+                    className={accessClassName(styles, "submit", getSubmitClass(state.allowSubmit))}
+                    onClick={() => invokeDispatch({ type: "submit" })}
+                >
+                    Submit
+                </button>
             </div>
         </div>
     );
