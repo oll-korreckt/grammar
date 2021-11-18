@@ -14,7 +14,9 @@ export const ExtendedModeSelector = makeRefComponent<HTMLDivElement, PropsWithCh
     }
 
     return (
-        <div className={accessClassName(styles, "modeSelector")} ref={ref}>
+        <div
+            ref={ref}
+        >
             {children}
             <div className={accessClassName(styles, "modeSelectorBar")} ref={ref}>
                 <div className={accessClassName(styles, "progress")}>
