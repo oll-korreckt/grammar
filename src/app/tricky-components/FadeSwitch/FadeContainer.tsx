@@ -1,27 +1,19 @@
 import { accessClassName, ChildVariants, EVENTS } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { motion } from "framer-motion";
-import React, { createContext, useContext, useLayoutEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useRef, useState } from "react";
 import { FadeSwitchContext } from "../FadeSwitch/FadeSwitch";
 import styles from "./_styles.scss";
 
-interface FadeProps {
-    width?: number;
-    height?: number;
-}
-
-function getSize(show: boolean, width?: number, height?: number): { width?: number; height?: number; } {
-    return show ? { width, height } : { width: 0, height: 0 };
-}
 
 /*
     After mount, immediatly renders at full size + opacity. Then decreases opacity
     to 0 and immediatly shrinks to 0 area thereafter.
 */
-const FadeIn: React.VFC<FadeProps> = ({ width, height }) => {
+const FadeIn: React.VFC = () => {
     const { duration, targetChild, targetAnimationComplete: switchComplete } = useContext(FadeSwitchContext);
     const { index } = useContext(FadeContainerContext);
-    const [showFade, setShowFade] = useState(false);
+    const [showFadeIn, setShowFadeIn] = useState(false);
 
     const variants: ChildVariants = {
         hidden: () => {
@@ -33,13 +25,17 @@ const FadeIn: React.VFC<FadeProps> = ({ width, height }) => {
     };
 
     function invokeDelay(): void {
-        setTimeout(() => setShowFade(true), duration * 1000 / 2);
+        setTimeout(() => setShowFadeIn(true), duration * 1000 / 2);
+    }
+
+    const classes = ["fadeIn"];
+    if (showFadeIn) {
+        classes.push("showFadeIn");
     }
 
     return (
         <motion.div
-            className={accessClassName(styles, "fadeIn")}
-            style={getSize(showFade, width, height)}
+            className={accessClassName(styles, ...classes)}
             variants={variants}
             {...EVENTS}
             onAnimationStart={() => {
@@ -64,7 +60,7 @@ type EventName = keyof ChildVariants;
     is slightly longer than necessary to prevent Canvas from being shown in random
     instances when FadeOut accidentally completes before it unmounts.
 */
-const FadeOut: React.VFC<FadeProps> = ({ width, height }) => {
+const FadeOut: React.VFC = () => {
     const { duration } = useContext(FadeSwitchContext);
     const [showFadeOut, setShowFadeOut] = useState(false);
     const eventRef = useRef<EventName | undefined>();
@@ -89,10 +85,14 @@ const FadeOut: React.VFC<FadeProps> = ({ width, height }) => {
         }
     };
 
+    const classes = ["fadeOut"];
+    if (showFadeOut) {
+        classes.push("showFadeOut");
+    }
+
     return (
         <motion.div
-            className={accessClassName(styles, "fadeOut")}
-            style={getSize(showFadeOut, width, height)}
+            className={accessClassName(styles, ...classes)}
             {...EVENTS}
             onAnimationStart={() => {
                 if (eventRef.current === "show") {
@@ -113,11 +113,11 @@ const FadeOut: React.VFC<FadeProps> = ({ width, height }) => {
     );
 };
 
-interface CanvasProps extends FadeProps {
+interface CanvasProps {
     children?: React.ReactNode;
 }
 
-const Canvas = makeRefComponent<HTMLDivElement, CanvasProps>("Cavas", ({ children, width, height }, ref) => {
+const Canvas = makeRefComponent<HTMLDivElement, CanvasProps>("Cavas", ({ children }, ref) => {
     const { firstMount, duration } = useContext(FadeSwitchContext);
     const [hiZ, setHiZ] = useState(firstMount);
 
@@ -150,7 +150,6 @@ const Canvas = makeRefComponent<HTMLDivElement, CanvasProps>("Cavas", ({ childre
             ref={ref}
             className={accessClassName(styles, ...classes)}
             transition={{ duration: duration / 2 }}
-            style={{ width, height }}
             onAnimationStart={() => {
                 invokeDelay();
             }}
@@ -169,22 +168,13 @@ export interface FadeContainerContext {
 export const FadeContainerContext = createContext<FadeContainerContext>({ index: 0 });
 
 export const FadeContainer: React.FC<{ index: number; }> = ({ children, index }) => {
-    const [size, setSize] = useState<FadeProps>({});
     const ref = useRef<HTMLDivElement>(null);
-
-    useLayoutEffect(() => {
-        if (ref.current === null || ref.current.parentElement === null) {
-            throw "no ref";
-        }
-        const { width, height } = ref.current.parentElement.getBoundingClientRect();
-        setSize({ width, height });
-    }, []);
 
     return (
         <FadeContainerContext.Provider value={{ index }}>
-            <Canvas ref={ref} {...size}>
-                <FadeIn {...size} />
-                <FadeOut {...size} />
+            <Canvas ref={ref}>
+                <FadeIn />
+                <FadeOut />
                 {children}
             </Canvas>
         </FadeContainerContext.Provider>
