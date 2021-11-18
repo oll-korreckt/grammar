@@ -1,4 +1,5 @@
-import { accessClassName } from "@app/utils";
+import { accessClassName, ElementDisplayInfo } from "@app/utils";
+import { ElementType } from "@domain/language";
 import React, { useRef } from "react";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import { FadeSwitch } from "../FadeSwitch";
@@ -11,6 +12,7 @@ import styles from "./_styles.scss";
 
 export interface PropertyEditorProps {
     state: PropertyEditorState;
+    elementType?: ElementType;
     dispatch?: ActionDispatch;
     duration?: number;
 }
@@ -89,12 +91,15 @@ const EditBody: React.VFC<EditBodyProps> = ({ state }) => {
     );
 };
 
-export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, dispatch, duration }) => {
+export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementType, dispatch, duration }) => {
     const invokeDispatch = (action: PropertyEditorAction) => dispatch && dispatch(action);
     const prevState = useRef(state);
     const transportId = useRef<string>();
     const displayState: PropertyEditorDisplayState | undefined = state.type === "display" ? state : undefined;
     const editState: PropertyEditorEditState | undefined = state.type === "edit" ? state : undefined;
+    const header = elementType !== undefined
+        ? ElementDisplayInfo.getAbbreviatedName(ElementDisplayInfo.getDisplayInfo(elementType))
+        : undefined;
     const activeChild = state.type === "display" ? 0 : 1;
 
     if (state.type === "edit"
@@ -106,12 +111,13 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, dispatch
     return (
         <div className={accessClassName(styles, "container")}>
             <div className={accessClassName(styles, "bar")}>
-                {state.type === "edit" &&
-                    <FaArrowLeft
-                        className={accessClassName(styles, "back")}
-                        onClick={() => invokeDispatch({ type: "exit edit" })}
-                    />
-                }
+                <FaArrowLeft
+                    className={accessClassName(styles, state.type === "edit" ? "back" : "hide")}
+                    onClick={() => invokeDispatch({ type: "exit edit" })}
+                />
+                <div className={accessClassName(styles, "header")}>
+                    {header}
+                </div>
                 <FaTimes className={accessClassName(styles, "close")} />
             </div>
             <div className={accessClassName(styles, "body")}>
