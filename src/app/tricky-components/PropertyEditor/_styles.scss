@@ -5,7 +5,7 @@
     height: 30vh;
     position: relative;
     display: grid;
-    grid-template-rows: 30px auto 40px;
+    grid-template-rows: 30px auto 50px;
     border: 1px solid grey;
     box-shadow: 0 0 3px grey;
     user-select: none;
@@ -86,7 +86,9 @@
 }
 
 .bottom {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: right;
     border-top: 1px solid grey;
     padding-left: 10px;
     padding-right: 10px;
@@ -96,7 +98,7 @@
 .submit {
     border-radius: 3px;
     border: none;
-    padding: 5px;
+    padding: 10px 25px;
     float: right;
 }
 
