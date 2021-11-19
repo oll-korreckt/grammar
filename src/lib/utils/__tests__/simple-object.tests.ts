@@ -290,4 +290,36 @@ describe("SimpleObject", () => {
         ];
         assert.deepEqual(result, expected);
     });
+
+    describe("clean", () => {
+        test("no props", () => {
+            const input = {};
+            const result = SimpleObject.clean(input);
+            assert.deepStrictEqual(result, input);
+            assert.notEqual(result, input);
+        });
+
+        test("nothing removed", () => {
+            const input = {
+                firstName: "bob",
+                lastName: "smith"
+            };
+            const result = SimpleObject.clean(input);
+            assert.deepStrictEqual(result, input);
+            assert.notEqual(result, input);
+        });
+
+        test("props removed", () => {
+            const input = {
+                firstName: "bob",
+                lastName: undefined,
+                age: undefined
+            };
+            const expected = { firstName: "bob" };
+            const result = SimpleObject.clean(input);
+            assert.deepStrictEqual(result, expected);
+            assert.doesNotHaveAnyKeys(result, ["lastName", "age"]);
+            assert.notEqual(result, expected);
+        });
+    });
 });

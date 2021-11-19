@@ -145,9 +145,20 @@ function cloneArray(arr: Values[]): Values[] {
     return output;
 }
 
+function clean(obj: SimpleObject): SimpleObject {
+    const output: SimpleObject = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        if (value !== undefined) {
+            output[key] = value;
+        }
+    });
+    return output;
+}
+
 export const SimpleObject = {
     deepEquals: deepEquals,
     clone: clone,
     getValueType: getValueType,
-    getSortedEntries: getSortedEntries
+    getSortedEntries: getSortedEntries,
+    clean: clean
 };
