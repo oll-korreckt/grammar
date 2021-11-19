@@ -411,6 +411,31 @@ function setTypedReference<TParentType extends Exclude<ElementType, "word">, TKe
     );
 }
 
+function createDeleteProperty(state: DiagramState, id: ElementId, property: string): AtomicChange[] {
+    const { value } = getItem(state, id);
+    const propertyValue = (value as unknown as Record<string, ElementReference | ElementReference[]>)[property];
+    if (propertyValue === undefined) {
+        throw `'${property}' property does not exist on element '${id}'`;
+    }
+    const childIds = Array.isArray(propertyValue)
+        ? propertyValue.map((child) => child.id)
+        : [propertyValue.id];
+    const output: AtomicChange[] = [
+        AtomicChange.createDelete(
+            ["elements", id, "value", property],
+            propertyValue
+        )
+    ];
+    childIds.forEach((childId) => {
+        output.push(_deleteReferenceFromChild(
+            state,
+            id,
+            childId
+        ));
+    });
+    return output;
+}
+
 function setReference(state: DiagramState, parentType: Exclude<ElementType, "word">, parentId: ElementId, key: string, newValue: undefined | ElementReference | ElementReference[]): AtomicChange[] {
     const [isArray, elementTypes] = getElementDefinition(parentType)[key];
     const newValueArray = _checkNewValueDataType(newValue, isArray, elementTypes);
@@ -524,6 +549,7 @@ export const DiagramState = {
     createTypedAddReference: createTypedAddReference,
     createDeleteReference: createDeleteReference,
     createTypedDeleteReference: createTypedDeleteReference,
+    createDeleteProperty: createDeleteProperty,
     setTypedReference: setTypedReference,
     setReference: setReference,
     getReferencingProperties: getReferencingProperties,

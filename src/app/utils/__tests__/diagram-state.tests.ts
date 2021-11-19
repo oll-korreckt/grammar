@@ -1,3 +1,4 @@
+import { createState, Ids } from "@app/testing";
 import { ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive, NounPhrase, RelativeClause, VerbPhrase, AdjectivePhrase } from "@domain/language";
 import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { assert } from "chai";
@@ -482,6 +483,42 @@ describe("DiagramState", () => {
                 () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", wordId),
                 /is not referenced by/i
             );
+        });
+    });
+
+    describe("createDeleteProperty", () => {
+        test("delete array property", () => {
+            const testState = createState();
+            const initTarget = DiagramState.getItem(testState, Ids.quickBrownAdj);
+            const initQuick = DiagramState.getItem(testState, Ids.quick);
+            const initBrown = DiagramState.getItem(testState, Ids.brown);
+            const change = DiagramState.createDeleteProperty(testState, Ids.quickBrownAdj, "words");
+            const newState = AtomicChange.apply(testState, ...change);
+            const newTarget = DiagramState.getItem(newState, Ids.quickBrownAdj);
+            const newQuick = DiagramState.getItem(newState, Ids.quick);
+            const newBrown = DiagramState.getItem(newState, Ids.brown);
+            assert.notDeepEqual(newState, testState);
+            assert.notDeepEqual(newTarget, initTarget);
+            assert.notDeepEqual(newQuick, initQuick);
+            assert.notDeepEqual(newBrown, initBrown);
+            assert.doesNotHaveAnyKeys(newTarget, ["words"]);
+            assert.doesNotHaveAnyKeys(newQuick, ["ref"]);
+            assert.doesNotHaveAnyKeys(newBrown, ["ref"]);
+        });
+
+        test("delete object property", () => {
+            const testState = createState();
+            const initTarget = DiagramState.getItem(testState, Ids.dogNounPhrase);
+            const initDog = DiagramState.getItem(testState, Ids.dogNoun);
+            const change = DiagramState.createDeleteProperty(testState, Ids.dogNounPhrase, "head");
+            const newState = AtomicChange.apply(testState, ...change);
+            const newTarget = DiagramState.getItem(newState, Ids.dogNounPhrase);
+            const newDog = DiagramState.getItem(newState, Ids.dogNoun);
+            assert.notDeepEqual(newState, testState);
+            assert.notDeepEqual(newTarget, initTarget);
+            assert.notDeepEqual(newDog, initDog);
+            assert.doesNotHaveAnyKeys(newTarget, ["head"]);
+            assert.doesNotHaveAnyKeys(newDog, ["ref"]);
         });
     });
 
