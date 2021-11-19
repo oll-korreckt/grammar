@@ -1,4 +1,5 @@
 import { accessClassName, ElementDisplayInfo } from "@app/utils";
+import { makeRefComponent } from "@app/utils/hoc";
 import { ElementType } from "@domain/language";
 import React, { useRef } from "react";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
@@ -102,7 +103,7 @@ function getSubmitClass(allowSubmit: boolean | undefined): string {
     return allowSubmit ? submitEnabled : submitDisabled;
 }
 
-export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementType, dispatch, duration }) => {
+export const PropertyEditor = makeRefComponent<HTMLDivElement, PropertyEditorProps>("PropertyEditor", ({ state, elementType, dispatch, duration }, ref) => {
     const invokeDispatch = (action: PropertyEditorAction) => dispatch && dispatch(action);
     const prevState = useRef(state);
     const transportId = useRef<string>();
@@ -120,7 +121,10 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementT
     prevState.current = state;
 
     return (
-        <div className={accessClassName(styles, "container")}>
+        <div
+            ref={ref}
+            className={accessClassName(styles, "container")}
+        >
             <div className={accessClassName(styles, "bar")}>
                 <FaArrowLeft
                     className={accessClassName(styles, state.type === "edit" ? "back" : "hide")}
@@ -156,4 +160,4 @@ export const PropertyEditor: React.VFC<PropertyEditorProps> = ({ state, elementT
             </div>
         </div>
     );
-};
+});
