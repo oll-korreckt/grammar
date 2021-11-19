@@ -1,8 +1,22 @@
 import { Token, TokenType } from "./_types";
 
-export function scan(target: string): Token[] {
+export function scan(target: string): Token[] | ScannerError {
     return new EnglishScanner().scan(target);
 }
+
+enum ResultType {
+    token = 1,
+    error = 2
+}
+
+export interface ScannerError {
+    position: number;
+    message: string;
+}
+
+type TokenResult = [ResultType.token, Token];
+type ErrorResult = [ResultType.error, ScannerError];
+type Result = TokenResult | ErrorResult;
 
 interface char {
     value: string;
@@ -106,12 +120,15 @@ class EnglishScanner {
     private _current = 0;
     private _tokens: Token[] = [];
 
-    public scan(target: string): Token[] {
+    public scan(target: string): Token[] | ScannerError {
         this._target = target;
         while (!this._isAtEnd()) {
             this._start = this._current;
-            const nextToken = this._scanNextToken();
-            this._tokens.push(nextToken);
+            const result = this._scanNextToken();
+            if (result[0] === ResultType.error) {
+                return result[1];
+            }
+            this._tokens.push(result[1]);
         }
         this._tokens.push({
             lexeme: "",
@@ -120,23 +137,23 @@ class EnglishScanner {
         return this._tokens;
     }
 
-    private _scanNextToken(): Token {
+    private _scanNextToken(): Result {
         const currentChar = this._advance();
         if (EnglishScanner._isWhitespaceChar(currentChar)) {
             return this._finishWhiteSpace();
         } else if (EnglishScanner._isStartWordChar(currentChar)) {
             return this._finishWord();
         } else {
-            throw `Character ${currentChar.value} with code ${currentChar.code} is not recognized`;
+            return this._createError(`Invalid character '${currentChar.value}'`);
         }
     }
 
-    private _finishWhiteSpace(): Token {
+    private _finishWhiteSpace(): TokenResult {
         while (this._match(EnglishScanner._isWhitespaceChar)) { }
         return this._createToken("whitespace");
     }
 
-    private _finishWord(): Token {
+    private _finishWord(): Result {
         while (this._match(EnglishScanner._isContWordChar)) {
             // advance
         }
@@ -149,7 +166,7 @@ class EnglishScanner {
         return this._createToken("word");
     }
 
-    private _finishWord_hyphenEnDash(current: char): Token {
+    private _finishWord_hyphenEnDash(current: char): Result {
         const nextChar = this._peekNext();
         if (nextChar.code === current.code) {
             return this._createToken("word");
@@ -157,14 +174,17 @@ class EnglishScanner {
             this._advance();
             return this._finishWord();
         }
-        throw "";
+        this._advance();
+        this._advance();
+        return this._createError(`Invalid character '${nextChar.value}''`);
     }
 
-    private _createToken(tokenType: TokenType): Token {
-        return {
+    private _createToken(tokenType: TokenType): TokenResult {
+        const token: Token = {
             lexeme: this._getCurrentSubstring(),
             tokenType: tokenType
         };
+        return [ResultType.token, token];
     }
 
     private _getCurrentSubstring(): string {
@@ -206,5 +226,13 @@ class EnglishScanner {
 
     private _isAtEnd(): boolean {
         return this._current >= this._target.length;
+    }
+
+    private _createError(msg: string): ErrorResult {
+        const err: ScannerError = {
+            position: this._current - 1,
+            message: msg
+        };
+        return [ResultType.error, err];
     }
 }

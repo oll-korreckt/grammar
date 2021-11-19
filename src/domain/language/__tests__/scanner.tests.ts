@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Token, TokenType } from "..";
-import { scan } from "../scanner";
+import { scan, ScannerError } from "../scanner";
 
 const hyphen = "-";
 const enDash = "–";
@@ -126,8 +126,16 @@ describe("scan", () => {
     });
 
     describe("errors", () => {
-        test("Invalid start char", () => {
-            expect(() => scan("Contains invalid start char :"));
+        test("Invalid char in isolation", () => {
+            const result = scan("The cat !");
+            assert.isObject(result);
+            assert.strictEqual((result as ScannerError).position, 8);
+        });
+
+        test("Invalid char after dashes", () => {
+            const result = scan("Some----:dashes");
+            assert.isObject(result);
+            assert.strictEqual((result as ScannerError).position, 8);
         });
     });
 
