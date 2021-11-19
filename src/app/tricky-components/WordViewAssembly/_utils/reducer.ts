@@ -1,8 +1,11 @@
-import { createWordViewContext, DiagramState, DiagramStateContext, DisplayModel, ElementDisplayInfo, HistoryState, WordViewContext, WordViewMode } from "@app/utils";
+import { Ids } from "@app/testing";
+import { PropertyEditorState } from "@app/tricky-components/PropertyEditor/PropertyEditor";
+import { createWordViewContext, DiagramState, DiagramStateContext, DisplayModel, HistoryState, WordViewContext, WordViewMode } from "@app/utils";
 import { ElementCategory, ElementType, getElementDefinition } from "@domain/language";
 import { AtomicChange } from "@lib/utils";
 import React, { useReducer } from "react";
 import { Action, EditActiveState, AddState, State, StateBase, EditBrowseState } from "./types";
+import { utils } from "./utils";
 
 function extractCancelData(state: EditActiveState): Omit<StateBase, "type"> {
     const diagramStateContext = createDiagramStateContext(state.history.currState);
@@ -132,7 +135,10 @@ function reducer(state: State, action: Action): State {
                 wordViewContext: wordViewContext,
                 id: newItemId,
                 editHistory: HistoryState.createChild(newHistory),
-                property: ElementDisplayInfo.getPrimaryProperty(addElementType)
+                editMenuState: utils.getDisplayState(
+                    newHistory.currState,
+                    newItemId
+                )
             };
         }
         case "edit.browse: Enter edit.active": {
@@ -158,21 +164,11 @@ function reducer(state: State, action: Action): State {
                 history: editState.history,
                 wordViewContext: newWordViewContext,
                 editHistory: editHistory,
-                diagramStateContext: createDiagramStateContext(editHistory.currState)
-            };
-        }
-        case "edit.active: Submit Change": {
-            const editState = checkEditActive(state);
-            const editHistory = HistoryState.stageChange(editState.editHistory);
-            return {
-                type: "edit.active",
-                addElementType: editState.addElementType,
-                priorState: editState.priorState,
-                history: editState.history,
-                editHistory: editHistory,
-                wordViewContext: editState.wordViewContext,
-                id: editState.id,
-                diagramStateContext: createDiagramStateContext(editHistory.currState)
+                diagramStateContext: createDiagramStateContext(editHistory.currState),
+                editMenuState: utils.getDisplayState(
+                    editState.diagramStateContext.state,
+                    action.id
+                )
             };
         }
         case "edit.active: Done": {
@@ -235,47 +231,91 @@ function reducer(state: State, action: Action): State {
                 );
             }
             const editHistory = HistoryState.stageChange(editState.editHistory, ...change);
+            const currDiagram = editHistory.currState;
             return {
                 type: "edit.active",
                 addElementType: editState.addElementType,
                 priorState: editState.priorState,
                 history: editState.history,
                 editHistory: editHistory,
-                diagramStateContext: createDiagramStateContext(editHistory.currState),
+                diagramStateContext: createDiagramStateContext(currDiagram),
                 wordViewContext: editState.wordViewContext,
                 id: editState.id,
-                property: action.property
+                editMenuState: utils.getEditState(
+                    currDiagram,
+                    editState.id,
+                    action.property
+                )
             };
         }
         case "edit.active: Remove child reference": {
             const editState = checkEditActive(state);
             const parentId = editState.id;
-            const parentType = DiagramState.getItem(editState.diagramStateContext.state, parentId).type as Exclude<ElementType, "word">;
+            const currDiagram = editState.editHistory.currState;
+            const parentType = DiagramState.getItem(currDiagram, parentId).type as Exclude<ElementType, "word">;
             const change = DiagramState.createDeleteReference(
-                editState.diagramStateContext.state,
+                currDiagram,
                 parentType,
                 parentId,
                 action.property,
                 action.childId
             );
             const editHistory = HistoryState.stageChange(editState.editHistory, ...change);
+            const newDiagram = editHistory.currState;
             return {
                 type: "edit.active",
                 addElementType: editState.addElementType,
                 priorState: editState.priorState,
                 history: editState.history,
                 editHistory: editHistory,
-                diagramStateContext: createDiagramStateContext(editHistory.currState),
+                diagramStateContext: createDiagramStateContext(newDiagram),
                 wordViewContext: editState.wordViewContext,
                 id: editState.id,
-                property: action.property
+                editMenuState: {
+                    type: "edit",
+                    property: utils.getPropertyState(
+                        newDiagram,
+                        editState.id,
+                        action.property
+                    )
+                }
+            };
+        }
+        case "edit.active: Delete property": {
+            const editState = checkEditActive(state);
+            const currDiagram = editState.editHistory.currState;
+            const change = DiagramState.createDeleteProperty(
+                currDiagram,
+                editState.id,
+                action.property
+            );
+            const editHistory = HistoryState.stageChange(editState.editHistory, ...change);
+            const newDiagram = editHistory.currState;
+            return {
+                type: "edit.active",
+                priorState: editState.priorState,
+                id: editState.id,
+                history: editState.history,
+                diagramStateContext: createDiagramStateContext(newDiagram),
+                wordViewContext: editState.wordViewContext,
+                addElementType: editState.addElementType,
+                editHistory: editHistory,
+                editMenuState: utils.getDisplayState(
+                    newDiagram,
+                    editState.id
+                )
             };
         }
         case "edit.active: Select property": {
             const editState = checkEditActive(state);
+            const id = editState.id;
+            const diagramState = editState.editHistory.currState;
+            const editMenuState: PropertyEditorState = action.property !== undefined
+                ? utils.getEditState(diagramState, id, action.property)
+                : utils.getDisplayState(diagramState, id);
             return {
                 ...editState,
-                property: action.property
+                editMenuState: editMenuState
             };
         }
         case "edit.active: Switch mode": {
@@ -349,11 +389,24 @@ function createDiagramStateContext(diagram: DiagramState): DiagramStateContext {
 function initializer(diagram: DiagramState): State {
     const newDiagramStateContext = createDiagramStateContext(diagram);
     return {
-        type: "delete",
-        addElementType: undefined,
+        type: "edit.active",
+        id: Ids.quickBrownAdjPhrase,
         history: HistoryState.init(diagram),
+        editHistory: HistoryState.init(diagram),
         diagramStateContext: newDiagramStateContext,
-        wordViewContext: createWordViewContext(newDiagramStateContext, "partOfSpeech")
+        wordViewContext: createWordViewContext(newDiagramStateContext, "partOfSpeech"),
+        addElementType: "adjective",
+        editMenuState: utils.getDisplayState(diagram, Ids.quickBrownAdjPhrase),
+        priorState: {
+            type: "edit.browse",
+            contextData: {
+                elementCategory: "partOfSpeech"
+            }
+        }
+        // addElementType: undefined,
+        // history: HistoryState.init(diagram),
+        // diagramStateContext: newDiagramStateContext,
+        // wordViewContext: createWordViewContext(newDiagramStateContext, "partOfSpeech")
     };
 }
 

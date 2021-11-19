@@ -1,6 +1,5 @@
 import { withDisable, withFade } from "@app/basic-components/Word";
 import { BuildFunction, WordView } from "@app/tricky-components";
-import { PropertySelector } from "@app/tricky-components/PropertySelector";
 import { DiagramState, DiagramStateItem, ElementData, ElementDisplayInfo, ReferenceObject } from "@app/utils";
 import { withEventListener } from "@app/utils/hoc";
 import { ElementId, ElementReference, ElementType, getElementDefinition } from "@domain/language";
@@ -54,14 +53,14 @@ function createPropertyChecker({ value, type }: DiagramStateItem, property: stri
 }
 
 export function createBuildFn(state: EditActiveState, dispatch: React.Dispatch<Action>): BuildFunction {
-    const { diagramStateContext, id, property } = state;
+    const { diagramStateContext, id, editMenuState } = state;
     const parentItem = DiagramState.getItem(diagramStateContext.state, id);
     if (parentItem.type === "word") {
         throw "cannot reference word";
     }
     const parentReferences = DiagramState.getElementReferences(parentItem.type, parentItem.value);
     let buildFn: BuildFunction;
-    if (property === undefined) {
+    if (editMenuState.type === "display") {
         const propertyIdentifier = createPropertyIdentifier(parentItem.type, parentReferences);
         buildFn = (Component, data) => {
             const refProperties = propertyIdentifier(data.id);
@@ -70,16 +69,16 @@ export function createBuildFn(state: EditActiveState, dispatch: React.Dispatch<A
                 : withPropertyHeader(Component, refProperties);
         };
     } else {
-        const propertyChecker = createPropertyChecker(parentItem, property);
+        const { propertyKey } = editMenuState.property;
+        const propertyChecker = createPropertyChecker(parentItem, propertyKey);
         buildFn = (Component, data) => {
             let output = Component;
             const result = propertyChecker(data);
-            console.log(result, data.id);
             switch (result) {
                 case "assigned":
                     output = withEventListener(output, "click", () => dispatch({
                         type: "edit.active: Remove child reference",
-                        property: property,
+                        property: propertyKey,
                         childId: data.id
                     }));
                     break;
@@ -87,7 +86,7 @@ export function createBuildFn(state: EditActiveState, dispatch: React.Dispatch<A
                     output = withFade(output);
                     output = withEventListener(output, "click", () => dispatch({
                         type: "edit.active: Add child reference",
-                        property: property,
+                        property: propertyKey,
                         childId: data.id
                     }));
                     break;
@@ -110,18 +109,5 @@ export interface EditBodyProps {
 
 export const EditActiveBody: React.VFC<EditBodyProps> = ({ state, dispatch }) => {
     const buildFn = createBuildFn(state, dispatch);
-    const item = DiagramState.getItem(
-        state.diagramStateContext.state,
-        state.id
-    );
-    return (
-        <>
-            <WordView buildFn={buildFn}/>
-            <PropertySelector
-                item={item}
-                selectedProperty={state.property}
-                onSelectChange={(property) => dispatch({ type: "edit.active: Select property", property: property })}
-            />
-        </>
-    );
+    return <WordView buildFn={buildFn}/>;
 };

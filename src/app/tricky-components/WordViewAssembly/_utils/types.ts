@@ -1,3 +1,4 @@
+import { PropertyEditorState } from "@app/tricky-components/PropertyEditor/PropertyEditor";
 import { DiagramState, DiagramStateContext, HistoryState, WordViewContext, WordViewMode } from "@app/utils";
 import { ElementCategory, ElementId, ElementType } from "@domain/language";
 import { AtomicChange } from "@lib/utils";
@@ -33,7 +34,7 @@ export interface EditActiveState extends TypedStateBase<"edit.active"> {
     priorState: PriorStateData;
     editHistory: HistoryState<DiagramState>;
     id: ElementId;
-    property?: string;
+    editMenuState: PropertyEditorState;
 }
 
 export type EditState = EditBrowseState | EditActiveState;
@@ -62,8 +63,8 @@ export type Action = {
 } | {
     type: "edit.active: Cancel";
 } | {
-    type: "edit.active: Submit Change";
-    change: AtomicChange[];
+    type: "edit.active: Delete property";
+    property: string;
 } | {
     type: "edit.active: Add child reference";
     property: string;

@@ -90,6 +90,46 @@ $transition: 2000ms;
 .container {
     padding-top: 5px;
     padding-bottom: 5px;
-    padding: 5px 0;
     width: 100vw;
+    position: absolute;
+    bottom: 0;
+}
+
+.propertyEditor {
+    height: 100% !important;
+}
+
+.editActiveContainer, .barContainer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.editPrompt {
+    @include main.center-content;
+    font-size: 24px;
+}
+
+.editActiveContainer {
+    @include main.center-content;
+    padding: 10px;
+    height: max(320px, 30vh);
+}
+
+.editActiveInnerContainer {
+    width: min(700px, 100%);
+    height: 100%;
+}
+
+.barContainer {
+    display: inline-block;
+}
+
+.bottomContainer {
+    display: inline-block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
 }
