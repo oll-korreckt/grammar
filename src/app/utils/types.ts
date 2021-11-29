@@ -1,5 +1,7 @@
 import { Variant } from "framer-motion";
 import React from "react";
+import { Element as SlateElement } from "slate";
+import { EditableProps, RenderElementProps } from "slate-react/dist/components/editable";
 
 export type ElementFilterType = "word" | "partOfSpeech" | "phrase" | "clause" | "sentence";
 export type SimpleComponentProps = { children: string; }
@@ -37,3 +39,12 @@ export const EVENTS = {
     animate: "show",
     exit: "exit"
 };
+
+type EditableProp<Key extends keyof EditableProps> = Exclude<EditableProps[Key], undefined>;
+export type RenderElement = EditableProp<"renderElement">;
+export type RenderLeaf = EditableProp<"renderLeaf">;
+export type Decorate = EditableProp<"decorate">;
+export interface TypedRenderElementProps<TElement extends SlateElement = SlateElement> extends RenderElementProps {
+    element: TElement;
+}
+export type TypedRenderElement<TElement extends SlateElement = SlateElement> = (props: TypedRenderElementProps<TElement>) => JSX.Element;
