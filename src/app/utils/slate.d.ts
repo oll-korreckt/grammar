@@ -8,6 +8,7 @@ export interface ParagraphElement {
 
 export interface ErrorElement {
     type: "error";
+    message: string;
     children: CustomText[];
 }
 
