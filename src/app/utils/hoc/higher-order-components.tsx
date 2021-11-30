@@ -147,7 +147,7 @@ export function withEventProp<TEvent extends SupportedEvents, TElement extends H
     });
 }
 
-function mergeRefs<T>(ref1: React.ForwardedRef<T>, ref2: React.ForwardedRef<T>): React.ForwardedRef<T> {
+export function mergeRefs<T>(ref1: React.ForwardedRef<T>, ref2: React.ForwardedRef<T>): React.ForwardedRef<T> {
     return (value) => {
         [ref1, ref2].forEach((ref) => {
             if (typeof ref === "function") {
@@ -157,4 +157,21 @@ function mergeRefs<T>(ref1: React.ForwardedRef<T>, ref2: React.ForwardedRef<T>):
             }
         });
     };
+}
+
+export function extendRef<TData>(ref: React.ForwardedRef<TData>, action: (instance: TData | null) => void): React.Ref<TData> {
+    if (ref === null) {
+        return action;
+    } else if (typeof ref === "object") {
+        return (instance) => {
+            ref.current = instance;
+            action(instance);
+        };
+    } else if (typeof ref === "function") {
+        return (instance) => {
+            ref(instance);
+            action(instance);
+        };
+    }
+    throw "Unexpected ref. Received a value that is not null, an object, or a function.";
 }
