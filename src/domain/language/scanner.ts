@@ -6,10 +6,10 @@ export function scan(target: string): ScanResult {
 
 export type ScanResult = {
     type: "tokens";
-    result: Token[];
+    data: Token[];
 } | {
     type: "errors";
-    result: ScannerError[];
+    data: ScannerError[];
 }
 
 enum ResultType {
@@ -145,8 +145,8 @@ class EnglishScanner {
             tokenType: "end"
         });
         return this._errors.length === 0
-            ? { type: "tokens", result: this._tokens }
-            : { type: "errors", result: this._errors };
+            ? { type: "tokens", data: this._tokens }
+            : { type: "errors", data: this._errors };
     }
 
     private _scanNextToken(): Result {

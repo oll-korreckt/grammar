@@ -126,11 +126,11 @@ describe("scan", () => {
     });
 
     describe("errors", () => {
-        function checkErrors({ type, result }: ScanResult, expectedErrors: ScannerError[]): void {
+        function checkErrors({ type, data }: ScanResult, expectedErrors: ScannerError[]): void {
             if (type !== "errors") {
                 assert.fail();
             }
-            const castResult = result as ScannerError[];
+            const castResult = data as ScannerError[];
             assert.strictEqual(castResult.length, expectedErrors.length);
             for (let index = 0; index < expectedErrors.length; index++) {
                 assert.strictEqual(
@@ -175,7 +175,7 @@ describe("scan", () => {
         const result = scan(target);
         const scanResult: ScanResult = {
             type: "tokens",
-            result: expectedTokens
+            data: expectedTokens
         };
         assert.deepEqual(result, scanResult);
     }
