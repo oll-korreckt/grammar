@@ -1,7 +1,15 @@
 import { Token, TokenType } from "./_types";
 
-export function scan(target: string): Token[] | ScannerError {
+export function scan(target: string): ScanResult {
     return new EnglishScanner().scan(target);
+}
+
+export type ScanResult = {
+    type: "tokens";
+    result: Token[];
+} | {
+    type: "errors";
+    result: ScannerError[];
 }
 
 enum ResultType {
@@ -119,22 +127,26 @@ class EnglishScanner {
     private _start = 0;
     private _current = 0;
     private _tokens: Token[] = [];
+    private _errors: ScannerError[] = [];
 
-    public scan(target: string): Token[] | ScannerError {
+    public scan(target: string): ScanResult {
         this._target = target;
         while (!this._isAtEnd()) {
             this._start = this._current;
             const result = this._scanNextToken();
             if (result[0] === ResultType.error) {
-                return result[1];
+                this._errors.push(result[1]);
+            } else {
+                this._tokens.push(result[1]);
             }
-            this._tokens.push(result[1]);
         }
         this._tokens.push({
             lexeme: "",
             tokenType: "end"
         });
-        return this._tokens;
+        return this._errors.length === 0
+            ? { type: "tokens", result: this._tokens }
+            : { type: "errors", result: this._errors };
     }
 
     private _scanNextToken(): Result {

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Token, TokenType } from "..";
-import { scan, ScannerError } from "../scanner";
+import { scan, ScannerError, ScanResult } from "../scanner";
 
 const hyphen = "-";
 const enDash = "–";
@@ -126,16 +126,39 @@ describe("scan", () => {
     });
 
     describe("errors", () => {
+        function checkErrors({ type, result }: ScanResult, expectedErrors: ScannerError[]): void {
+            if (type !== "errors") {
+                assert.fail();
+            }
+            const castResult = result as ScannerError[];
+            assert.strictEqual(castResult.length, expectedErrors.length);
+            for (let index = 0; index < expectedErrors.length; index++) {
+                assert.strictEqual(
+                    castResult[index].position,
+                    expectedErrors[index].position
+                );
+            }
+        }
+
+        function createErrors(...positions: number[]): ScannerError[] {
+            return positions.map((pos) => {
+                return { message: "", position: pos };
+            });
+        }
+
         test("Invalid char in isolation", () => {
             const result = scan("The cat !");
-            assert.isObject(result);
-            assert.strictEqual((result as ScannerError).position, 8);
+            checkErrors(result, createErrors(8));
         });
 
         test("Invalid char after dashes", () => {
             const result = scan("Some----:dashes");
-            assert.isObject(result);
-            assert.strictEqual((result as ScannerError).position, 8);
+            checkErrors(result, createErrors(8));
+        });
+
+        test("Multiple errors", () => {
+            const result = scan("Here : here ! and here ?");
+            checkErrors(result, createErrors(5, 12, 23));
         });
     });
 
@@ -150,6 +173,10 @@ describe("scan", () => {
             { lexeme: "", tokenType: "end" }
         ];
         const result = scan(target);
-        assert.deepEqual(result, expectedTokens);
+        const scanResult: ScanResult = {
+            type: "tokens",
+            result: expectedTokens
+        };
+        assert.deepEqual(result, scanResult);
     }
 });
