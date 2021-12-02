@@ -134,15 +134,18 @@ describe("scan", () => {
             assert.strictEqual(castResult.length, expectedErrors.length);
             for (let index = 0; index < expectedErrors.length; index++) {
                 assert.strictEqual(
-                    castResult[index].position,
-                    expectedErrors[index].position
+                    castResult[index].start,
+                    expectedErrors[index].start
                 );
             }
         }
 
-        function createErrors(...positions: number[]): ScannerError[] {
+        function createErrors(...positions: number[] | [number, number][]): ScannerError[] {
             return positions.map((pos) => {
-                return { message: "", position: pos };
+                const [start, end] = Array.isArray(pos)
+                    ? pos
+                    : [pos, pos + 1];
+                return { message: "", start, end };
             });
         }
 
@@ -159,6 +162,11 @@ describe("scan", () => {
         test("Multiple errors", () => {
             const result = scan("Here : here ! and here ?");
             checkErrors(result, createErrors(5, 12, 23));
+        });
+
+        test("Multi-character errors", () => {
+            const result = scan("what ?)]! what ???");
+            checkErrors(result, createErrors([5, 9], [15, 18]));
         });
     });
 

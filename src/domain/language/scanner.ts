@@ -18,7 +18,8 @@ enum ResultType {
 }
 
 export interface ScannerError {
-    position: number;
+    start: number;
+    end: number;
     message: string;
 }
 
@@ -89,6 +90,11 @@ class EnglishScanner {
             || EnglishScanner._isStartingPunctuation(value);
     }
 
+    private static _isErrorChar(value: char): boolean {
+        return !(EnglishScanner._isWhitespaceChar(value)
+            || EnglishScanner._isStartWordChar(value));
+    }
+
     private static _isStartingPunctuation({ value }: char): boolean {
         return startPunct.includes(value);
     }
@@ -156,7 +162,7 @@ class EnglishScanner {
         } else if (EnglishScanner._isStartWordChar(currentChar)) {
             return this._finishWord();
         } else {
-            return this._createError(`Invalid character '${currentChar.value}'`);
+            return this._finishError();
         }
     }
 
@@ -188,7 +194,7 @@ class EnglishScanner {
         }
         this._advance();
         this._advance();
-        return this._createError(`Invalid character '${nextChar.value}''`);
+        return this._finishError();
     }
 
     private _createToken(tokenType: TokenType): TokenResult {
@@ -240,10 +246,12 @@ class EnglishScanner {
         return this._current >= this._target.length;
     }
 
-    private _createError(msg: string): ErrorResult {
+    private _finishError(): ErrorResult {
+        while (this._match(EnglishScanner._isErrorChar)) { }
         const err: ScannerError = {
-            position: this._current - 1,
-            message: msg
+            start: this._start,
+            end: this._current,
+            message: `Invalid character(s) '${this._getCurrentSubstring()}'`
         };
         return [ResultType.error, err];
     }
