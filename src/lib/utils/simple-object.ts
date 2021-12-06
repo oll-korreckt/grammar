@@ -155,10 +155,26 @@ function clean(obj: SimpleObject): SimpleObject {
     return output;
 }
 
+function sameKeys(obj1: Record<string, any>, obj2: Record<string, any>): boolean {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) {
+        return false;
+    }
+    for (let index = 0; index < keys2.length; index++) {
+        const key = keys1[index];
+        if (!(key in obj2)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export const SimpleObject = {
     deepEquals: deepEquals,
     clone: clone,
     getValueType: getValueType,
     getSortedEntries: getSortedEntries,
-    clean: clean
+    clean: clean,
+    sameKeys: sameKeys
 };

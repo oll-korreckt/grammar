@@ -322,4 +322,50 @@ describe("SimpleObject", () => {
             assert.notEqual(result, expected);
         });
     });
+
+    describe("same keys", () => {
+        test("diff number", () => {
+            const obj1 = {
+                what: 1,
+                the: true,
+                heck: ""
+            };
+            const obj2 = {
+                what: 1,
+                the: true,
+                heck: "",
+                is: {},
+                this: 42.42
+            };
+            assert.isFalse(SimpleObject.sameKeys(obj1, obj2));
+        });
+
+        test("diff keys", () => {
+            const obj1 = {
+                what: 1
+            };
+            const obj2 = {
+                hwat: 1
+            };
+            assert.isFalse(SimpleObject.sameKeys(obj1, obj2));
+        });
+
+        test("same keys", () => {
+            const obj1 = {
+                what: 1,
+                the: true,
+                heck: ""
+            };
+            const obj2 = {
+                what: 1,
+                the: true,
+                heck: ""
+            };
+            assert.isTrue(SimpleObject.sameKeys(obj1, obj2));
+        });
+
+        test("no keys", () => {
+            assert.isTrue(SimpleObject.sameKeys({}, {}));
+        });
+    });
 });
