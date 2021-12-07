@@ -1,4 +1,3 @@
-import { DistributiveOmit } from "@lib/utils/types";
 import { BaseEditor, BaseRange, NodeEntry, Text, Node } from "slate";
 import { ReactEditor } from "slate-react";
 
@@ -54,7 +53,7 @@ export function getTextType(text: CustomText): TextType {
 
 export type CustomElement = ParagraphElement;
 export type CustomText = PlainText | ErrorToken;
-export type DecoratorRange = DistributiveOmit<CustomText, "text"> & BaseRange;
+export type DecoratorRange = Omit<ErrorToken, "text"> & BaseRange;
 export type Decorator = (entry: NodeEntry<Node>) => DecoratorRange[];
 
 declare module "slate" {
