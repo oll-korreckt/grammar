@@ -1,7 +1,6 @@
-import { ErrorKey } from "@app/basic-components/SentenceInput/error-key";
-import { Paragraph } from "@app/basic-components/SentenceInput/sub-components";
-import { accessClassName, CustomText, Decorator, DecoratorRange, ErrorToken, getTextType, PlainText, RenderElement, RenderLeaf, TypedRenderLeaf, TypedRenderLeafProps } from "@app/utils";
-import { extendRef, makeRefComponent } from "@app/utils/hoc";
+import { ErrorKey } from "@app/tricky-components/TextEditor/error-key";
+import { accessClassName, CustomText, Decorator, DecoratorRange, ErrorToken, getTextType, ParagraphElement, PlainText, RenderElement, RenderLeaf, TypedRenderElementProps, TypedRenderLeaf, TypedRenderLeafProps } from "@app/utils";
+import { extendRef, makeRefComponent, mergeRefs } from "@app/utils/hoc";
 import { scan } from "@domain/language";
 import { ScannerError } from "@domain/language/scanner";
 import React, { useRef, useState } from "react";
@@ -197,6 +196,18 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Edi
                 />
             </Slate>
         </div>
+    );
+});
+
+const Paragraph = makeRefComponent<HTMLParagraphElement, TypedRenderElementProps<ParagraphElement>>("Paragraph", ({ children, attributes }, forwardedRef) => {
+    const { ref, ...rest } = attributes;
+    return (
+        <p
+            ref={mergeRefs(forwardedRef, ref)}
+            {...rest}
+        >
+            {children}
+        </p>
     );
 });
 
