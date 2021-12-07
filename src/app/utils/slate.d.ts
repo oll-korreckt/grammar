@@ -21,7 +21,7 @@ interface Token extends PlainText {
 export interface ErrorToken extends Token {
     tokenType: "error";
     key: string;
-    message?: string;
+    message: string;
 }
 
 function isPlainText(value: any): value is PlainText {
