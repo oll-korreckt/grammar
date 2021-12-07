@@ -3,7 +3,8 @@ import { accessClassName, CustomText, Decorator, DecoratorRange, ErrorToken, get
 import { extendRef, makeRefComponent, mergeRefs } from "@app/utils/hoc";
 import { scan } from "@domain/language";
 import { ScannerError } from "@domain/language/scanner";
-import React, { useRef, useState } from "react";
+import { SimpleObject } from "@lib/utils";
+import React, { useEffect, useRef, useState } from "react";
 import { Descendant, Editor as SlateEditor, Node, NodeEntry, Path, Text } from "slate";
 import { Editable, Slate } from "slate-react";
 import styles from "./_styles.scss";
@@ -12,6 +13,7 @@ export interface TextEditorProps {
     children?: string;
     editor: SlateEditor;
     errorDelay?: number;
+    onErrorStateChange?: (errors: DecoratorRange[]) => void;
     editorRef?: React.Ref<HTMLDivElement>;
 }
 
@@ -81,7 +83,9 @@ function newStorage(descendents: Descendant[], old?: DecorationStorage): Decorat
     getTextNodes(descendents).forEach(([{ text }, path]) => {
         const key = ErrorKey.createPathKey(path);
         let decorations: DecoratorRange[];
-        if (old !== undefined && old[key].text === text) {
+        if (old !== undefined
+            && key in old
+            && old[key].text === text) {
             decorations = old[key].decorations;
         } else {
             const scanResult = scan(text);
@@ -133,7 +137,13 @@ function useDecorations(initial: Descendant[]): [decorations: Decorations, updat
     ];
 }
 
-export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Editor", ({ children, errorDelay, editor, editorRef }, ref) => {
+function extractErrors(decorations: Decorations): DecoratorRange[] {
+    return Object.values(decorations)
+        .flatMap((values) => values)
+        .sort((a, b) => ErrorKey.sortMethod(a.key, b.key));
+}
+
+export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Editor", ({ children, errorDelay, onErrorStateChange, editor, editorRef }, ref) => {
     const timerId = useRef<any>();
     const [descendents, setDescendents] = useState<Descendant[]>([{
         type: "paragraph",
@@ -142,6 +152,7 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Edi
         }]
     }]);
     const [decorations, setDecorations] = useDecorations(descendents);
+    const decorationsRef = useRef(decorations);
     const extendedRef = extendRef<HTMLDivElement>(ref, (instance) => {
         if (instance === null
             || instance.firstElementChild === null
@@ -166,8 +177,18 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Edi
             return [];
         }
         const key = ErrorKey.createPathKey(path);
-        return decorations[key] !== undefined ? decorations[key] : [];
+        const output = decorations[key] !== undefined ? decorations[key] : [];
+        return output;
     };
+
+    useEffect(() => {
+        if (onErrorStateChange
+            && !SimpleObject.deepEquals(decorations, decorationsRef.current)) {
+            const errors = extractErrors(decorations);
+            onErrorStateChange(errors);
+        }
+        decorationsRef.current = decorations;
+    }, [decorations, onErrorStateChange]);
 
     return (
         <div
