@@ -1,7 +1,10 @@
 import { Variant } from "framer-motion";
 import React from "react";
-import { Element as SlateElement } from "slate";
-import { EditableProps, RenderElementProps } from "slate-react/dist/components/editable";
+import {
+    Element as SlateElement,
+    Text as SlateText
+} from "slate";
+import { EditableProps, RenderElementProps, RenderLeafProps } from "slate-react/dist/components/editable";
 
 export type ElementFilterType = "word" | "partOfSpeech" | "phrase" | "clause" | "sentence";
 export type SimpleComponentProps = { children: string; }
@@ -48,3 +51,7 @@ export interface TypedRenderElementProps<TElement extends SlateElement = SlateEl
     element: TElement;
 }
 export type TypedRenderElement<TElement extends SlateElement = SlateElement> = (props: TypedRenderElementProps<TElement>) => JSX.Element;
+export interface TypedRenderLeafProps<TLeaf extends SlateText = SlateText> extends RenderLeafProps {
+    leaf: TLeaf;
+}
+export type TypedRenderLeaf<TLeaf extends SlateText = SlateText> = (props: TypedRenderLeafProps<TLeaf>) => JSX.Element;

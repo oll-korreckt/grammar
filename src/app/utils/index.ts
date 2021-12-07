@@ -10,3 +10,4 @@ export * from "./diagram-state-context";
 export * from "./word-view-context";
 export * from "./element-display-info";
 export * from "./derivation-tree";
+export * from "./slate.d";
