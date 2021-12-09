@@ -55,3 +55,4 @@ export interface TypedRenderLeafProps<TLeaf extends SlateText = SlateText> exten
     leaf: TLeaf;
 }
 export type TypedRenderLeaf<TLeaf extends SlateText = SlateText> = (props: TypedRenderLeafProps<TLeaf>) => JSX.Element;
+export type Stage = "input" | "label";
