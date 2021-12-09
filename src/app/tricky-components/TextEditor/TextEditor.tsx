@@ -152,7 +152,7 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Edi
         }]
     }]);
     const [decorations, setDecorations] = useDecorations(descendents);
-    const decorationsRef = useRef(decorations);
+    const decorationsRef = useRef<Decorations>({});
     const extendedRef = extendRef<HTMLDivElement>(ref, (instance) => {
         if (instance === null
             || instance.firstElementChild === null
