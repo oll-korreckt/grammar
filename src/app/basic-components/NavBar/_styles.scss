@@ -1,0 +1,20 @@
+@use "main";
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    user-select: none;
+}
+
+.item {
+    @include main.center-content;
+    font-size: 20px;
+}
+
+.selected {
+    color: black;
+}
+
+.unselected {
+    color: gray;
+}
