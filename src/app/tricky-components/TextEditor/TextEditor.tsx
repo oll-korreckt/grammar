@@ -4,7 +4,7 @@ import { extendRef, makeRefComponent, mergeRefs } from "@app/utils/hoc";
 import { scan } from "@domain/language";
 import { ScannerError } from "@domain/language/scanner";
 import { SimpleObject } from "@lib/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Descendant, Editor as SlateEditor, Node, NodeEntry, Path, Text } from "slate";
 import { Editable, Slate } from "slate-react";
 import styles from "./_styles.scss";
@@ -13,10 +13,15 @@ export interface TextEditorProps {
     children?: string;
     editor: SlateEditor;
     errorDelay?: number;
-    onErrorStateChange?: (errors: DecoratorRange[]) => void;
+    onErrorChange?: ErrorStateChange;
+    errorChangeInvoke?: ErrorChangeInvokeType;
+    onInputChange?: (input: string) => void;
+    onErrorDelayComplete?: () => void;
     editorRef?: React.Ref<HTMLDivElement>;
 }
 
+type ErrorChangeInvokeType = "always" | "on changes";
+type ErrorStateChange = (errors: DecoratorRange[]) => void;
 type Decorations = Record<string, DecoratorRange[]>;
 
 const DEFAULT_DELAY = 500;
@@ -98,14 +103,24 @@ function newStorage(descendents: Descendant[], old?: DecorationStorage): Decorat
     return output;
 }
 
-function useDecorations(initial: Descendant[]): [decorations: Decorations, updater: Updater] {
+function useDecorations(initial: Descendant[], errorChangeInvoke: ErrorChangeInvokeType, onErrorChange: ErrorStateChange): [decorations: Decorations, updater: Updater] {
     const [storage, setStorage] = useState<DecorationStorage>(newStorage(initial));
+    const decorationsOutput = extractDecorations(storage);
+
+    function invokeSetStorage(newStorageValue: DecorationStorage): void {
+        const newDecorations = extractDecorations(newStorageValue);
+        if (errorChangeInvoke === "always" || !SimpleObject.deepEquals(decorationsOutput, newDecorations)) {
+            const errors = extractErrors(newDecorations);
+            onErrorChange(errors);
+        }
+        setStorage(newStorageValue);
+    }
 
     const updater: Updater = (descendents) => {
         const keys = Object.keys(storage);
         const textNodes = getTextNodes(descendents);
         if (keys.length !== textNodes.length) {
-            setStorage(newStorage(descendents, storage));
+            invokeSetStorage(newStorage(descendents, storage));
             return;
         }
         const output: DecorationStorage = {};
@@ -127,12 +142,12 @@ function useDecorations(initial: Descendant[]): [decorations: Decorations, updat
             }
         }
         if (applyUpdate) {
-            setStorage(output);
+            invokeSetStorage(output);
         }
     };
 
     return [
-        extractDecorations(storage),
+        decorationsOutput,
         updater
     ];
 }
@@ -143,16 +158,41 @@ function extractErrors(decorations: Decorations): DecoratorRange[] {
         .sort((a, b) => ErrorKey.sortMethod(a.key, b.key));
 }
 
-export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Editor", ({ children, errorDelay, onErrorStateChange, editor, editorRef }, ref) => {
+function initChildren(children: string | undefined): Descendant[] {
+    const definedChildren = children !== undefined ? children : "";
+    return definedChildren.split("\n").map((line) => {
+        return {
+            type: "paragraph",
+            children: [{ text: line }]
+        };
+    });
+}
+
+function extractText(descendents: Descendant[]): string {
+    let output = "";
+    descendents.forEach((node, index) => {
+        const text = Node.string(node);
+        output += text;
+        if (index < descendents.length - 1) {
+            output += "\n";
+        }
+    });
+    return output;
+}
+
+export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("TextEditor", ({ children, errorDelay, errorChangeInvoke, onErrorChange, onInputChange, editor, editorRef }, ref) => {
     const timerId = useRef<any>();
-    const [descendents, setDescendents] = useState<Descendant[]>([{
-        type: "paragraph",
-        children: [{
-            text: children !== undefined ? children : ""
-        }]
-    }]);
-    const [decorations, setDecorations] = useDecorations(descendents);
-    const decorationsRef = useRef<Decorations>({});
+    const [descendents, setDescendents] = useState<Descendant[]>(initChildren(children));
+    const [decorations, setDecorations] = useDecorations(
+        descendents,
+        errorChangeInvoke !== undefined
+            ? errorChangeInvoke
+            : "on changes",
+        onErrorChange !== undefined
+            ? onErrorChange
+            : () => { return; }
+    );
+    const textRef = useRef<string>(extractText(descendents));
     const extendedRef = extendRef<HTMLDivElement>(ref, (instance) => {
         if (instance === null
             || instance.firstElementChild === null
@@ -181,15 +221,6 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Edi
         return output;
     };
 
-    useEffect(() => {
-        if (onErrorStateChange
-            && !SimpleObject.deepEquals(decorations, decorationsRef.current)) {
-            const errors = extractErrors(decorations);
-            onErrorStateChange(errors);
-        }
-        decorationsRef.current = decorations;
-    }, [decorations, onErrorStateChange]);
-
     return (
         <div
             ref={extendedRef}
@@ -200,12 +231,19 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Edi
                 value={descendents}
                 onChange={(newValue) => {
                     clearTimeout(timerId.current);
-                    const delay = errorDelay !== undefined
-                        ? errorDelay
-                        : DEFAULT_DELAY;
-                    timerId.current = setTimeout(() => {
-                        setDecorations(newValue);
-                    }, delay);
+                    const newText = extractText(newValue);
+                    if (newText !== textRef.current) {
+                        const delay = errorDelay !== undefined
+                            ? errorDelay
+                            : DEFAULT_DELAY;
+                        timerId.current = setTimeout(() => {
+                            setDecorations(newValue);
+                        }, delay);
+                        if (onInputChange) {
+                            onInputChange(newText);
+                        }
+                    }
+                    textRef.current = newText;
                     setDescendents(newValue);
                 }}
             >
