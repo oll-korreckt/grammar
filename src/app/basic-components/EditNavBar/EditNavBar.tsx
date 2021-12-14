@@ -5,7 +5,7 @@ import React from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import styles from "./_styles.scss";
 
-export interface NavBarProps {
+export interface EditNavBarProps {
     stage: Stage;
     enabledStages?: ["input"] | ["input", "label"];
     onStageClick?: (stage: Stage) => void;
@@ -17,7 +17,7 @@ interface Item {
     stage: Stage;
 }
 
-export const NavBar = makeRefComponent<HTMLDivElement, NavBarProps>("NavBar", ({ stage, enabledStages, onStageClick, onBackClick }, ref) => {
+export const EditNavBar = makeRefComponent<HTMLDivElement, EditNavBarProps>("EditNavBar", ({ stage, enabledStages, onStageClick, onBackClick }, ref) => {
     const enabledStagesSet: Set<Stage> = enabledStages !== undefined
         ? new Set(enabledStages)
         : new Set(["input"]);
