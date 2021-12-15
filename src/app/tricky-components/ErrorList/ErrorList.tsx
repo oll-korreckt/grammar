@@ -1,7 +1,7 @@
 import { accessClassName, ErrorToken } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
-import { AnimatePresence, AnimateSharedLayout, motion } from "framer-motion";
-import React from "react";
+import { AnimatePresence, AnimateSharedLayout, motion, Variants } from "framer-motion";
+import React, { useLayoutEffect, useState } from "react";
 import styles from "./_styles.scss";
 
 export type ErrorListItem = Pick<ErrorToken, "key" | "message">;
@@ -10,6 +10,7 @@ export interface ErrorListProps {
     children?: ErrorListItem | ErrorListItem[];
     onItemSelect?: (key: string) => void;
     selectedKey?: string;
+    showAnimation?: boolean | undefined;
 }
 
 function convertToArray(data: undefined | ErrorListItem | ErrorListItem[]): ErrorListItem[] {
@@ -18,7 +19,22 @@ function convertToArray(data: undefined | ErrorListItem | ErrorListItem[]): Erro
         : [];
 }
 
-export const ErrorList = makeRefComponent<HTMLDivElement, ErrorListProps>("ErrorList", ({ children, onItemSelect, selectedKey }, ref) => {
+export const ErrorList = makeRefComponent<HTMLDivElement, ErrorListProps>("ErrorList", ({ children, onItemSelect, selectedKey, showAnimation }, ref) => {
+    const defShowAnimation: boolean = showAnimation !== undefined ? showAnimation : true;
+    const [currShowAnimation, setCurrShowAnimation] = useState<boolean>(defShowAnimation);
+
+    const variants: Variants = {
+        initial: { opacity: 0 },
+        animate: { opacity: 0.8 },
+        exit: { opacity: 0 }
+    };
+
+    useLayoutEffect(() => {
+        if (currShowAnimation !== defShowAnimation) {
+            setCurrShowAnimation(defShowAnimation);
+        }
+    }, [defShowAnimation, currShowAnimation]);
+
     const data = convertToArray(children);
 
     return (
@@ -38,9 +54,10 @@ export const ErrorList = makeRefComponent<HTMLDivElement, ErrorListProps>("Error
                         return (
                             <motion.div
                                 key={key}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 0.8 }}
-                                exit={{ opacity: 0 }}
+                                initial="initial"
+                                animate="animate"
+                                exit="exit"
+                                variants={currShowAnimation ? variants : {}}
                                 className={accessClassName(styles, ...classes)}
                                 layoutId={key}
                                 layout="position"
