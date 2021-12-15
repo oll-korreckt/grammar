@@ -1,6 +1,6 @@
 import { accessClassName, DecoratorRange } from "@app/utils";
 import { withClassNameProp } from "@app/utils/hoc";
-import React, { useMemo, useReducer, useRef, useState } from "react";
+import React, { useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createEditor, Transforms } from "slate";
 import { withReact } from "slate-react";
 import { ErrorList, ErrorListItem } from "../ErrorList";
@@ -14,10 +14,10 @@ export interface SentenceInputProps {
 
 export interface SentenceInputState {
     value: string;
-    errorState: ErrorState;
+    errorState: SentenceInputErrorState;
 }
 
-type ErrorState = "none" | "errors" | "calculating";
+export type SentenceInputErrorState = "none" | "errors" | "calculating";
 
 interface State {
     input: string;
@@ -58,6 +58,7 @@ function extractInput(children: string | undefined): string {
 const errorDelay = 500;
 
 export const SentenceInput: React.VFC<SentenceInputProps> = ({ initialValue, onStateChange }) => {
+    const [errorListAnimate, setErrorListAnimate] = useState<boolean>(false);
     const [state, dispatch] = useReducer(
         reducer,
         {
@@ -88,6 +89,8 @@ export const SentenceInput: React.VFC<SentenceInputProps> = ({ initialValue, onS
             editorRef.current.focus();
         }
     }
+
+    useLayoutEffect(() => setErrorListAnimate(true), []);
 
     const errListItems: ErrorListItem[] = state.errors.map(({ key, message, anchor }) => {
         const lineNum = anchor.path[0] + 1;
@@ -140,6 +143,7 @@ export const SentenceInput: React.VFC<SentenceInputProps> = ({ initialValue, onS
                     onItemSelect={setCursor}
                     selectedKey={selectedErr}
                     className={accessClassName(styles, "errorList")}
+                    showAnimation={errorListAnimate}
                 >
                     {errListItems}
                 </ExtendedErrorList>
