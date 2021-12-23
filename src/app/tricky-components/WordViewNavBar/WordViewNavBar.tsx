@@ -1,7 +1,7 @@
 import { accessClassName, WordViewMode } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimateSharedLayout, motion } from "framer-motion";
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
@@ -17,7 +17,7 @@ interface Item {
     onClick?: () => void;
 }
 
-export const WordViewNavBar = makeRefComponent<HTMLDivElement, WordViewNavBarProps>("WordViewNavBar", ({ mode, onModeChange }, ref) => {
+export const WordViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren<WordViewNavBarProps>>("WordViewNavBar", ({ mode, onModeChange, children }, ref) => {
     const currentMode = WordViewMode.getDefault(mode);
 
     function invokeModeChange(newMode: WordViewMode): void {
@@ -31,6 +31,7 @@ export const WordViewNavBar = makeRefComponent<HTMLDivElement, WordViewNavBarPro
             ref={ref}
             className={accessClassName(styles, "wordViewNavBar")}
         >
+            {children}
             <AnimateSharedLayout>
                 <Item
                     icon={FaSitemap}
