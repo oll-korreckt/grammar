@@ -1,0 +1,38 @@
+@use "main";
+
+.navigateMenu {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 10px;
+}
+
+.item {
+    @include main.center-content;
+}
+
+.itemContent {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.icon, .children {
+    display: inline-block;
+}
+
+.icon {
+    font-size: 25px;
+}
+
+.underline {
+    position: absolute;
+    bottom: -5px;
+    width: 100%;
+    height: 5px;
+    background-color: black;
+}
