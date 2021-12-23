@@ -27,6 +27,12 @@ export type WordViewMode =
     | "edit.active"
     | "delete";
 
+export const WordViewMode = {
+    getDefault(mode?: WordViewMode): WordViewMode {
+        return mode !== undefined ? mode : "navigate";
+    }
+};
+
 export interface WordViewContext {
     elementCategory: ElementCategory;
     visibleElements: ElementData[];
