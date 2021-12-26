@@ -1,4 +1,4 @@
-export type PropertyEditorAction = {
+export type EditActiveMenuAction = {
     type: "property select";
     property: string;
 } | {
@@ -12,8 +12,6 @@ export type PropertyEditorAction = {
     type: "submit";
 }
 
-export type PropertyStatus = "assigned" | "unassigned" | "editing";
-
 export interface PropertyState {
     propertyKey: string;
     order: number;
@@ -22,4 +20,4 @@ export interface PropertyState {
     satisfied?: boolean | undefined;
 }
 
-export type ActionDispatch = (action: PropertyEditorAction) => void;
+export type ActionDispatch = (action: EditActiveMenuAction) => void;

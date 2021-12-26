@@ -2,7 +2,7 @@ import { FadeTransport } from "@app/tricky-components/FadeTransport";
 import { accessClassName } from "@app/utils";
 import React from "react";
 import { ActionDispatch, PropertyState } from "../types";
-import { Property } from "../_Property/Property";
+import { Property } from "../_Property";
 import styles from "./_styles.scss";
 
 export interface PropertySectionProps {

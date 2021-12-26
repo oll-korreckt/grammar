@@ -5,36 +5,36 @@ import React, { useRef } from "react";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import { FadeSwitch } from "../FadeSwitch";
 import { FadeTransport } from "../FadeTransport";
-import { ActionDispatch, PropertyEditorAction, PropertyState } from "./types";
-import { Property } from "./_Property/Property";
-import { PropertySection } from "./_PropertySection/PropertySection";
+import { ActionDispatch, EditActiveMenuAction, PropertyState } from "./types";
+import { Property } from "./_Property";
+import { PropertySection } from "./_PropertySection";
 import styles from "./_styles.scss";
 
 
-export interface PropertyEditorProps {
-    state: PropertyEditorState;
+export interface EditActiveMenuProps {
+    state: EditActiveMenuState;
     elementType?: ElementType;
     dispatch?: ActionDispatch;
     duration?: number;
 }
 
-export interface PropertyEditorDisplayState {
+export interface EditActiveMenuDisplayState {
     type: "display";
     allowSubmit?: boolean | undefined;
     assigned: PropertyState[];
     unassigned: PropertyState[];
 }
 
-export interface PropertyEditorEditState {
+export interface EditActiveMenuEditState {
     type: "edit";
     allowSubmit?: boolean | undefined;
     property: PropertyState;
 }
 
-export type PropertyEditorState = PropertyEditorDisplayState | PropertyEditorEditState;
+export type EditActiveMenuState = EditActiveMenuDisplayState | EditActiveMenuEditState;
 
 interface DisplayBodyProps {
-    state?: PropertyEditorDisplayState;
+    state?: EditActiveMenuDisplayState;
     dispatch: ActionDispatch;
 }
 
@@ -69,7 +69,7 @@ const DisplayBody: React.VFC<DisplayBodyProps> = ({ state, dispatch }) => {
 };
 
 interface EditBodyProps {
-    state?: PropertyEditorEditState;
+    state?: EditActiveMenuEditState;
 }
 
 const EditBody: React.VFC<EditBodyProps> = ({ state }) => {
@@ -103,12 +103,12 @@ function getSubmitClass(allowSubmit: boolean | undefined): string {
     return allowSubmit ? submitEnabled : submitDisabled;
 }
 
-export const PropertyEditor = makeRefComponent<HTMLDivElement, PropertyEditorProps>("PropertyEditor", ({ state, elementType, dispatch, duration }, ref) => {
-    const invokeDispatch = (action: PropertyEditorAction) => dispatch && dispatch(action);
+export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuProps>("PropertyEditor", ({ state, elementType, dispatch, duration }, ref) => {
+    const invokeDispatch = (action: EditActiveMenuAction) => dispatch && dispatch(action);
     const prevState = useRef(state);
     const transportId = useRef<string>();
-    const displayState: PropertyEditorDisplayState | undefined = state.type === "display" ? state : undefined;
-    const editState: PropertyEditorEditState | undefined = state.type === "edit" ? state : undefined;
+    const displayState: EditActiveMenuDisplayState | undefined = state.type === "display" ? state : undefined;
+    const editState: EditActiveMenuEditState | undefined = state.type === "edit" ? state : undefined;
     const header = elementType !== undefined
         ? ElementDisplayInfo.getAbbreviatedName(ElementDisplayInfo.getDisplayInfo(elementType))
         : undefined;
