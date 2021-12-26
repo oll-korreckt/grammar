@@ -522,5 +522,8 @@ function getElementCategory(type: ElementType): ElementCategory {
 
 export const ElementCategory = {
     getLayerFilter: getLayerFilter,
-    getElementCategory: getElementCategory
+    getElementCategory: getElementCategory,
+    getDefault(category?: ElementCategory): ElementCategory {
+        return category !== undefined ? category : "clause";
+    }
 };
