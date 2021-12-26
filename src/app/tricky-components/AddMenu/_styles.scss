@@ -1,0 +1,134 @@
+@use "main";
+
+.addMenu {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: 100%;
+    height: 300px;
+}
+
+.categories {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 5px;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.category {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+.categoryIcon, .categoryChildren {
+    display: inline-block;
+}
+
+.categoryIcon {
+    font-size: 30px;
+}
+
+.categoryChildren {
+    position: relative;
+    font-size: 15px;
+}
+
+.categoryEnabled {
+    cursor: pointer;
+    color: black;
+}
+
+.categoryDisabled {
+    pointer-events: none;
+    color: grey;
+}
+
+.categoryUnderline {
+    position: absolute;
+    height: 5px;
+    background-color: black;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
+
+$dotRadius: 8px;
+
+.dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: $dotRadius * 2;
+    height: $dotRadius * 2;
+    border-radius: $dotRadius;
+    background-color: orangered;
+    transform: translateX(-50%);
+}
+
+.items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 5px;
+    gap: 5px;
+    border: 1px solid black;
+}
+
+.item {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+}
+
+.itemContent {
+    @include main.center-content;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+    cursor: pointer;
+    user-select: none;
+}
+
+.itemSymbol {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.itemHeader, .itemChildren {
+    display: inline-flex;
+}
+
+.itemHeader {
+    font-size: 30px;
+}
+
+.itemChildren {
+    position: relative;
+    font-size: 12px;
+}
+
+.itemUnderline {
+    position: absolute;
+    bottom: -4px;
+    width: 100%;
+    height: 5px;
+    background-color: orangered;
+}
