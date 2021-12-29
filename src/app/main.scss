@@ -30,9 +30,23 @@ $offset: 1px;
     }
 }
 
+@mixin smMdScreen {
+    @media (orientation: landscape) and (max-height: #{$md-dim - $offset}),
+        (orientation: portrait) and (max-width: #{$md-dim - $offset}) {
+        @content;
+    }
+}
+
 @mixin mdScreen {
     @media (orientation: landscape) and (min-height: #{$sm-dim}) and (max-height: #{$md-dim - $offset}),
         (orientation: portrait) and (min-width: #{$sm-dim}) and (max-width: #{$md-dim - $offset}) {
+        @content;
+    }
+}
+
+@mixin mdLgScreen {
+    @media (orientation: landscape) and (min-height: #{$sm-dim}),
+        (orientation: portrait) and (min-width: #{$sm-dim}) {
         @content;
     }
 }
