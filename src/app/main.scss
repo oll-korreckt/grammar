@@ -18,3 +18,28 @@ $color-11: ("main": #bdb76b, "dark": #84814b, "text": #fff);
 $color-12: ("main": #aa6342, "dark": #70391f, "text": #fff);
 
 $colors: $color-1, $color-2, $color-3, $color-4, $color-5, $color-6, $color-7, $color-8, $color-9, $color-10, $color-11, $color-12;
+
+$sm-dim: 400px;
+$md-dim: 900px;
+$offset: 1px;
+
+@mixin smScreen {
+    @media (orientation: landscape) and (max-height: #{$sm-dim - $offset}),
+        (orientation: portrait) and (max-width: #{$sm-dim - $offset}) {
+        @content;
+    }
+}
+
+@mixin mdScreen {
+    @media (orientation: landscape) and (min-height: #{$sm-dim}) and (max-height: #{$md-dim - $offset}),
+        (orientation: portrait) and (min-width: #{$sm-dim}) and (max-width: #{$md-dim - $offset}) {
+        @content;
+    }
+}
+
+@mixin lgScreen {
+    @media (orientation: landscape) and (min-height: #{$md-dim}),
+        (orientation: portrait) and (min-width: #{$md-dim}) {
+        @content;
+    }
+}
