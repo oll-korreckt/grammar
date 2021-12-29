@@ -1,0 +1,26 @@
+@use "main";
+
+$sm-diameter: 100px;
+$lg-diameter: 150px;
+
+@mixin deleteMenuWidth {
+    @include main.smMdScreen {
+        width: $sm-diameter;
+        height: $sm-diameter;
+    }
+    @include main.lgScreen {
+        width: $lg-diameter;
+        height: $lg-diameter;
+    }
+}
+
+@mixin deleteMenuHeight {
+    @include main.smMdScreen {
+        width: $sm-diameter;
+        height: $sm-diameter;
+    }
+    @include main.lgScreen {
+        width: $lg-diameter;
+        height: $lg-diameter;
+    }
+}

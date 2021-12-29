@@ -1,0 +1,36 @@
+@use "main";
+@use "./sizes.scss" as *;
+
+.deleteMenu {
+    @include main.center-content;
+    @include deleteMenuWidth;
+    @include deleteMenuHeight;
+    border: 1px solid black;
+    border-radius: 50%;
+    user-select: none;
+    cursor: pointer;
+}
+
+.content {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon {
+    @include main.smMdScreen {
+        font-size: 30px;
+    }
+    @include main.lgScreen {
+        font-size: 50px;
+    }
+}
+
+.children {
+    @include main.smMdScreen {
+        font-size: 12px;
+    }
+    @include main.lgScreen {
+        font-size: 16px;
+    }
+}
