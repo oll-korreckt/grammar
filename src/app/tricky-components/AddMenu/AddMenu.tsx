@@ -55,7 +55,9 @@ function initActiveCategory(menuItems: MenuItems, selectedCategory: (keyof MenuI
 }
 
 export const AddMenu = makeRefComponent<HTMLDivElement, AddMenuProps>("AddMenu", ({ menuItems, selectedItem, onSelectedItemChange }, ref) => {
-    const currMenuItems: MenuItems = menuItems !== undefined ? menuItems : {};
+    const currMenuItems: MenuItems = menuItems !== undefined
+        ? menuItems
+        : { category: [] };
     const selectedCategory = getSelectedCategory(currMenuItems, selectedItem);
     const [activeCategory, setActiveCategory] = useState<keyof MenuItems>(initActiveCategory(currMenuItems, selectedCategory));
     const activeItems = currMenuItems[activeCategory] as Exclude<ElementType, "word">[];
@@ -103,10 +105,13 @@ export const AddMenu = makeRefComponent<HTMLDivElement, AddMenuProps>("AddMenu",
                 {activeItems.map((item) => {
                     const data = ElementDisplayInfo.getDisplayInfo(item);
                     const name = ElementDisplayInfo.getAbbreviatedName(data);
+                    const header = activeCategory === "coordinated"
+                        ? data.header.slice(1)
+                        : data.header;
                     return (
                         <Item
                             key={item}
-                            header={data.header}
+                            header={header}
                             onClick={() => onSelectedItemChange && onSelectedItemChange(item)}
                         >
                             {name}

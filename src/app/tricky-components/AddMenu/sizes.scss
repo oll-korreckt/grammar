@@ -1,0 +1,14 @@
+@use "main";
+
+@mixin addMenuWidth {
+    width: min(95%, 1000px);
+}
+
+@mixin addMenuHeight {
+    @include main.smMdScreen {
+        height: 200px;
+    }
+    @include main.lgScreen {
+        height: 400px;
+    }
+}
