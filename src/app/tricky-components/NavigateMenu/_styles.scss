@@ -1,11 +1,13 @@
 @use "main";
+@use "./sizes.scss" as *;
 
 .navigateMenu {
+    @include navigateMenuWidth;
+    @include naviageMenuHeight;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     border: 1px solid black;
     border-radius: 3px;
-    padding: 10px;
 }
 
 .item {
@@ -26,7 +28,21 @@
 }
 
 .icon {
-    font-size: 25px;
+    @include main.smMdScreen {
+        font-size: 24px;
+    }
+    @include main.lgScreen {
+        font-size: 30px;
+    }
+}
+
+.children {
+    @include main.smMdScreen {
+        font-size: 12px;
+    }
+    @include main.lgScreen {
+        font-size: 18px;
+    }
 }
 
 .underline {

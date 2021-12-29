@@ -1,0 +1,14 @@
+@use "main";
+
+@mixin navigateMenuWidth {
+    width: min(100%, 800px);
+}
+
+@mixin naviageMenuHeight {
+    @include main.smMdScreen {
+        height: 60px;
+    }
+    @include main.lgScreen {
+        height: 70px;
+    }
+}
