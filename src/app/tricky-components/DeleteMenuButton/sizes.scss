@@ -3,7 +3,7 @@
 $sm-diameter: 100px;
 $lg-diameter: 150px;
 
-@mixin deleteMenuWidth {
+@mixin deleteMenuButtonWidth {
     @include main.smMdScreen {
         width: $sm-diameter;
         height: $sm-diameter;
@@ -14,7 +14,7 @@ $lg-diameter: 150px;
     }
 }
 
-@mixin deleteMenuHeight {
+@mixin deleteMenuButtonHeight {
     @include main.smMdScreen {
         width: $sm-diameter;
         height: $sm-diameter;

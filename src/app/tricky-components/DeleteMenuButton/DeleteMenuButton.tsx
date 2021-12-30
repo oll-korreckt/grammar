@@ -3,14 +3,14 @@ import React from "react";
 import { FaBomb } from "react-icons/fa";
 import styles from "./_styles.scss";
 
-export interface DeleteMenuProps {
+export interface DeleteMenuButtonProps {
     onClick?: () => void;
 }
 
-export const DeleteMenu: React.VFC<DeleteMenuProps> = ({ onClick }) => {
+export const DeleteMenuButton: React.VFC<DeleteMenuButtonProps> = ({ onClick }) => {
     return (
         <div
-            className={accessClassName(styles, "deleteMenu")}
+            className={accessClassName(styles, "deleteMenuButton")}
             onClick={() => onClick && onClick()}
         >
             <div className={accessClassName(styles, "content")}>
