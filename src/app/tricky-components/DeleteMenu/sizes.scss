@@ -1,0 +1,5 @@
+@use "../DeleteMenuButton/sizes.scss" as *;
+
+@mixin deleteMenuHeight {
+    @include deleteMenuButtonHeight;
+}
