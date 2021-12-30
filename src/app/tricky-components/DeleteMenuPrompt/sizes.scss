@@ -1,0 +1,19 @@
+@use "main";
+
+@mixin deleteMenuPromptWidth {
+    @include main.smMdScreen {
+        width: 230px;
+    }
+    @include main.lgScreen {
+        width: 340px;
+    }
+}
+
+@mixin deleteMenuPromptHeight {
+    @include main.smMdScreen {
+        height: 20px;
+    }
+    @include main.lgScreen {
+        height: 30px;
+    }
+}
