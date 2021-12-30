@@ -1,7 +1,7 @@
 @use "main";
 
 @mixin navigateMenuWidth {
-    width: min(100%, 800px);
+    width: min(95%, 800px);
 }
 
 @mixin naviageMenuHeight {
