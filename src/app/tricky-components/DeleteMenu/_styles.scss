@@ -1,7 +1,7 @@
 @use "./sizes.scss" as *;
 
 .deleteMenu {
-    @include deleteMenuWidth;
+    width: 100%;
     position: relative;
     height: 0;
 }
