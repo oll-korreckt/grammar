@@ -4,7 +4,7 @@
     width: min(95%, 800px);
 }
 
-@mixin naviageMenuHeight {
+@mixin navigateMenuHeight {
     @include main.smMdScreen {
         height: 60px;
     }
