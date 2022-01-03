@@ -1,12 +1,16 @@
 import { accessClassName } from "@app/utils";
+import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import styles from "./_styles.scss";
 
 
-export const DeleteMenuPrompt: React.VFC = () => {
+export const DeleteMenuPrompt = makeRefComponent<HTMLSpanElement>("DeleteMenuPrompt", ({}, ref) => {
     return (
-        <span className={accessClassName(styles, "deleteMenuPrompt")}>
+        <span
+            ref={ref}
+            className={accessClassName(styles, "deleteMenuPrompt")}
+        >
             Select Element(s) to Delete
         </span>
     );
-};
+});

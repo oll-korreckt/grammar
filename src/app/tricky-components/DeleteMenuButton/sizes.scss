@@ -1,26 +1,26 @@
 @use "main";
 
-$sm-diameter: 100px;
-$lg-diameter: 150px;
+$deleteMenuButtonSmMdDiameter: 100px;
+$deleteMenuButtonLgDiameter: 150px;
 
 @mixin deleteMenuButtonWidth {
     @include main.smMdScreen {
-        width: $sm-diameter;
-        height: $sm-diameter;
+        width: $deleteMenuButtonSmMdDiameter;
+        height: $deleteMenuButtonSmMdDiameter;
     }
     @include main.lgScreen {
-        width: $lg-diameter;
-        height: $lg-diameter;
+        width: $deleteMenuButtonLgDiameter;
+        height: $deleteMenuButtonLgDiameter;
     }
 }
 
 @mixin deleteMenuButtonHeight {
     @include main.smMdScreen {
-        width: $sm-diameter;
-        height: $sm-diameter;
+        width: $deleteMenuButtonSmMdDiameter;
+        height: $deleteMenuButtonSmMdDiameter;
     }
     @include main.lgScreen {
-        width: $lg-diameter;
-        height: $lg-diameter;
+        width: $deleteMenuButtonLgDiameter;
+        height: $deleteMenuButtonLgDiameter;
     }
 }

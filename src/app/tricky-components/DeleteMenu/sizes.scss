@@ -1,5 +1,42 @@
+@use "main";
+@use "../DeleteMenuPrompt/sizes.scss" as *;
 @use "../DeleteMenuButton/sizes.scss" as *;
 
+@function calcLeft($prompt-width) {
+    @return "(50% - 0.5 * #{$prompt-width})";
+}
+
+@function calcRight($button-width) {
+    @return "(5%)";
+}
+
+@function calcWidth($prompt-width, $button-width) {
+    @return "100% - #{calcLeft($prompt-width)} - #{calcRight($button-width)}";
+}
+
+@mixin deleteMenuWidth {
+    @include main.smMdScreen {
+        width: calc(#{calcWidth($deleteMenuPromptSmMdWidth, $deleteMenuButtonSmMdDiameter)});
+    }
+    @include main.lgScreen {
+        width: calc(#{calcWidth($deleteMenuPromptLgWidth, $deleteMenuButtonLgDiameter)});
+    }
+}
+
 @mixin deleteMenuHeight {
-    @include deleteMenuButtonHeight;
+    @include main.smMdScreen {
+        height: max($deleteMenuPromptSmMdHeight, $deleteMenuButtonSmMdDiameter);
+    }
+    @include main.lgScreen {
+        height: max($deleteMenuPromptLgHeight, $deleteMenuButtonLgDiameter);
+    }
+}
+
+@mixin deleteMenuLeft {
+    @include main.smMdScreen {
+        left: calc(#{calcLeft($deleteMenuPromptSmMdWidth)});
+    }
+    @include main.lgScreen {
+        left: calc(#{calcLeft($deleteMenuPromptLgWidth)});
+    }
 }

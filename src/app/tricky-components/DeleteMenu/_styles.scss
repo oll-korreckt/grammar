@@ -1,0 +1,19 @@
+@use "./sizes.scss" as *;
+
+.deleteMenu {
+    @include deleteMenuWidth;
+    position: relative;
+    height: 0;
+}
+
+.deleteMenuPrompt {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.deleteMenuButton {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}

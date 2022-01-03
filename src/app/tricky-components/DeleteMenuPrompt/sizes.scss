@@ -1,19 +1,25 @@
 @use "main";
 
+$deleteMenuPromptSmMdWidth: 230px;
+$deleteMenuPromptLgWidth: 340px;
+
 @mixin deleteMenuPromptWidth {
     @include main.smMdScreen {
-        width: 230px;
+        width: $deleteMenuPromptSmMdWidth;
     }
     @include main.lgScreen {
-        width: 340px;
+        width: $deleteMenuPromptLgWidth;
     }
 }
 
+$deleteMenuPromptSmMdHeight: 20px;
+$deleteMenuPromptLgHeight: 30px;
+
 @mixin deleteMenuPromptHeight {
     @include main.smMdScreen {
-        height: 20px;
+        height: $deleteMenuPromptSmMdHeight;
     }
     @include main.lgScreen {
-        height: 30px;
+        height: $deleteMenuPromptLgHeight;
     }
 }

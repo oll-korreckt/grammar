@@ -1,4 +1,5 @@
 import { accessClassName } from "@app/utils";
+import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import { FaBomb } from "react-icons/fa";
 import styles from "./_styles.scss";
@@ -7,9 +8,10 @@ export interface DeleteMenuButtonProps {
     onClick?: () => void;
 }
 
-export const DeleteMenuButton: React.VFC<DeleteMenuButtonProps> = ({ onClick }) => {
+export const DeleteMenuButton = makeRefComponent<HTMLDivElement, DeleteMenuButtonProps>("DeleteMenuButton", ({ onClick }, ref) => {
     return (
         <div
+            ref={ref}
             className={accessClassName(styles, "deleteMenuButton")}
             onClick={() => onClick && onClick()}
         >
@@ -19,4 +21,4 @@ export const DeleteMenuButton: React.VFC<DeleteMenuButtonProps> = ({ onClick }) 
             </div>
         </div>
     );
-};
+});
