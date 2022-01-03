@@ -1,4 +1,5 @@
 import { accessClassName, WordViewMode } from "@app/utils";
+import { makeRefComponent } from "@app/utils/hoc";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import React, { useRef } from "react";
 import { AddMenu, AddMenuProps } from "../AddMenu";
@@ -85,7 +86,7 @@ const containerClasses: Record<WordViewMode, string[]> = {
     "delete": ["deleteContainer"]
 };
 
-export const WordViewNavBarMenu: React.VFC<WordViewNavBarMenuProps> = ({ mode, props }) => {
+export const WordViewNavBarMenu = makeRefComponent<HTMLDivElement, WordViewNavBarMenuProps>("WordViewNavBarMenu", ({ mode, props }, ref) => {
     const prevMode = useRef(mode);
     const directionRef = useRef<Direction>();
 
@@ -95,7 +96,10 @@ export const WordViewNavBarMenu: React.VFC<WordViewNavBarMenuProps> = ({ mode, p
     }
 
     return (
-        <div className={accessClassName(styles, "menuContainer")}>
+        <div
+            ref={ref}
+            className={accessClassName(styles, "menuContainer")}
+        >
             <AnimatePresence
                 initial={false}
                 custom={directionRef.current}
@@ -134,4 +138,4 @@ export const WordViewNavBarMenu: React.VFC<WordViewNavBarMenuProps> = ({ mode, p
             </AnimatePresence>
         </div>
     );
-};
+});

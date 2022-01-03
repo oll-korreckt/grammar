@@ -3,15 +3,12 @@
 @use "../EditBrowseMenu/sizes.scss" as *;
 @use "../EditActiveMenu/sizes.scss" as *;
 @use "../DeleteMenu/sizes.scss" as *;
+@use "./sizes.scss" as *;
 
 .menuContainer {
-    position: absolute;
     width: 100%;
     height: 0;
-    bottom: 0;
 }
-
-$offset: 5px;
 
 .navigateContainer, .addContainer, .editBrowseContainer, .editActiveContainer, .deleteContainer {
     position: absolute;
