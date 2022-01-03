@@ -3,15 +3,15 @@
 @use "../DeleteMenuButton/sizes.scss" as *;
 
 @function calcLeft($prompt-width) {
-    @return "(50% - 0.5 * #{$prompt-width})";
+    @return "(50vw - 0.5 * #{$prompt-width})";
 }
 
 @function calcRight($button-width) {
-    @return "(5%)";
+    @return "(5vw)";
 }
 
 @function calcWidth($prompt-width, $button-width) {
-    @return "100% - #{calcLeft($prompt-width)} - #{calcRight($button-width)}";
+    @return "100vw - #{calcLeft($prompt-width)} - #{calcRight($button-width)}";
 }
 
 @mixin deleteMenuWidth {
