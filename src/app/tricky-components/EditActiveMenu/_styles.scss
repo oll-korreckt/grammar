@@ -1,8 +1,9 @@
 @use "main";
+@use "./sizes.scss" as *;
 
 .container {
-    width: 100%;
-    height: 30vh;
+    @include editActiveMenuWidth;
+    @include editActiveMenuHeight;
     position: relative;
     display: grid;
     grid-template-rows: 30px auto 50px;
