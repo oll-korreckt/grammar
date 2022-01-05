@@ -32,7 +32,11 @@ function fromText(text: string): DiagramState {
         wordOrder: [],
         elements: {}
     };
-    scan(text).forEach(({ lexeme, tokenType }) => {
+    const scanResult = scan(text);
+    if (scanResult.type === "errors") {
+        throw "errors in text";
+    }
+    scanResult.data.forEach(({ lexeme, tokenType }) => {
         if (tokenType === "word") {
             const word: Word = {
                 id: getNewItemId(),
