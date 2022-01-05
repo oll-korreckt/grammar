@@ -5,7 +5,7 @@ import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDef
 import { SimpleObject } from "@lib/utils";
 
 export type {
-    Element,
+    ElementRecord,
     ElementId,
     Identifiable,
     PartOfSpeechType,
@@ -71,6 +71,7 @@ export type ElementMapper<Type extends ElementType> =
     : Type extends ClauseGuard<ClauseType> ? ClauseMapper<Type>
     : Type extends CoordClauseType ? CoordClauseMapper<Type>
     : never;
+export type Element = ElementMapper<ElementType>;
 
 export type ElementDefinitionMapper<Type extends Exclude<ElementType, "word">> =
     Type extends PartOfSpeechType ? PosDefinitionMapper<Type>

@@ -1,5 +1,5 @@
 export type ElementId = string;
-export type Element = Record<string, undefined | string | ElementReference | ElementReference[]>;
+export type ElementRecord = Record<string, undefined | string | ElementReference | ElementReference[]>;
 export interface Identifiable {
     id: ElementId;
 }
