@@ -6,11 +6,11 @@ $smMdPadding: 5px;
 $lgPadding: 10px;
 
 @mixin withDeletePadding($padding) {
-    padding: $padding calc($padding / 2) $padding $padding;
+    padding: $padding calc(#{$padding} / 2) $padding $padding;
 }
 
 @mixin propertyDeletePadding($padding) {
-    padding: $padding $padding $padding calc($padding / 2);
+    padding: $padding $padding $padding calc(#{$padding} / 2);
 }
 
 .property {
