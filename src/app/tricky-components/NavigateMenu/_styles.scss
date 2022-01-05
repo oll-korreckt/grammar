@@ -3,7 +3,7 @@
 
 .navigateMenu {
     @include navigateMenuWidth;
-    @include naviageMenuHeight;
+    @include navigateMenuHeight;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     border: 1px solid black;
