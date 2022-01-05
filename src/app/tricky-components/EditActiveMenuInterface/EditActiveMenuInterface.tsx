@@ -1,5 +1,6 @@
 import { ElementDisplayInfo } from "@app/utils";
-import { Element, ElementType, Noun } from "@domain/language";
+import { Element, ElementType } from "@domain/language";
+import { initElement } from "@domain/language/element-init";
 import { ElementRecord, ElementReference } from "@domain/language/_types/utils";
 import React from "react";
 import { EditActiveMenu, EditActiveMenuDispatch, EditActiveMenuDisplayState, EditActiveMenuEditState, EditActiveMenuState, PropertyState } from "../EditActiveMenu";
@@ -85,14 +86,9 @@ function isPropertyValue(value: undefined | string | ElementReference | ElementR
     return typeof value !== "string";
 }
 
-const blankNoun: Noun = {
-    id: "",
-    posType: "noun"
-};
-
 export const EditActiveMenuInterface: React.VFC<EditActiveMenuInterfaceProps> = ({ type, value, property, dispatch }) => {
     const definedType: Exclude<ElementType, "word"> = type !== undefined ? type : "noun";
-    const definedValue: Element = value !== undefined ? value : blankNoun;
+    const definedValue: Element = value !== undefined ? value : initElement(definedType, "");
     const menuState = convertState(definedType, definedValue, property);
 
     return (
