@@ -1,7 +1,17 @@
 @use "main";
 
-$height: 18px;
-$padding: 10px;
+$smMdHeight: 12px;
+$lgHeight: 18px;
+$smMdPadding: 5px;
+$lgPadding: 10px;
+
+@mixin withDeletePadding($padding) {
+    padding: $padding calc($padding / 2) $padding $padding;
+}
+
+@mixin propertyDeletePadding($padding) {
+    padding: $padding $padding $padding calc($padding / 2);
+}
 
 .property {
     display: inline-flex;
@@ -38,10 +48,19 @@ $required: rgb(175, 76, 76);
     }
 }
 
-.propertyText {
+.propertyText, .propertyDelete {
     display: inline-block;
-    font-size: $height;
-    line-height: $height;
+    @include main.smMdScreen {
+        font-size: $smMdHeight;
+        line-height: $smMdHeight;
+    }
+    @include main.lgScreen {
+        font-size: $lgHeight;
+        line-height: $lgHeight;
+    }
+}
+
+.propertyText {
     color: black;
     white-space: nowrap;
 }
@@ -51,18 +70,30 @@ $required: rgb(175, 76, 76);
 }
 
 .noDelete {
-    padding: $padding;
+    @include main.smMdScreen {
+        padding: $smMdPadding;
+    }
+    @include main.lgScreen {
+        padding: $lgPadding;
+    }
 }
 
 .withDelete {
-    padding: $padding calc(#{$padding} / 2) $padding $padding;
+    @include main.smMdScreen {
+        @include withDeletePadding($smMdPadding);
+    }
+    @include main.lgScreen {
+        @include withDeletePadding($lgPadding);
+    }
 }
 
 .propertyDelete {
-    display: inline-block;
-    font-size: $height;
-    line-height: $height;
-    padding: $padding $padding $padding calc(#{$padding} / 2);
+    @include main.smMdScreen {
+        @include propertyDeletePadding($smMdPadding);
+    }
+    @include main.lgScreen {
+        @include propertyDeletePadding($lgPadding);
+    }
     cursor: pointer;
     &:hover {
         color: red;

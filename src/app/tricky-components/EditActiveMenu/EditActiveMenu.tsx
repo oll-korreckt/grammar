@@ -123,7 +123,7 @@ export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuPro
     return (
         <div
             ref={ref}
-            className={accessClassName(styles, "container")}
+            className={accessClassName(styles, "editActiveMenu")}
         >
             <div className={accessClassName(styles, "bar")}>
                 <FaArrowLeft

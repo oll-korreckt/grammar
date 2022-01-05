@@ -1,7 +1,19 @@
+@use "main";
+
 @mixin editActiveMenuWidth {
-    width: 100%;
+    @include main.smMdScreen {
+        width: min(400px, calc(100% - 5px));
+    }
+    @include main.lgScreen {
+        width: min(600px, calc(100% - 5px));
+    }
 }
 
 @mixin editActiveMenuHeight {
-    height: 30vh;
+    @include main.smMdScreen {
+        height: 200px;
+    }
+    @include main.lgScreen {
+        height: 300px;
+    }
 }

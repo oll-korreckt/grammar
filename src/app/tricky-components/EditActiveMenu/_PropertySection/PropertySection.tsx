@@ -14,7 +14,7 @@ export interface PropertySectionProps {
 export const PropertySection: React.VFC<PropertySectionProps> = ({ children, type, dispatch }) => {
 
     return (
-        <div className={accessClassName(styles, "container")}>
+        <div className={accessClassName(styles, "propertySection")}>
             <div className={accessClassName(styles, "header")}>
                 <span>{type}</span>
                 <div className={accessClassName(styles, "headerLine")}/>

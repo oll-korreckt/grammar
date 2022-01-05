@@ -1,12 +1,17 @@
 @use "main";
 @use "./sizes.scss" as *;
 
-.container {
+.editActiveMenu {
     @include editActiveMenuWidth;
     @include editActiveMenuHeight;
     position: relative;
     display: grid;
-    grid-template-rows: 30px auto 50px;
+    @include main.smMdScreen {
+        grid-template-rows: 20px auto 30px;
+    }
+    @include main.lgScreen {
+        grid-template-rows: 30px auto 50px;
+    }
     border: 1px solid grey;
     box-shadow: 0 0 3px grey;
     user-select: none;
@@ -27,8 +32,14 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    font-size: 20px;
-    line-height: 20px;
+    @include main.smMdScreen {
+        font-size: 14px;
+        line-height: 14px;
+    }
+    @include main.lgScreen {
+        font-size: 20px;
+        line-height: 20px;
+    }
     padding: 5px 20px 5px 20px;
     border-bottom: 1px solid grey;
     box-shadow: 0 0 3px grey;
@@ -47,11 +58,9 @@
 }
 
 .body {
-    @include main.center-content;
     position: relative;
-    width: calc(100% - 20px);
-    margin: auto;
-    height: calc(100% - 2px);
+    width: 100%;
+    height: 100%;
     overflow-y: auto;
 }
 
@@ -91,15 +100,20 @@
     align-items: center;
     justify-content: right;
     border-top: 1px solid grey;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 2px 10px;
     box-shadow: 0 0 3px grey;
 }
 
 .submit {
     border-radius: 3px;
     border: none;
-    padding: 10px 25px;
+    @include main.smMdScreen {
+        padding: 0 15px;
+    }
+    @include main.lgScreen {
+        padding: 0 25px;
+    }
+    height: 100%;
     float: right;
 }
 

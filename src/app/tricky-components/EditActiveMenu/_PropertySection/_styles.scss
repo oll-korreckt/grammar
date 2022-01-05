@@ -1,4 +1,6 @@
-.container {
+@use "main";
+
+.propertySection {
     display: block;
 }
 
@@ -7,6 +9,12 @@
     flex-direction: row;
     gap: 10px;
     width: 100%;
+    @include main.smMdScreen {
+        font-size: 12px;
+    }
+    @include main.lgScreen {
+        font-size: 16px;
+    }
 }
 
 .headerLine {
