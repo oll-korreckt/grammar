@@ -5,7 +5,7 @@ import React, { useRef } from "react";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import { FadeSwitch } from "../FadeSwitch";
 import { FadeTransport } from "../FadeTransport";
-import { ActionDispatch, EditActiveMenuAction, PropertyState } from "./types";
+import { EditActiveMenuDispatch, EditActiveMenuAction, PropertyState } from "./types";
 import { Property } from "./_Property";
 import { PropertySection } from "./_PropertySection";
 import styles from "./_styles.scss";
@@ -14,7 +14,7 @@ import styles from "./_styles.scss";
 export interface EditActiveMenuProps {
     state: EditActiveMenuState;
     elementType?: ElementType;
-    dispatch?: ActionDispatch;
+    dispatch?: EditActiveMenuDispatch;
     duration?: number;
 }
 
@@ -35,7 +35,7 @@ export type EditActiveMenuState = EditActiveMenuDisplayState | EditActiveMenuEdi
 
 interface DisplayBodyProps {
     state?: EditActiveMenuDisplayState;
-    dispatch: ActionDispatch;
+    dispatch: EditActiveMenuDispatch;
 }
 
 function getState<T>(oldState: T | undefined, newState: T | undefined): T | undefined {

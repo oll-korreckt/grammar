@@ -20,4 +20,4 @@ export interface PropertyState {
     satisfied?: boolean | undefined;
 }
 
-export type ActionDispatch = (action: EditActiveMenuAction) => void;
+export type EditActiveMenuDispatch = (action: EditActiveMenuAction) => void;

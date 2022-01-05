@@ -1,14 +1,14 @@
 import { FadeTransport } from "@app/tricky-components/FadeTransport";
 import { accessClassName } from "@app/utils";
 import React from "react";
-import { ActionDispatch, PropertyState } from "../types";
+import { EditActiveMenuDispatch, PropertyState } from "../types";
 import { Property } from "../_Property";
 import styles from "./_styles.scss";
 
 export interface PropertySectionProps {
     type: "Assigned" | "Unassigned";
     children: PropertyState[];
-    dispatch: ActionDispatch;
+    dispatch: EditActiveMenuDispatch;
 }
 
 export const PropertySection: React.VFC<PropertySectionProps> = ({ children, type, dispatch }) => {
