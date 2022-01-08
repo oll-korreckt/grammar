@@ -17,10 +17,30 @@ export type TypedDiagramStateItem<T extends ElementType> = {
 }
 
 export type DiagramState = {
-    wordOrder: ElementId[];
+    lexemes: DiagramStateLexeme[];
     elements: {
         [key: string]: DiagramStateItem;
     };
+}
+
+export type DiagramStateLexeme = WordLexeme | WhitespaceLexeme;
+
+export interface WordLexeme {
+    type: "word";
+    id: ElementId;
+}
+
+export interface WhitespaceLexeme {
+    type: "whitespace";
+    lexeme: string;
+}
+
+function isWordLexeme(lexeme: DiagramStateLexeme): lexeme is WordLexeme {
+    return lexeme.type === "word";
+}
+
+function isWhitespaceLexeme(lexeme: DiagramStateLexeme): lexeme is WhitespaceLexeme {
+    return lexeme.type === "whitespace";
 }
 
 function getNewItemId(): string {
@@ -29,7 +49,7 @@ function getNewItemId(): string {
 
 function fromText(text: string): DiagramState {
     const output: DiagramState = {
-        wordOrder: [],
+        lexemes: [],
         elements: {}
     };
     const scanResult = scan(text);
@@ -37,16 +57,30 @@ function fromText(text: string): DiagramState {
         throw "errors in text";
     }
     scanResult.data.forEach(({ lexeme, tokenType }) => {
-        if (tokenType === "word") {
-            const word: Word = {
-                id: getNewItemId(),
-                lexeme: lexeme
-            };
-            output.elements[word.id] = {
-                value: word,
-                type: "word"
-            };
-            output.wordOrder.push(word.id);
+        switch (tokenType) {
+            case "word": {
+                const wordId = getNewItemId();
+                const word: Word = {
+                    id: wordId,
+                    lexeme: lexeme
+                };
+                output.elements[wordId] = {
+                    type: "word",
+                    value: word
+                };
+                output.lexemes.push({
+                    type: "word",
+                    id: wordId
+                });
+                break;
+            }
+            case "whitespace": {
+                output.lexemes.push({
+                    type: "whitespace",
+                    lexeme: lexeme
+                });
+                break;
+            }
         }
     });
     return output;
@@ -112,12 +146,18 @@ function getElementReferences(type: Exclude<ElementType, "word">, value: Identif
     return output;
 }
 
-function getWordIndex(state: DiagramState, id: ElementId): number {
-    const output = state.wordOrder.indexOf(id);
-    if (output === -1) {
-        throw `Id '${id}' is not a word`;
+function getWordIndex({ lexemes }: DiagramState, id: ElementId): number {
+    for (let index = 0; index < lexemes.length; index++) {
+        const element = lexemes[index];
+        if (element.type !== "word") {
+            continue;
+        }
+        if (element.id === id) {
+            return index;
+        }
     }
-    return output;
+    throw `Id '${id}' is not a word`;
+
 }
 
 function createWordSorter(state: DiagramState): (x: ElementId, y: ElementId) => number {
@@ -544,6 +584,8 @@ function createDeleteEmptyElements(state: DiagramState): AtomicChange[] {
 export const DiagramState = {
     fromText: fromText,
     getWordIndex: getWordIndex,
+    isWordLexeme: isWordLexeme,
+    isWhitespaceLexeme: isWhitespaceLexeme,
     getItem: getItem,
     getTypedItem: getTypedItem,
     createWordSorter: createWordSorter,

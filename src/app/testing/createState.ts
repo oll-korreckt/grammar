@@ -1,4 +1,4 @@
-import { DiagramState, TypedDiagramStateItem } from "@app/utils";
+import { DiagramState, TypedDiagramStateItem, WhitespaceLexeme, WordLexeme } from "@app/utils";
 import { ClauseGuard, ClauseType, ElementId, ElementMapper, PartOfSpeechType, PhraseGuard, PhraseType, Word, ElementType } from "@domain/language";
 
 function createWord(lexeme: string, id?: ElementId): [ElementId, Word] {
@@ -25,6 +25,13 @@ function createItem<T extends ElementType>(type: T, value: ElementMapper<T>, ref
             value: value,
             ref: ref
         }
+    };
+}
+
+export function createWordLexeme(id: ElementId): WordLexeme {
+    return {
+        type: "word",
+        id: id
     };
 }
 
@@ -150,8 +157,30 @@ export function createState(): DiagramState {
         subject: { id: foxNounPhraseId, type: "nounPhrase" },
         predicate: { id: jumpsVerbPhraseId, type: "verbPhrase" }
     });
+    const space: WhitespaceLexeme = {
+        type: "whitespace",
+        lexeme: " "
+    };
     return {
-        wordOrder: [the1Id, quickId, brownId, foxId, jumpsId, overId, the2Id, lazyId, dogId],
+        lexemes: [
+            createWordLexeme(the1Id),
+            space,
+            createWordLexeme(quickId),
+            space,
+            createWordLexeme(brownId),
+            space,
+            createWordLexeme(foxId),
+            space,
+            createWordLexeme(jumpsId),
+            space,
+            createWordLexeme(overId),
+            space,
+            createWordLexeme(the2Id),
+            space,
+            createWordLexeme(lazyId),
+            space,
+            createWordLexeme(dogId)
+        ],
         elements: {
             ...createItem("word", the1Word, the1DetId),
             ...createItem("word", quickWord, quickBrownAdjId),

@@ -1,7 +1,8 @@
-import { createState, Ids } from "@app/testing";
+import { createState, createWordLexeme, Ids } from "@app/testing";
 import { ElementReference, Noun, Word, Coordinator, ElementMapper, Infinitive, NounPhrase, RelativeClause, VerbPhrase, AdjectivePhrase } from "@domain/language";
 import { AtomicChange, ChangeKey, ChangeType } from "@lib/utils";
 import { assert } from "chai";
+import { WhitespaceLexeme, WordLexeme } from "..";
 import { DiagramState, ReferenceObject, TypedDiagramStateItem } from "../diagram-state";
 
 
@@ -25,23 +26,23 @@ function sortElementReferences(x: ElementReference, y: ElementReference): number
 
 describe("DiagramState", () => {
     let state: DiagramState;
+    const words = [
+        "The",
+        "quick",
+        "brown",
+        "fox",
+        "jumps",
+        "over",
+        "the",
+        "lazy",
+        "dog."
+    ];
     beforeEach(() => {
         state = DiagramState.fromText("The quick brown fox jumps over the lazy dog.");
     });
 
     test("fromText", () => {
-        const words = [
-            "The",
-            "quick",
-            "brown",
-            "fox",
-            "jumps",
-            "over",
-            "the",
-            "lazy",
-            "dog."
-        ];
-        state.wordOrder.forEach((id, index) => {
+        state.lexemes.filter(DiagramState.isWordLexeme).forEach(({ id }, index) => {
             const { value } = DiagramState.getTypedItem(state, "word", id);
             assert.strictEqual(value.lexeme, words[index]);
         });
@@ -65,7 +66,7 @@ describe("DiagramState", () => {
         });
 
         test("error - type", () => {
-            const id = state.wordOrder[0];
+            const id = (state.lexemes[0] as WordLexeme).id;
             assert.throw(
                 () => DiagramState.getTypedItem(state, "adverbPhrase", id),
                 /does not have type adverbphrase/i
@@ -184,9 +185,9 @@ describe("DiagramState", () => {
 
     describe("getWordIndex", () => {
         test("standard", () => {
-            const id = state.wordOrder[3];
+            const id = (state.lexemes[2] as WordLexeme).id;
             const result = DiagramState.getWordIndex(state, id);
-            assert.strictEqual(result, 3);
+            assert.strictEqual(result, 2);
         });
 
         test("error", () => {
@@ -201,7 +202,10 @@ describe("DiagramState", () => {
         const unsortedWordIds = Object.keys(state.elements);
         const sorter = DiagramState.createWordSorter(state);
         const result = unsortedWordIds.sort(sorter);
-        assert.deepStrictEqual(result, state.wordOrder);
+        assert.deepStrictEqual(
+            result,
+            state.lexemes.filter(DiagramState.isWordLexeme).map(({ id }) => id)
+        );
     });
 
     test("createAddItem", () => {
@@ -260,8 +264,9 @@ describe("DiagramState", () => {
         });
 
         test("error - delete word", () => {
+            const id = state.lexemes.filter(DiagramState.isWordLexeme)[0].id;
             assert.throw(
-                () => DiagramState.createDeleteItem(state, state.wordOrder[3]),
+                () => DiagramState.createDeleteItem(state, id),
                 /cannot delete words/i
             );
         });
@@ -272,7 +277,7 @@ describe("DiagramState", () => {
             state = AtomicChange.apply(state, AtomicChange.createSet(
                 ["elements", nounId, "ref"],
                 DiagramState.getItem(state, nounId).ref,
-                state.wordOrder[3]
+                state.lexemes.filter(DiagramState.isWordLexeme)[3].id
             ));
             assert.throw(
                 () => DiagramState.createDeleteItem(state, nounId),
@@ -299,7 +304,7 @@ describe("DiagramState", () => {
 
     describe("createTypedAddReference", () => {
         test("standard", () => {
-            const wordId = state.wordOrder[3];
+            const wordId = state.lexemes.filter(DiagramState.isWordLexeme)[3].id;
             const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             const result = DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId);
@@ -319,8 +324,8 @@ describe("DiagramState", () => {
         });
 
         test("switch parent", () => {
-            const word1Id = state.wordOrder[2];
-            const word2Id = state.wordOrder[3];
+            const word1Id = state.lexemes.filter(DiagramState.isWordLexeme)[2].id;
+            const word2Id = state.lexemes.filter(DiagramState.isWordLexeme)[3].id;
             const [infId, addInfinitive] = DiagramState.createAddItem("infinitive");
             state = AtomicChange.apply(state, addInfinitive);
             state = AtomicChange.apply(
@@ -354,7 +359,7 @@ describe("DiagramState", () => {
         });
 
         test("error - reference not allowed", () => {
-            const wordId = state.wordOrder[4];
+            const wordId = state.lexemes.filter(DiagramState.isWordLexeme)[4].id;
             const [verbPhraseId, addVerbPhrase] = DiagramState.createAddItem("verbPhrase");
             state = AtomicChange.apply(state, addVerbPhrase);
             assert.throw(
@@ -364,7 +369,7 @@ describe("DiagramState", () => {
         });
 
         test("error - reference already exists - array property", () => {
-            const wordId = state.wordOrder[3];
+            const wordId = state.lexemes.filter(DiagramState.isWordLexeme)[3].id;
             const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
@@ -389,7 +394,7 @@ describe("DiagramState", () => {
 
     describe("createTypedDeleteReference", () => {
         test("standard", () => {
-            const wordId = state.wordOrder[3];
+            const wordId = state.lexemes.filter(DiagramState.isWordLexeme)[3].id;
             const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
@@ -419,15 +424,30 @@ describe("DiagramState", () => {
         test("error - array - parent does not reference", () => {
             const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
-            state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", state.wordOrder[3]));
+            state = AtomicChange.apply(
+                state,
+                ...DiagramState.createTypedAddReference(
+                    state,
+                    "noun",
+                    nounId,
+                    "words",
+                    state.lexemes.filter(DiagramState.isWordLexeme)[3].id
+                )
+            );
             assert.throw(
-                () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", state.wordOrder[8]),
+                () => DiagramState.createTypedDeleteReference(
+                    state,
+                    "noun",
+                    nounId,
+                    "words",
+                    state.lexemes.filter(DiagramState.isWordLexeme)[8].id
+                ),
                 /element does not contain a reference/i
             );
         });
 
         test("error - array - parent has multiple references", () => {
-            const wordId = state.wordOrder[3];
+            const wordId = state.lexemes.filter(DiagramState.isWordLexeme)[3].id;
             const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
@@ -436,14 +456,14 @@ describe("DiagramState", () => {
                 DiagramState.getItem(state, wordId).ref,
                 [DiagramState.getItem(state, wordId).ref, nounId]
             ));
-            const words = DiagramState.getTypedItem(state, "noun", nounId).value.words;
-            if (words === undefined) {
+            const nounWords = DiagramState.getTypedItem(state, "noun", nounId).value.words;
+            if (nounWords === undefined) {
                 throw "should not be undefined";
             }
             state = AtomicChange.apply(state, AtomicChange.createSet(
                 ["elements", nounId, "value", "words"],
-                words,
-                [...words, { id: wordId, type: "word" }]
+                nounWords,
+                [...nounWords, { id: wordId, type: "word" }]
             ));
             assert.throw(
                 () => DiagramState.createTypedDeleteReference(state, "noun", nounId, "words", wordId),
@@ -460,7 +480,7 @@ describe("DiagramState", () => {
                 ["elements", addVerbPhraseId, "value", "head"],
                 DiagramState.getTypedItem(state, "verbPhrase", addVerbPhraseId).value.head,
                 {
-                    id: state.wordOrder[4],
+                    id: state.lexemes.filter(DiagramState.isWordLexeme)[4].id,
                     type: "word"
                 }
             ));
@@ -471,7 +491,7 @@ describe("DiagramState", () => {
         });
 
         test("error - child not referenced", () => {
-            const wordId = state.wordOrder[3];
+            const wordId = state.lexemes.filter(DiagramState.isWordLexeme)[3].id;
             const [nounId, addNoun] = DiagramState.createAddItem("noun");
             state = AtomicChange.apply(state, addNoun);
             state = AtomicChange.apply(state, ...DiagramState.createTypedAddReference(state, "noun", nounId, "words", wordId));
@@ -623,8 +643,22 @@ describe("DiagramState", () => {
                     }
                 ]
             };
+            const space: WhitespaceLexeme = {
+                type: "whitespace",
+                lexeme: " "
+            };
             setRefState = {
-                wordOrder: [catsId, dogsId, miceId, andId, menId],
+                lexemes: [
+                    createWordLexeme(catsId),
+                    space,
+                    createWordLexeme(dogsId),
+                    space,
+                    createWordLexeme(miceId),
+                    space,
+                    createWordLexeme(andId),
+                    space,
+                    createWordLexeme(menId)
+                ],
                 elements: {
                     [catsId]: {
                         type: "word",
@@ -760,7 +794,11 @@ describe("DiagramState", () => {
                 to: { id: to1Id, type: "word" }
             };
             let testState: DiagramState = {
-                wordOrder: [to1Id, to2Id],
+                lexemes: [
+                    createWordLexeme(to1Id),
+                    { type: "whitespace", lexeme: " " },
+                    createWordLexeme(to2Id)
+                ],
                 elements: {
                     [to1Id]: {
                         type: "word",
