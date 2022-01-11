@@ -150,10 +150,9 @@ describe("DiagramStateFunctions", () => {
                 elements: { indClause, verb, verbPhrase }
             };
             const result = DiagramStateFunctions.addReference(state, "verbPhrase", "head", "verb");
-            const newIndClause = DiagramState.getItem(result, "indClause");
+            assert.doesNotHaveAnyKeys(result.elements, ["indClause"]);
             const newVerb = DiagramState.getItem(result, "verb");
             const newVerbPhrase = DiagramState.getItem(result, "verbPhrase");
-            assert.hasAllKeys(newIndClause.value, ["id", "clauseType"]);
             assert.strictEqual(verb.ref, "indClause");
             assert.hasAllKeys(verbPhrase.value, ["id", "phraseType"]);
             assert.strictEqual(newVerb.ref, "verbPhrase");
@@ -239,13 +238,6 @@ describe("DiagramStateFunctions", () => {
             const expected2: DiagramState = {
                 lexemes: [],
                 elements: {
-                    noun: {
-                        type: "noun",
-                        value: {
-                            id: "noun",
-                            posType: "noun"
-                        } as Noun
-                    },
                     adj: {
                         type: "adjective",
                         value: {
@@ -272,8 +264,17 @@ describe("DiagramStateFunctions", () => {
 
     describe("deleteReference", () => {
         test("object", () => {
+            const indClause: TypedDiagramStateItem<"independentClause"> = {
+                type: "independentClause",
+                value: {
+                    id: "indClause",
+                    clauseType: "independent",
+                    predicate: { id: "verbPhrase", type: "verbPhrase" }
+                }
+            };
             const verbPhrase: TypedDiagramStateItem<"verbPhrase"> = {
                 type: "verbPhrase",
+                ref: "indClause",
                 value: {
                     id: "verbPhrase",
                     phraseType: "verb",
@@ -290,20 +291,13 @@ describe("DiagramStateFunctions", () => {
             };
             const state: DiagramState = {
                 lexemes: [],
-                elements: { verbPhrase, verb }
+                elements: { indClause, verbPhrase, verb }
             };
             const stateClone = SimpleObject.clone(state);
             const result = DiagramStateFunctions.deleteReference(state, "verbPhrase", "head", "verb");
             const expected: DiagramState = {
                 lexemes: [],
                 elements: {
-                    verbPhrase: {
-                        type: "verbPhrase",
-                        value: {
-                            id: "verbPhrase",
-                            phraseType: "verb"
-                        } as VerbPhrase
-                    },
                     verb: {
                         type: "verb",
                         value: { id: "verb", posType: "verb" } as Verb
@@ -385,13 +379,6 @@ describe("DiagramStateFunctions", () => {
             const expected2: DiagramState = {
                 lexemes: [],
                 elements: {
-                    adj: {
-                        type: "adjective",
-                        value: {
-                            id: "adj",
-                            posType: "adjective"
-                        } as Adjective
-                    },
                     quick: {
                         type: "word",
                         value: {

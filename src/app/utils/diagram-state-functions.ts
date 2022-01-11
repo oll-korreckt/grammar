@@ -11,7 +11,7 @@ function addItem(state: DiagramState, type: Exclude<ElementType, "word">): Diagr
         type: type,
         value: newValue
     };
-    const output = SimpleObject.clone(state);
+    const output = cloneElements(state);
     output.elements = {
         ...output.elements,
         [newId]: newItem
@@ -27,32 +27,61 @@ function castToIdentifiable(value: ElementRecord): Identifiable {
     return value as unknown as Identifiable;
 }
 
+function cloneElements(state: DiagramState): DiagramState {
+    return {
+        ...state,
+        elements: SimpleObject.clone(state.elements)
+    };
+}
+
 // used to remove childId from any parent properties containing it
-function deleteParentToChildReferences(parent: Identifiable, childId: ElementId): Identifiable {
-    const output: ElementRecord = {};
-    const entries = Object.entries(castToRecord(parent));
+function _deleteParentToChildReferences(elements: DiagramState["elements"], parentId: ElementId, childId: ElementId): void {
+    const newParentValue: ElementRecord = {};
+    const parent = elements[parentId];
+    const entries = Object.entries(castToRecord(parent.value));
+    let newPropCnt = 0;
     for (let index = 0; index < entries.length; index++) {
         const [key, value] = entries[index];
         if (value === undefined) {
             continue;
         }
         if (typeof value === "string") {
-            output[key] = value;
+            newParentValue[key] = value;
         } else if (Array.isArray(value)) {
             const newValue = value.filter((ref) => ref.id !== childId);
             if (newValue.length > 0) {
-                output[key] = newValue;
+                newParentValue[key] = newValue;
+                newPropCnt++;
             }
         } else if (value.id !== childId) {
-            output[key] = value;
+            newParentValue[key] = value;
+            newPropCnt++;
         }
     }
-    return castToIdentifiable(output);
+    parent.value = castToIdentifiable(newParentValue);
+    if (newPropCnt === 0) {
+        delete elements[parentId];
+        if (parent.ref !== undefined) {
+            _deleteParentToChildReferences(elements, parent.ref, parentId);
+        }
+    }
 }
 
-function deleteParentToChildReference(parent: Identifiable, key: string, childId: ElementId): Identifiable {
-    const output = castToRecord(parent);
-    const property = output[key];
+function _deleteIfEmpty(elements: DiagramState["elements"], id: ElementId): void {
+    const { ref, value } = elements[id];
+    const props = _getElementReferences(value);
+    if (props.length === 0) {
+        delete elements[id];
+        if (ref !== undefined) {
+            _deleteParentToChildReferences(elements, ref, id);
+        }
+    }
+}
+
+function _deleteParentToChildReference(elements: DiagramState["elements"], parentId: ElementId, key: string, childId: ElementId): void {
+    const parent = elements[parentId];
+    const parentValue = castToRecord(parent.value);
+    const property = parentValue[key];
     if (property === undefined) {
         throw `Property '${key}' does not exist`;
     }
@@ -69,17 +98,18 @@ function deleteParentToChildReference(parent: Identifiable, key: string, childId
             ...property.slice(index + 1)
         ];
         if (newProperty.length > 0) {
-            output[key] = newProperty;
+            parentValue[key] = newProperty;
         } else {
-            delete output[key];
+            delete parentValue[key];
+            _deleteIfEmpty(elements, parentId);
         }
     } else {
         if (property.id !== childId) {
             throw `Parent property '${key}' does not reference child '${childId}'`;
         }
-        delete output[key];
+        delete parentValue[key];
+        _deleteIfEmpty(elements, parentId);
     }
-    return castToIdentifiable(output);
 }
 
 // used to delete ref property from any of the childIds
@@ -93,7 +123,7 @@ function _deleteChildToParentReference(elements: DiagramState["elements"], paren
     });
 }
 
-function getElementReferences(item: Identifiable): ElementReference[] {
+function _getElementReferences(item: Identifiable): ElementReference[] {
     const ids = new Set<ElementId>();
     const output: ElementReference[] = [];
     const values = Object.values(castToRecord(item));
@@ -115,23 +145,25 @@ function getElementReferences(item: Identifiable): ElementReference[] {
     return output;
 }
 
-function deleteItem(state: DiagramState, id: ElementId): DiagramState {
-    const output: DiagramState = SimpleObject.clone(state);
-    const item = DiagramState.getItem(state, id);
+function _deleteItem(elements: DiagramState["elements"], id: ElementId): void {
+    const item = elements[id];
     if (item.type === "word") {
         throw "Cannot delete words";
     }
     // delete property values from any parent items referencing this id
     if (item.ref !== undefined) {
-        const newParent = DiagramState.getItem(output, item.ref);
-        newParent.value = deleteParentToChildReferences(newParent.value, id);
-        output.elements[item.ref] = newParent;
+        _deleteParentToChildReferences(elements, item.ref, id);
     }
     // delete references from any children that are referenced by the item
-    const childIds = getElementReferences(item.value).map((ref) => ref.id);
-    _deleteChildToParentReference(output.elements, id, ...childIds);
+    const childIds = _getElementReferences(item.value).map((ref) => ref.id);
+    _deleteChildToParentReference(elements, id, ...childIds);
     // delete item itself
-    delete output.elements[id];
+    delete elements[id];
+}
+
+function deleteItem(state: DiagramState, id: ElementId): DiagramState {
+    const output = cloneElements(state);
+    _deleteItem(output.elements, id);
     return output;
 }
 
@@ -183,26 +215,26 @@ function _addChildToParentReference(elements: DiagramState["elements"], parentId
     };
     // child is referencing another element so need to remove that reference
     if (childItem.ref !== undefined) {
-        elements[childItem.ref].value = deleteParentToChildReferences(elements[childItem.ref].value, childId);
+        _deleteParentToChildReferences(elements, childItem.ref, childId);
     }
 }
 
 function addReference(state: DiagramState, parentId: ElementId, key: string, childId: ElementId): DiagramState {
-    const output = SimpleObject.clone(state);
+    const output = cloneElements(state);
     _addParentToChildReference(output.elements, parentId, key, childId);
     _addChildToParentReference(output.elements, parentId, childId);
     return output;
 }
 
 function deleteReference(state: DiagramState, parentId: ElementId, key: string, childId: ElementId): DiagramState {
-    const output = SimpleObject.clone(state);
-    output.elements[parentId].value = deleteParentToChildReference(output.elements[parentId].value, key, childId);
+    const output = cloneElements(state);
+    _deleteParentToChildReference(output.elements, parentId, key, childId);
     _selectiveDeleteChildToParentReferences(output.elements, parentId, childId);
     return output;
 }
 
 function deleteProperty(state: DiagramState, id: ElementId, key: string): DiagramState {
-    const output = SimpleObject.clone(state);
+    const output = cloneElements(state);
     const outputItem = output.elements[id];
     const outputValue = castToRecord(outputItem.value);
     const property = outputValue[key];
@@ -227,8 +259,10 @@ function deleteProperty(state: DiagramState, id: ElementId, key: string): Diagra
 }
 
 function _selectiveDeleteChildToParentReferences(elements: DiagramState["elements"], parentId: ElementId, ...childIds: ElementId[]): void {
-    const parentValue = elements[parentId].value;
-    const remainingReferences = new Set(getElementReferences(parentValue).map(({ id }) => id));
+    const parentItem = elements[parentId];
+    const remainingReferences: Set<ElementId> = parentItem !== undefined
+        ? new Set(_getElementReferences(parentItem.value).map(({ id }) => id))
+        : new Set();
     childIds.forEach((id) => {
         if (!remainingReferences.has(id)) {
             if (elements[id].ref !== parentId) {
