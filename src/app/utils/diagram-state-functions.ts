@@ -1,7 +1,8 @@
 import { ElementId, ElementRecord, ElementReference, ElementType, getElementDefinition, Identifiable } from "@domain/language";
 import { initElement } from "@domain/language/element-init";
 import { SimpleObject } from "@lib/utils";
-import { DiagramState, DiagramStateItem, getNewItemId } from ".";
+import { DiagramState, DiagramStateItem } from ".";
+import { getNewItemId } from "./diagram-state";
 
 function addItem(state: DiagramState, type: Exclude<ElementType, "word">): DiagramState {
     const newId = getNewItemId();
