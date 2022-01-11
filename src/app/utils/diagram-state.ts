@@ -43,7 +43,7 @@ function isWhitespaceLexeme(lexeme: DiagramStateLexeme): lexeme is WhitespaceLex
     return lexeme.type === "whitespace";
 }
 
-function getNewItemId(): string {
+export function getNewItemId(): string {
     return SerialId.getNextId();
 }
 

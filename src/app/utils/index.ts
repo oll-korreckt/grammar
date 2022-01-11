@@ -1,7 +1,9 @@
 export * from "./types";
 export * from "./styles";
 export * from "./hooks";
-export * from "./diagram-state";
+export { DiagramState } from "./diagram-state";
+export type { DiagramStateItem, TypedDiagramStateItem, DiagramStateLexeme, WordLexeme, WhitespaceLexeme } from "./diagram-state";
+export { DiagramStateFunctions } from "./diagram-state-functions";
 export * from "./history-state";
 export { DisplayModel, WordRange } from "./display-model";
 export type { Progress } from "./display-model";
