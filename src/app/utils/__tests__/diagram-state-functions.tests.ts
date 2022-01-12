@@ -5,18 +5,6 @@ import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "..";
 import { DiagramStateFunctions, Private } from "../diagram-state-functions";
 
-function getNewItemId(oldState: DiagramState, newState: DiagramState): ElementId {
-    const oldStateKeys = Object.keys(oldState.elements);
-    const newStateKeys = Object.keys(newState.elements);
-    const difference = oldStateKeys
-        .filter((key) => !newStateKeys.includes(key))
-        .concat(newStateKeys.filter((key) => !oldStateKeys.includes(key)));
-    if (difference.length !== 1) {
-        throw "only one difference is expected";
-    }
-    return difference[0];
-}
-
 function getReferences(element: Identifiable): ElementReference[] {
     const record = element as unknown as ElementRecord;
     const ids = new Set<ElementId>();
@@ -47,7 +35,7 @@ function getReferences(element: Identifiable): ElementReference[] {
 describe("DiagramStateFunctions", () => {
     test("addItem", () => {
         const state = DiagramState.fromText("dog");
-        const result = DiagramStateFunctions.addItem(state, "noun");
+        const [, result] = DiagramStateFunctions.addItem(state, "noun");
         assert.strictEqual(Object.keys(state.elements).length, 1);
         assert.strictEqual(Object.keys(result.elements).length, 2);
     });
@@ -56,8 +44,7 @@ describe("DiagramStateFunctions", () => {
         test("single element", () => {
             const state = DiagramState.fromText("dog");
             const [dogId] = Object.keys(state.elements);
-            const withNoun = DiagramStateFunctions.addItem(state, "noun");
-            const nounId = getNewItemId(state, withNoun);
+            const [nounId, withNoun] = DiagramStateFunctions.addItem(state, "noun");
             const result = DiagramStateFunctions.deleteItem(withNoun, nounId);
             assert.hasAllKeys(state.elements, [dogId]);
             assert.hasAllKeys(withNoun.elements, [dogId, nounId]);

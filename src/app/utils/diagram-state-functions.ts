@@ -4,19 +4,21 @@ import { SimpleObject } from "@lib/utils";
 import { DiagramState, DiagramStateItem } from ".";
 import { getNewItemId } from "./diagram-state";
 
-function addItem(state: DiagramState, type: Exclude<ElementType, "word">): DiagramState {
+function addItem(state: DiagramState, type: Exclude<ElementType, "word">): [newId: ElementId, newState: DiagramState] {
     const newId = getNewItemId();
     const newValue = initElement(type, newId);
     const newItem: DiagramStateItem = {
         type: type,
         value: newValue
     };
-    const output = cloneElements(state);
-    output.elements = {
-        ...output.elements,
-        [newId]: newItem
+    const outputState: DiagramState = {
+        lexemes: state.lexemes,
+        elements: {
+            ...state.elements,
+            [newId]: newItem
+        }
     };
-    return output;
+    return [newId, outputState];
 }
 
 function castToRecord(value: Identifiable): ElementRecord {
