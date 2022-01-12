@@ -75,15 +75,6 @@ function peek(data: Data): LabelData | "end" {
     return data.labels[data.current];
 }
 
-function peekNext(data: Data): LabelData | "end" {
-    const { current, labels } = data;
-    const currentPlus1 = current + 1;
-    if (currentPlus1 >= labels.length) {
-        return "end";
-    }
-    return labels[currentPlus1];
-}
-
 function scan(labels: LabelData[] | undefined): ConsolidatedLabel[] {
     if (labels === undefined) {
         return [];
