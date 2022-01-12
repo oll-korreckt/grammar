@@ -50,18 +50,25 @@ export const HeadLabel = makeRefComponent<HTMLDivElement, HeadLabelProps>("HeadL
 
 export interface WordLabelProps {
     children: ReactNode;
-    color: Colors;
+    color?: Colors;
+    fade?: boolean | undefined;
 }
 
-export const WordLabel = makeRefComponent<HTMLSpanElement, WordLabelProps>("WordLabel", ({ color, children }, ref) => (
-    <span
-        className={accessClassName(styles, "wordLabel", color)}
-        ref={ref}
-        onMouseDown={cancelHighlightDoubleClick}
-    >
-        {children}
-    </span>
-));
+export const WordLabel = makeRefComponent<HTMLSpanElement, WordLabelProps>("WordLabel", ({ color, fade, children }, ref) => {
+    const classes = ["wordLabel"];
+    if (color !== undefined) {
+        classes.push(fade ? getFadeName(color) : color);
+    }
+    return (
+        <span
+            className={accessClassName(styles, ...classes)}
+            ref={ref}
+            onMouseDown={cancelHighlightDoubleClick}
+        >
+            {children}
+        </span>
+    );
+});
 
 export function withSpace(Component: typeof Word): typeof Word {
     return makeRefComponent("withSpace", (props, ref) => (
