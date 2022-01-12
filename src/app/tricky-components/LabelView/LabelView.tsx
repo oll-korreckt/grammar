@@ -9,6 +9,7 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 
 export interface LabelViewProps {
     children?: LabelData[];
+    headers?: Record<ElementId, string>;
     onLabelClick?: (id: ElementId) => void;
 }
 
@@ -28,8 +29,11 @@ const LinkIcon: React.VFC = () => (
     </>
 );
 
-export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, onLabelClick }, ref) => {
+export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, headers, onLabelClick }, ref) => {
     const labels = Utils.scan(children);
+    const defHeaders: Record<ElementId, string> = headers !== undefined
+        ? headers
+        : {};
     const idCounts: Record<ElementId, number> = {};
     let whitespaceCnt = 0;
 
@@ -66,11 +70,15 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                                 );
                             } else {
                                 const isHead = idCnt === 0 && index === 0;
+                                const prescribedHeader = defHeaders[id];
+                                const header = prescribedHeader !== undefined
+                                    ? prescribedHeader
+                                    : displayInfo.header;
                                 return (
                                     <Word key={lexemeKey}>
                                         {isHead &&
                                             <HeadLabel>
-                                                {displayInfo.header}
+                                                {header}
                                                 {referenced !== undefined
                                                     ? <LinkIcon/>
                                                     : ""

@@ -100,8 +100,7 @@ function next(data: Data): void {
             lexeme: current.lexeme
         });
     } else {
-        const { id, elementType, referenced } = current;
-        return finishElementLabel(data, id, elementType, referenced);
+        return finishElementLabel(data, current);
     }
 }
 
@@ -111,8 +110,14 @@ function makeLabelMatchFn(id: ElementId): (label: LabelData) => boolean {
     };
 }
 
-function finishElementLabel(data: Data, id: ElementId, elementType: ElementType, referenced: boolean | undefined): void {
-    const matchFn = makeLabelMatchFn(id);
+function excludeLexeme(elementLabel: ElementLabelData): Omit<ElementLabelData, "lexeme"> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { lexeme, ...output } = elementLabel;
+    return output;
+}
+
+function finishElementLabel(data: Data, elementLabel: ElementLabelData): void {
+    const matchFn = makeLabelMatchFn(elementLabel.id);
     while (match(data, matchFn)) {
         // advance
     }
@@ -121,17 +126,13 @@ function finishElementLabel(data: Data, id: ElementId, elementType: ElementType,
     if (peekLabel === "end") {
         const lexemes = labels.slice(start, current).map(labelToLexeme);
         output.push(createConsolidatedElementLabel(
-            id,
-            elementType,
-            referenced,
+            excludeLexeme(elementLabel),
             lexemes
         ));
     } else {
         const lexemes: Lexeme[] = labels.slice(start, current - 1).map(labelToLexeme);
         output.push(createConsolidatedElementLabel(
-            id,
-            elementType,
-            referenced,
+            excludeLexeme(elementLabel),
             lexemes
         ));
         output.push({
@@ -141,12 +142,24 @@ function finishElementLabel(data: Data, id: ElementId, elementType: ElementType,
     }
 }
 
-function createConsolidatedElementLabel(id: ElementId, elementType: ElementType, referenced: boolean | undefined, lexemes: Lexeme[]): ConsolidatedElementLabel {
+function createConsolidatedElementLabel(labelData: Omit<ElementLabelData, "lexeme">, lexemes: Lexeme[]): ConsolidatedElementLabel {
     const output: ConsolidatedElementLabel = lexemes.length === 1
-        ? { type: "element", id, elementType, lexemes: lexemes[0] as ElementLexeme }
-        : { type: "element", id, elementType, lexemes };
-    if (referenced !== undefined) {
-        output.referenced = referenced;
+        ?
+        {
+            type: "element",
+            id: labelData.id,
+            elementType: labelData.elementType,
+            lexemes: lexemes[0] as ElementLexeme
+        }
+        :
+        {
+            type: "element",
+            id: labelData.id,
+            elementType: labelData.elementType,
+            lexemes
+        };
+    if (labelData.referenced !== undefined) {
+        output.referenced = labelData.referenced;
     }
     return output;
 }
