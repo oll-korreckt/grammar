@@ -275,12 +275,32 @@ function _selectiveDeleteChildToParentReferences(elements: DiagramState["element
     });
 }
 
+function deleteAll(state: DiagramState): DiagramState {
+    const { lexemes } = state;
+    const newElements: DiagramState["elements"] = {};
+    for (let index = 0; index < lexemes.length; index++) {
+        const lexeme = lexemes[index];
+        if (lexeme.type === "whitespace") {
+            continue;
+        }
+        const { id } = lexeme;
+        const wordItem = { ...DiagramState.getTypedItem(state, "word", id) };
+        delete wordItem.ref;
+        newElements[id] = wordItem;
+    }
+    return {
+        lexemes: lexemes,
+        elements: newElements
+    };
+}
+
 export const DiagramStateFunctions = {
     addItem: addItem,
     deleteItem: deleteItem,
     deleteProperty: deleteProperty,
     addReference: addReference,
-    deleteReference: deleteReference
+    deleteReference: deleteReference,
+    deleteAll: deleteAll
 };
 
 export const Private = {

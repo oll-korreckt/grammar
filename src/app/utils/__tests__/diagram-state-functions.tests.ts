@@ -385,6 +385,24 @@ describe("DiagramStateFunctions", () => {
             assert.deepStrictEqual(result2, expected2);
         });
     });
+
+    test("deleteAll", () => {
+        const state = createState();
+        const newState = DiagramStateFunctions.deleteAll(state);
+        Object.values(newState.elements).forEach((element) => {
+            assert.isUndefined(element.ref);
+            assert.deepStrictEqual(element.type, "word");
+        });
+        assert.strictEqual(
+            Object.keys(newState.elements).length,
+            state.lexemes.filter((lexeme) => lexeme.type === "word").length
+        );
+        assert.deepStrictEqual(state.lexemes, newState.lexemes);
+        assert.notStrictEqual(
+            Object.keys(state.elements),
+            Object.keys(newState.elements)
+        );
+    });
 });
 
 describe("Private", () => {
