@@ -5,7 +5,8 @@ import React, { useRef } from "react";
 import { AddMenu, AddMenuProps } from "../AddMenu";
 import { DeleteMenu, DeleteMenuProps } from "../DeleteMenu";
 import { EditActiveMenu, EditActiveMenuProps } from "../EditActiveMenu";
-import { EditBrowseMenu } from "../EditBrowseMenu";
+import { EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
+import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
 import styles from "./_styles.scss";
 
@@ -19,9 +20,8 @@ export type WordViewNavBarMenuProps =
 type MenuState<TMode extends WordViewMode> =
     TMode extends "navigate" ? { mode: TMode; props: NavigateMenuProps; }
         : TMode extends "add" ? { mode: TMode; props: AddMenuProps; }
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        : TMode extends "edit.browse" ? { mode: TMode; props: {}; }
-        : TMode extends "edit.active" ? { mode: TMode; props: EditActiveMenuProps; }
+        : TMode extends "edit.browse" ? { mode: TMode; props: EditBrowseMenuProps; }
+        : TMode extends "edit.active" ? { mode: TMode; props: EditActiveMenuInterfaceProps; }
         : TMode extends "delete" ? { mode: TMode; props: DeleteMenuProps; }
         : never;
 
