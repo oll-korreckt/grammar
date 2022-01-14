@@ -121,9 +121,14 @@ function getLabelData(diagram: DiagramState, { category, expanded }: DisplaySett
     });
 }
 
+function isElementLabel(label: LabelData): label is ElementLabelData {
+    return label.type === "element";
+}
+
 export const Utils = {
     getLabelData: getLabelData,
     getAncestors: getAncestors,
     getChildren: getChildren,
-    getExpandedElements: getExpandedElements
+    getExpandedElements: getExpandedElements,
+    isElementLabel: isElementLabel
 };

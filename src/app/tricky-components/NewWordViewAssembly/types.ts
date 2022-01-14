@@ -1,6 +1,5 @@
 import { DiagramState, WordViewMode } from "@app/utils";
 import { ElementCategory, ElementId, ElementType } from "@domain/language";
-import { AddMenuProps } from "../AddMenu";
 
 const navigateMode: WordViewMode = "navigate";
 const addMode: WordViewMode = "add";
@@ -8,36 +7,38 @@ const editBrowseMode: WordViewMode = "edit.browse";
 const editActiveMode: WordViewMode = "edit.active";
 const deleteMode: WordViewMode = "delete";
 
-export type State = {
+interface StateBase {
     display: DisplaySettings;
     diagram: DiagramState;
-} & (
+}
+
+export type State =
     | NavigateState
     | AddState
     | EditBrowseState
     | EditActiveState
-    | DeleteState
-);
+    | DeleteState;
 
-interface NavigateState {
+export interface NavigateState extends StateBase {
     mode: typeof navigateMode;
 }
 
-interface AddState extends Required<Pick<AddMenuProps, "menuItems" | "selectedItem">> {
+export interface AddState extends StateBase {
     mode: typeof addMode;
 }
 
-interface EditBrowseState {
+export interface EditBrowseState extends StateBase {
     mode: typeof editBrowseMode;
 }
 
-interface EditActiveState {
+export interface EditActiveState extends StateBase {
     mode: typeof editActiveMode;
     id: ElementId;
-    priorMode: { diagram: DiagramState; } & (AddState | EditBrowseState);
+    property?: string;
+    priorMode?: AddState | EditBrowseState;
 }
 
-interface DeleteState {
+export interface DeleteState extends StateBase {
     mode: typeof deleteMode;
 }
 
@@ -45,6 +46,15 @@ interface DeleteState {
 export interface DisplaySettings {
     category?: ElementCategory;
     expanded?: ElementId;
+}
+
+export type DiagramChange = (newDiagram: DiagramState) => void;
+
+export interface NewWordViewAssemblyProps {
+    initialDiagram: DiagramState;
+    initialMode?: WordViewMode;
+    initialDisplay?: DisplaySettings;
+    onDiagramChange?: DiagramChange;
 }
 
 export type WordViewAssemblyAction = {
@@ -68,6 +78,7 @@ export type WordViewAssemblyAction = {
     type: "edit.active: cancel";
 } | {
     type: "edit.active: delete property";
+    property: string;
 } | {
     type: "edit.active: edit property";
     property: string | undefined;
