@@ -10,6 +10,8 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 export interface LabelViewProps {
     children?: LabelData[];
     headers?: Record<ElementId, string>;
+    onlyShow?: ElementId[];
+    onlyOpaque?: ElementId[];
     onLabelClick?: (id: ElementId) => void;
 }
 
@@ -29,12 +31,22 @@ const LinkIcon: React.VFC = () => (
     </>
 );
 
-export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, headers, onLabelClick }, ref) => {
+function createElementFilter(elements: ElementId[] | undefined): (id: ElementId) => boolean {
+    if (elements === undefined) {
+        return () => true;
+    }
+    const filterSet = new Set(elements);
+    return (id) => filterSet.has(id);
+}
+
+export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, headers, onlyShow, onlyOpaque, onLabelClick }, ref) => {
     const labels = Utils.scan(children);
     const defHeaders: Record<ElementId, string> = headers !== undefined
         ? headers
         : {};
     const idCounts: Record<ElementId, number> = {};
+    const showElementFilter = createElementFilter(onlyShow);
+    const opaqueElementFilter = createElementFilter(onlyOpaque);
     let whitespaceCnt = 0;
 
     return (
@@ -54,9 +66,12 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                     ? lexemes
                     : [lexemes];
                 const labelKey = `${id}-${idCnt}`;
+                const showElement = showElementFilter(id);
+                const opaqueElement = opaqueElementFilter(id);
                 return (
                     <ExtendedWordLabel
-                        color={displayInfo.color}
+                        color={showElement ? displayInfo.color : undefined}
+                        fade={!opaqueElement}
                         key={labelKey}
                         onClick={() => onLabelClick && onLabelClick(id)}
                     >
@@ -71,9 +86,11 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                             } else {
                                 const isHead = idCnt === 0 && index === 0;
                                 const prescribedHeader = defHeaders[id];
-                                const header = prescribedHeader !== undefined
-                                    ? prescribedHeader
-                                    : displayInfo.header;
+                                const header = showElement
+                                    ? prescribedHeader !== undefined
+                                        ? prescribedHeader
+                                        : displayInfo.header
+                                    : undefined;
                                 return (
                                     <Word key={lexemeKey}>
                                         {isHead &&
