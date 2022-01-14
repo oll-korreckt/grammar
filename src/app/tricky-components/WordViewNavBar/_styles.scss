@@ -1,12 +1,17 @@
 @use "main";
+@use "./sizes.scss" as *;
 
 .wordViewNavBar {
+    @include main.center-content;
+    @include wordViewNavBarHeight;
     position: relative;
+    border-top: 1px solid black;
+}
+
+.itemContainer {
+    width: min(100%, 1100px);
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    border: 1px solid black;
-    border-radius: 3px;
-    padding: 15px;
 }
 
 .item {
@@ -30,7 +35,21 @@
 }
 
 .icon {
-    font-size: 40px;
+    @include main.smMdScreen {
+        font-size: 30px;
+    }
+    @include main.lgScreen {
+        font-size: 40px;
+    }
+}
+
+.children {
+    @include main.smMdScreen {
+        font-size: 12px;
+    }
+    @include main.lgScreen {
+        font-size: 18px;
+    }
 }
 
 .underline {

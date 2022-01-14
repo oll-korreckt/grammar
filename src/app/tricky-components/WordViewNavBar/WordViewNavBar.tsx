@@ -32,36 +32,38 @@ export const WordViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren
             className={accessClassName(styles, "wordViewNavBar")}
         >
             {children}
-            <AnimateSharedLayout>
-                <Item
-                    icon={FaSitemap}
-                    selected={currentMode === "navigate"}
-                    onClick={() => invokeModeChange("navigate")}
-                >
-                    Navigate
-                </Item>
-                <Item
-                    icon={FaPlus}
-                    selected={currentMode === "add"}
-                    onClick={() => invokeModeChange("add")}
-                >
-                    Add
-                </Item>
-                <Item
-                    icon={RiEdit2Fill}
-                    selected={currentMode === "edit.browse" || currentMode === "edit.active"}
-                    onClick={() => invokeModeChange("edit.browse")}
-                >
-                    Edit
-                </Item>
-                <Item
-                    icon={FaTrashAlt}
-                    selected={currentMode === "delete"}
-                    onClick={() => invokeModeChange("delete")}
-                >
-                    Delete
-                </Item>
-            </AnimateSharedLayout>
+            <div className={accessClassName(styles, "itemContainer")}>
+                <AnimateSharedLayout>
+                    <Item
+                        icon={FaSitemap}
+                        selected={currentMode === "navigate"}
+                        onClick={() => invokeModeChange("navigate")}
+                    >
+                        Navigate
+                    </Item>
+                    <Item
+                        icon={FaPlus}
+                        selected={currentMode === "add"}
+                        onClick={() => invokeModeChange("add")}
+                    >
+                        Add
+                    </Item>
+                    <Item
+                        icon={RiEdit2Fill}
+                        selected={currentMode === "edit.browse" || currentMode === "edit.active"}
+                        onClick={() => invokeModeChange("edit.browse")}
+                    >
+                        Edit
+                    </Item>
+                    <Item
+                        icon={FaTrashAlt}
+                        selected={currentMode === "delete"}
+                        onClick={() => invokeModeChange("delete")}
+                    >
+                        Delete
+                    </Item>
+                </AnimateSharedLayout>
+            </div>
         </div>
     );
 });

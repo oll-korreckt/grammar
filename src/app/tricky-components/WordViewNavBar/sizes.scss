@@ -1,0 +1,10 @@
+@use "main";
+
+@mixin wordViewNavBarHeight {
+    @include main.smMdScreen {
+        height: 65px;
+    }
+    @include main.lgScreen {
+        height: 90px;
+    }
+}
