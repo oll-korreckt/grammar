@@ -1,23 +1,23 @@
+import { WhitespaceLexeme } from "@app/utils";
 import { assert } from "chai";
-import { ConsolidatedLabel, Utils, LabelData } from "../utils";
+import { Lexeme, Utils, ConsolidatedElementLexeme } from "../utils";
 
-const space: LabelData = { type: "whitespace", lexeme: " " };
+const space: Lexeme = { type: "whitespace", lexeme: " " };
 
 describe("Utils", () => {
     describe("scan", () => {
         test("adjacent diff ids", () => {
-            const input: LabelData[] = [
-                { type: "element", id: "1", elementType: "word", lexeme: "moo" },
+            const input: Lexeme[] = [
+                { type: "element", id: "1", lexeme: "moo" },
                 space,
-                { type: "element", id: "2", elementType: "word", lexeme: "cow" }
+                { type: "element", id: "2", lexeme: "cow" }
             ];
             const result = Utils.scan(input);
-            const expected: ConsolidatedLabel[] = [
+            const expected: (ConsolidatedElementLexeme | WhitespaceLexeme)[] = [
                 {
                     type: "element",
                     id: "1",
-                    elementType: "word",
-                    lexemes: { type: "element", lexeme: "moo" }
+                    lexemes: [{ type: "element", lexeme: "moo" }]
                 },
                 {
                     type: "whitespace",
@@ -26,29 +26,27 @@ describe("Utils", () => {
                 {
                     type: "element",
                     id: "2",
-                    elementType: "word",
-                    lexemes: { type: "element", lexeme: "cow" }
+                    lexemes: [{ type: "element", lexeme: "cow" }]
                 }
             ];
             assert.deepStrictEqual(result, expected);
         });
 
         test("adjacent same ids", () => {
-            const input: LabelData[] = [
-                { type: "element", id: "1", elementType: "adjective", lexeme: "happy" },
+            const input: Lexeme[] = [
+                { type: "element", id: "1", lexeme: "happy" },
                 space,
-                { type: "element", id: "1", elementType: "adjective", lexeme: "big" },
+                { type: "element", id: "1", lexeme: "big" },
                 space,
-                { type: "element", id: "1", elementType: "adjective", lexeme: "red" },
+                { type: "element", id: "1", lexeme: "red" },
                 space,
-                { type: "element", id: "2", elementType: "noun", lexeme: "dog" }
+                { type: "element", id: "2", lexeme: "dog" }
             ];
             const result = Utils.scan(input);
-            const expected: ConsolidatedLabel[] = [
+            const expected: (ConsolidatedElementLexeme | WhitespaceLexeme)[] = [
                 {
                     type: "element",
                     id: "1",
-                    elementType: "adjective",
                     lexemes: [
                         { type: "element", lexeme: "happy" },
                         space,
@@ -64,28 +62,26 @@ describe("Utils", () => {
                 {
                     type: "element",
                     id: "2",
-                    elementType: "noun",
-                    lexemes: { type: "element", lexeme: "dog" }
+                    lexemes: [{ type: "element", lexeme: "dog" }]
                 }
             ];
             assert.deepStrictEqual(result, expected);
         });
 
         test("diff between same", () => {
-            const input: LabelData[] = [
-                { type: "element", id: "1", elementType: "verb", lexeme: "to" },
+            const input: Lexeme[] = [
+                { type: "element", id: "1", lexeme: "to" },
                 space,
-                { type: "element", id: "2", elementType: "adverb", lexeme: "boldly" },
+                { type: "element", id: "2", lexeme: "boldly" },
                 space,
-                { type: "element", id: "1", elementType: "verb", lexeme: "go" }
+                { type: "element", id: "1", lexeme: "go" }
             ];
             const result = Utils.scan(input);
-            const expected: ConsolidatedLabel[] = [
+            const expected: (ConsolidatedElementLexeme | WhitespaceLexeme)[] = [
                 {
                     type: "element",
                     id: "1",
-                    elementType: "verb",
-                    lexemes: { type: "element", lexeme: "to" }
+                    lexemes: [{ type: "element", lexeme: "to" }]
                 },
                 {
                     type: "whitespace",
@@ -94,8 +90,7 @@ describe("Utils", () => {
                 {
                     type: "element",
                     id: "2",
-                    elementType: "adverb",
-                    lexemes: { type: "element", lexeme: "boldly" }
+                    lexemes: [{ type: "element", lexeme: "boldly" }]
                 },
                 {
                     type: "whitespace",
@@ -104,8 +99,7 @@ describe("Utils", () => {
                 {
                     type: "element",
                     id: "1",
-                    elementType: "verb",
-                    lexemes: { type: "element", lexeme: "go" }
+                    lexemes: [{ type: "element", lexeme: "go" }]
                 }
             ];
             assert.deepStrictEqual(result, expected);

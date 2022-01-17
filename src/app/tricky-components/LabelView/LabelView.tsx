@@ -1,18 +1,21 @@
-import { HeadLabel, Word, WordLabel } from "@app/basic-components/Word";
-import { ElementDisplayInfo } from "@app/utils";
-import { makeRefComponent, withEventProp } from "@app/utils/hoc";
+import { Colors } from "@app/utils";
+import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
 import { ElementId } from "@domain/language";
-import { LabelData, Utils, Lexeme } from "./utils";
+import { Lexeme, Utils } from "./utils";
 import React from "react";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { Label } from "@app/basic-components/Label";
 
 
 export interface LabelViewProps {
-    children?: LabelData[];
-    headers?: Record<ElementId, string>;
-    onlyShow?: ElementId[];
-    onlyOpaque?: ElementId[];
+    children?: Lexeme[];
+    settings?: Record<ElementId, LabelSettings>;
     onLabelClick?: (id: ElementId) => void;
+}
+
+export interface LabelSettings {
+    fade?: boolean | undefined;
+    color?: Colors;
+    header?: string | undefined;
 }
 
 function incrementIdCount(idCounts: Record<ElementId, number>, id: ElementId): number {
@@ -24,29 +27,10 @@ function incrementIdCount(idCounts: Record<ElementId, number>, id: ElementId): n
     return output;
 }
 
-const LinkIcon: React.VFC = () => (
-    <>
-        &nbsp;
-        <FaExternalLinkAlt/>
-    </>
-);
-
-function createElementFilter(elements: ElementId[] | undefined): (id: ElementId) => boolean {
-    if (elements === undefined) {
-        return () => true;
-    }
-    const filterSet = new Set(elements);
-    return (id) => filterSet.has(id);
-}
-
-export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, headers, onlyShow, onlyOpaque, onLabelClick }, ref) => {
+export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, settings, onLabelClick }, ref) => {
     const labels = Utils.scan(children);
-    const defHeaders: Record<ElementId, string> = headers !== undefined
-        ? headers
-        : {};
+    const defSettings: Record<ElementId, LabelSettings> = settings ? settings : {};
     const idCounts: Record<ElementId, number> = {};
-    const showElementFilter = createElementFilter(onlyShow);
-    const opaqueElementFilter = createElementFilter(onlyOpaque);
     let whitespaceCnt = 0;
 
     return (
@@ -59,59 +43,24 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                         </span>
                     );
                 }
-                const { id, elementType, lexemes, referenced } = label;
+                const { id, lexemes } = label;
                 const idCnt = incrementIdCount(idCounts, id);
-                const displayInfo = ElementDisplayInfo.getDisplayInfo(elementType);
-                const lexemeArray: Lexeme[] = Array.isArray(lexemes)
-                    ? lexemes
-                    : [lexemes];
+                const { fade, color, header }: LabelSettings = id in defSettings ? defSettings[id] : {};
                 const labelKey = `${id}-${idCnt}`;
-                const showElement = showElementFilter(id);
-                const opaqueElement = opaqueElementFilter(id);
                 return (
-                    <ExtendedWordLabel
-                        color={showElement ? displayInfo.color : undefined}
-                        fade={!opaqueElement}
+                    <ExtendedLabel
                         key={labelKey}
+                        header={idCnt === 0 ? header : undefined}
+                        color={color}
+                        fade={fade}
                         onClick={() => onLabelClick && onLabelClick(id)}
                     >
-                        {lexemeArray.map(({ type, lexeme }, index) => {
-                            const lexemeKey = `${id}-${index}`;
-                            if (type === "whitespace") {
-                                return (
-                                    <Word key={lexemeKey}>
-                                        {lexeme}
-                                    </Word>
-                                );
-                            } else {
-                                const isHead = idCnt === 0 && index === 0;
-                                const prescribedHeader = defHeaders[id];
-                                const header = showElement
-                                    ? prescribedHeader !== undefined
-                                        ? prescribedHeader
-                                        : displayInfo.header
-                                    : undefined;
-                                return (
-                                    <Word key={lexemeKey}>
-                                        {isHead &&
-                                            <HeadLabel>
-                                                {header}
-                                                {referenced !== undefined
-                                                    ? <LinkIcon/>
-                                                    : ""
-                                                }
-                                            </HeadLabel>
-                                        }
-                                        {lexeme}
-                                    </Word>
-                                );
-                            }
-                        })}
-                    </ExtendedWordLabel>
+                        {lexemes.map(({ lexeme }) => lexeme)}
+                    </ExtendedLabel>
                 );
             })}
         </div>
     );
 });
 
-const ExtendedWordLabel = withEventProp(WordLabel, "click");
+const ExtendedLabel = withClassNameProp(withEventProp(Label, "click"));
