@@ -8,7 +8,6 @@ export interface LabelProps {
     color?: Colors;
     fade?: boolean | undefined;
     header?: string;
-    onClick?: () => void;
 }
 
 function cancelHighlightDoubleClick(ev: React.MouseEvent): void {
@@ -17,7 +16,7 @@ function cancelHighlightDoubleClick(ev: React.MouseEvent): void {
     }
 }
 
-export const Label = makeRefComponent<HTMLSpanElement, LabelProps>("Label", ({ children, color, fade, header, onClick }, ref) => {
+export const Label = makeRefComponent<HTMLSpanElement, LabelProps>("Label", ({ children, color, fade, header }, ref) => {
     const defChildren: string[] = Array.isArray(children) ? children : [children];
     if (defChildren.length === 0) {
         throw "Cannot have empty label";
@@ -26,16 +25,12 @@ export const Label = makeRefComponent<HTMLSpanElement, LabelProps>("Label", ({ c
     if (color !== undefined) {
         classes.push(fade ? `${color}Fade` : color);
     }
-    if (onClick) {
-        classes.push("pointerCursor");
-    }
 
     return (
         <span
             ref={ref}
             className={accessClassName(styles, ...classes)}
             onMouseDown={cancelHighlightDoubleClick}
-            onClick={() => onClick && onClick()}
         >
             {header &&
                 <span className={accessClassName(styles, "header")}>

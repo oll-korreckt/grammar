@@ -20,6 +20,8 @@
 .label {
     position: relative;
     border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
 }
 
 .header {
@@ -36,8 +38,4 @@
     width: 100%;
     cursor: default;
     pointer-events: none;
-}
-
-.pointerCursor {
-    cursor: pointer;
 }
