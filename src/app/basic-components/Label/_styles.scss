@@ -1,0 +1,43 @@
+@use "main";
+
+@for $i from 1 through length(main.$colors) {
+    $temp: nth(main.$colors, $i);
+    $main: map-get($temp, "main");
+    $dark: map-get($temp, "dark");
+    $text: map-get($temp, "text");
+
+    .color#{$i} {
+        background-color: $main;
+        color: $text;
+    }
+
+    .color#{$i}Fade {
+        background-color: rgba($main, 0.4);
+        color: $text;
+    }
+}
+
+.label {
+    position: relative;
+    border-radius: 5px;
+}
+
+.header {
+    position: absolute;
+    transform: translateY(-100%);
+    top: 0;
+    left: 0;
+    font-size: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+    color: black;
+    width: 100%;
+    cursor: default;
+    pointer-events: none;
+}
+
+.pointerCursor {
+    cursor: pointer;
+}
