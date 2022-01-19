@@ -1,0 +1,7 @@
+@use "../WordViewNavBar/sizes.scss" as *;
+
+.wordViewAssembly {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    height: 100%;
+}

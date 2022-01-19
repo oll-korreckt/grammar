@@ -67,6 +67,8 @@ export type WordViewAssemblyAction = {
     type: "navigate: expanded";
     expanded: ElementId | undefined;
 } | {
+    type: "navigate: up";
+} | {
     type: "add: edit.active";
     elementType: Exclude<ElementType, "word">;
 } | {

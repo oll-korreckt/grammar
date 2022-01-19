@@ -1,5 +1,5 @@
 
-import { DiagramStateFunctions, WordViewMode } from "@app/utils";
+import { DiagramState, DiagramStateFunctions, WordViewMode } from "@app/utils";
 import { ElementCategory, ElementId } from "@domain/language";
 import { SimpleObject } from "@lib/utils";
 import React, { useReducer } from "react";
@@ -106,15 +106,22 @@ function castState<T extends WordViewMode>(mode: T, state: State): StateMapper<T
     return state as any;
 }
 
-function getDefaultPriorState(): AddState | EditBrowseState {
-    return {
-        mode: "edit.browse",
-        diagram: {
-            lexemes: [],
-            elements: {}
-        },
-        display: {}
-    };
+function getUpExpanded(diagram: DiagramState, display: DisplaySettings): ElementId | undefined {
+    if (display.expanded === undefined) {
+        throw "cannot navigate up if no element is expanded";
+    }
+    const expandedItem = DiagramState.getItem(diagram, display.expanded);
+    if (expandedItem.ref === undefined) {
+        return undefined;
+    }
+    const parentItem = DiagramState.getItem(diagram, expandedItem.ref);
+    if (parentItem.ref === undefined) {
+        return undefined;
+    }
+    const category = ElementCategory.getDefault(display.category);
+    const categoryFilter = ElementCategory.getLayerFilter(category);
+    const parentCategory = ElementCategory.getElementCategory(parentItem.type);
+    return categoryFilter(parentCategory) ? parentItem.ref : undefined;
 }
 
 function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange?: DiagramChange | undefined): State {
@@ -143,6 +150,17 @@ function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange
                 display: createDisplaySettings(
                     state.display.category,
                     action.expanded
+                )
+            };
+        }
+        case "navigate: up": {
+            const { diagram, display } = state;
+            const expanded = getUpExpanded(diagram, display);
+            return {
+                ...state,
+                display: createDisplaySettings(
+                    display.category,
+                    expanded
                 )
             };
         }

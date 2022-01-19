@@ -1,5 +1,5 @@
 import { DerivationTree, DerivationTreeItem, DiagramState, WordViewMode } from "@app/utils";
-import { Element, ElementType } from "@domain/language";
+import { Element, ElementId, ElementType } from "@domain/language";
 import React from "react";
 import { AddMenuProps } from "../AddMenu";
 import { DeleteMenuProps } from "../DeleteMenu";
@@ -101,7 +101,9 @@ function extractDerivationTreeElements(tree: DerivationTree | undefined): Exclud
 
 function getAddMenuElements(diagram: DiagramState, display: DisplaySettings): Exclude<ElementType, "word">[] {
     const output = new Set<Exclude<ElementType, "word">>();
-    const visibleElementTypes = new Set(Utils.getLabelData(diagram, display).filter(Utils.isElementLabel).map(({ elementType }) => elementType));
+    const visibleElementTypes = new Set(Utils.getLabelData(diagram, display).filter(Utils.isElementLabel).map(({ id }) => {
+        return DiagramState.getItem(diagram, id).type;
+    }));
     visibleElementTypes.forEach((visibleElementType) => {
         const tree = DerivationTree.getDerivationTree(visibleElementType);
         extractDerivationTreeElements(tree).forEach((element) => output.add(element));
@@ -117,7 +119,9 @@ export function convertToMenuProps(state: State, dispatch: React.Dispatch<WordVi
                 onCategoryChange: (cat) => dispatch({
                     type: "navigate: category",
                     category: cat
-                })
+                }),
+                onUpLevel: () => dispatch({ type: "navigate: up" }),
+                enableUpLevel: !!state.display.expanded
             };
             return output;
         }
@@ -157,4 +161,14 @@ export function convertToMenuProps(state: State, dispatch: React.Dispatch<WordVi
             return output;
         }
     }
+}
+
+export function createOnLabelClick(state: State, dispatch: React.Dispatch<WordViewAssemblyAction>): (id: ElementId) => void {
+    switch (state.mode) {
+        case "navigate":
+            return (id) => {
+                dispatch({ type: "navigate: expanded", expanded: id });
+            };
+    }
+    return () => { return; };
 }

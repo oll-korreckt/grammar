@@ -1,11 +1,11 @@
 import { createState, Ids } from "@app/testing";
-import { LabelData } from "@app/tricky-components/LabelView";
+import { Lexeme } from "@app/tricky-components/LabelView";
 import { DiagramState, DiagramStateFunctions, WordLexeme } from "@app/utils";
 import { ElementId } from "@domain/language";
 import { assert } from "chai";
 import { Utils } from "../utils";
 
-function createLabelData(diagram: DiagramState, ids: ElementId[]): LabelData[] {
+function createLexemes(diagram: DiagramState, ids: ElementId[]): Lexeme[] {
     if (ids.length !== 9) {
         throw "need 9 ids";
     }
@@ -20,7 +20,7 @@ function createLabelData(diagram: DiagramState, ids: ElementId[]): LabelData[] {
         "lazy",
         "dog"
     ];
-    const output: LabelData[] = [];
+    const output: Lexeme[] = [];
     for (let index = 0; index < lexemes.length; index++) {
         const id = ids[index];
         const lexeme = lexemes[index];
@@ -30,13 +30,10 @@ function createLabelData(diagram: DiagramState, ids: ElementId[]): LabelData[] {
                 lexeme: " "
             });
         }
-        const { type, ref } = DiagramState.getItem(diagram, id);
         output.push({
             type: "element",
             lexeme: lexeme,
-            id: id,
-            elementType: type,
-            referenced: ref !== undefined
+            id: id
         });
     }
     return output;
@@ -113,7 +110,7 @@ describe("Utils", () => {
                 Ids.jumpsVerbPhrase,
                 Ids.jumpsVerbPhrase
             ];
-            const expected = createLabelData(state, ids);
+            const expected = createLexemes(state, ids);
             assert.deepStrictEqual(result, expected);
         });
 
@@ -132,7 +129,7 @@ describe("Utils", () => {
                 Ids.overPrepPhrase,
                 Ids.overPrepPhrase
             ];
-            const expected = createLabelData(state, ids);
+            const expected = createLexemes(state, ids);
             assert.deepStrictEqual(result, expected);
         });
 
@@ -151,7 +148,25 @@ describe("Utils", () => {
                 Ids.lazyAdjPhrase,
                 Ids.dogNoun
             ];
-            const expected = createLabelData(state, ids);
+            const expected = createLexemes(state, ids);
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("expanded + category 2", () => {
+            const state = createState();
+            const result = Utils.getLabelData(state, { category: "partOfSpeech", expanded: Ids.jumpsVerb });
+            const ids: ElementId[] = [
+                Ids.the1Det,
+                Ids.quickBrownAdj,
+                Ids.quickBrownAdj,
+                Ids.foxNoun,
+                Ids.jumps,
+                Ids.overPrep,
+                Ids.the2Det,
+                Ids.lazyAdj,
+                Ids.dogNoun
+            ];
+            const expected = createLexemes(state, ids);
             assert.deepStrictEqual(result, expected);
         });
 
@@ -170,13 +185,11 @@ describe("Utils", () => {
             state = DiagramStateFunctions.addReference(state, advId, "word", boldlyId);
             state = DiagramStateFunctions.addReference(state, infId, "verb", goId);
             const result = Utils.getLabelData(state, {});
-            const expected: LabelData[] = [
+            const expected: Lexeme[] = [
                 {
                     type: "element",
                     id: infId,
-                    elementType: "infinitive",
-                    lexeme: "to",
-                    referenced: false
+                    lexeme: "to"
                 },
                 {
                     type: "whitespace",
@@ -185,9 +198,7 @@ describe("Utils", () => {
                 {
                     type: "element",
                     id: advId,
-                    elementType: "adverb",
-                    lexeme: "boldly",
-                    referenced: false
+                    lexeme: "boldly"
                 },
                 {
                     type: "whitespace",
@@ -196,9 +207,7 @@ describe("Utils", () => {
                 {
                     type: "element",
                     id: infId,
-                    elementType: "infinitive",
-                    lexeme: "go",
-                    referenced: false
+                    lexeme: "go"
                 }
             ];
             assert.deepStrictEqual(result, expected);
