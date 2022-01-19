@@ -20,7 +20,7 @@
 .label {
     position: relative;
     border-radius: 5px;
-    padding: 5px;
+    padding: 5px 2px;
     cursor: pointer;
 }
 
@@ -29,7 +29,8 @@
     transform: translateY(-100%);
     top: 0;
     left: 0;
-    font-size: 8px;
+    font-size: var(--label-header-font-size, 8px);
+    line-height: var(--label-header-line-height, 8px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

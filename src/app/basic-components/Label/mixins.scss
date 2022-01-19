@@ -1,0 +1,4 @@
+@mixin labelHeaderSize($size) {
+    --label-header-font-size: #{$size};
+    --label-header-line-height: #{$size};
+}
