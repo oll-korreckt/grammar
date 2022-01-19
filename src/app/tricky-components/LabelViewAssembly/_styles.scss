@@ -1,0 +1,61 @@
+@use "main";
+@use "../NavigateMenu/sizes.scss" as *;
+@use "../AddMenu/sizes.scss" as *;
+@use "../EditBrowseMenu/sizes.scss" as *;
+@use "../EditActiveMenu/sizes.scss" as *;
+@use "../DeleteMenu/sizes.scss" as *;
+@use "../../basic-components/Label/mixins.scss" as *;
+
+$padding-sm: 15px;
+$padding-lg: 20px;
+
+.labelViewAssembly {
+    border: 1px solid black;
+    height: 100%;
+    overflow-y: auto;
+    @include main.smMdScreen {
+        padding-top: $padding-sm;
+    }
+    @include main.lgScreen {
+        padding-top: $padding-lg;
+    }
+}
+
+.labelView {
+    width: min(calc(100% - 2 * #{$padding-sm}), 900px);
+    margin: 0 auto;
+    @include main.smMdScreen {
+        @include labelHeaderSize(10px);
+        font-size: 20px;
+        line-height: 50px;
+    }
+    @include main.lgScreen {
+        @include labelHeaderSize(12px);
+        font-size: 30px;
+        line-height: 70px;
+    }
+}
+
+.filler {
+    width: 200px;
+}
+
+.navigate {
+    @include navigateMenuHeight;
+}
+
+.add {
+    @include addMenuHeight;
+}
+
+.editBrowse {
+    @include editBrowseMenuHeight;
+}
+
+.editActive {
+    @include editActiveMenuHeight;
+}
+
+.delete {
+    @include deleteMenuHeight;
+}
