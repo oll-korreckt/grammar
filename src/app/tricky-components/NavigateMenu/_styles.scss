@@ -5,9 +5,34 @@
     @include navigateMenuWidth;
     @include navigateMenuHeight;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: auto 1fr;
     border: 1px solid black;
     border-radius: 3px;
+}
+
+.upContainer {
+    @include main.center-content;
+    position: relative;
+    padding: 0 20px;
+}
+
+.border {
+    position: absolute;
+    top: 5%;
+    right: 0;
+    width: 1px;
+    height: 90%;
+    background-color: black;
+}
+
+.categoryContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.verticalLineContainer {
+    @include main.center-content;
+    padding-left: 10px;
 }
 
 .item {
@@ -51,4 +76,10 @@
     width: 100%;
     height: 5px;
     background-color: black;
+}
+
+.disableUpLevel {
+    pointer-events: none;
+    cursor: none;
+    color: grey;
 }

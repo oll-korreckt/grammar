@@ -1,18 +1,20 @@
 import { accessClassName } from "@app/utils";
-import { makeRefComponent } from "@app/utils/hoc";
+import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import { ElementCategory } from "@domain/language";
 import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
-import { FaLayerGroup } from "react-icons/fa";
+import { FaLayerGroup, FaAngleUp } from "react-icons/fa";
 import styles from "./_styles.scss";
 
 export interface NavigateMenuProps {
     category?: ElementCategory;
     onCategoryChange?: (newCat: ElementCategory) => void;
+    enableUpLevel?: boolean | undefined;
+    onUpLevel?: () => void;
 }
 
-export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<NavigateMenuProps>>("NavigateMenu", ({ category, onCategoryChange }, ref) => {
+export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<NavigateMenuProps>>("NavigateMenu", ({ category, onCategoryChange, enableUpLevel, onUpLevel }, ref) => {
     const defaultCategory = ElementCategory.getDefault(category);
 
     function invokeCategoryChange(newCat: ElementCategory): void {
@@ -26,36 +28,51 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
             ref={ref}
             className={accessClassName(styles, "navigateMenu")}
         >
-            <AnimateSharedLayout type="crossfade">
-                <Item
-                    icon={FaLayerGroup}
-                    selected={defaultCategory === "word"}
-                    onClick={() => invokeCategoryChange("word")}
+            <div className={accessClassName(styles, "upContainer")}>
+                <ExtendedItem
+                    icon={FaAngleUp}
+                    onClick={() => onUpLevel && onUpLevel()}
+                    className={accessClassName(
+                        styles,
+                        ...(enableUpLevel ? [] : ["disableUpLevel"])
+                    )}
                 >
-                    Word
-                </Item>
-                <Item
-                    icon={FaLayerGroup}
-                    selected={defaultCategory === "partOfSpeech"}
-                    onClick={() => invokeCategoryChange("partOfSpeech")}
-                >
-                    Category
-                </Item>
-                <Item
-                    icon={FaLayerGroup}
-                    selected={defaultCategory === "phrase"}
-                    onClick={() => invokeCategoryChange("phrase")}
-                >
-                    Phrase
-                </Item>
-                <Item
-                    icon={FaLayerGroup}
-                    selected={defaultCategory === "clause"}
-                    onClick={() => invokeCategoryChange("clause")}
-                >
-                    Clause
-                </Item>
-            </AnimateSharedLayout>
+                    Up
+                </ExtendedItem>
+                <div className={accessClassName(styles, "border")}/>
+            </div>
+            <div className={accessClassName(styles, "categoryContainer")}>
+                <AnimateSharedLayout type="crossfade">
+                    <Item
+                        icon={FaLayerGroup}
+                        selected={defaultCategory === "word"}
+                        onClick={() => invokeCategoryChange("word")}
+                    >
+                        Word
+                    </Item>
+                    <Item
+                        icon={FaLayerGroup}
+                        selected={defaultCategory === "partOfSpeech"}
+                        onClick={() => invokeCategoryChange("partOfSpeech")}
+                    >
+                        Category
+                    </Item>
+                    <Item
+                        icon={FaLayerGroup}
+                        selected={defaultCategory === "phrase"}
+                        onClick={() => invokeCategoryChange("phrase")}
+                    >
+                        Phrase
+                    </Item>
+                    <Item
+                        icon={FaLayerGroup}
+                        selected={defaultCategory === "clause"}
+                        onClick={() => invokeCategoryChange("clause")}
+                    >
+                        Clause
+                    </Item>
+                </AnimateSharedLayout>
+            </div>
         </div>
     );
 });
@@ -67,10 +84,13 @@ interface ItemProps {
     children: string;
 }
 
-const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, children }) => {
+const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClick, selected, children }, ref) => {
     const Icon = icon;
     return (
-        <div className={accessClassName(styles, "item")}>
+        <div
+            ref={ref}
+            className={accessClassName(styles, "item")}
+        >
             <div
                 className={accessClassName(styles, "itemContent")}
                 onClick={() => onClick && onClick()}
@@ -89,4 +109,6 @@ const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, children }) => {
             </div>
         </div>
     );
-};
+});
+
+const ExtendedItem = withClassNameProp(Item);
