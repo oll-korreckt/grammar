@@ -1,12 +1,12 @@
 import { ElementId } from "@domain/language";
 
-interface ElementLexeme {
+export interface ElementLexeme {
     type: "element";
     lexeme: string;
     id: ElementId;
 }
 
-interface WhitespaceLexeme {
+export interface WhitespaceLexeme {
     type: "whitespace";
     lexeme: string;
 }
