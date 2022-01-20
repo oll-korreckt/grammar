@@ -384,6 +384,88 @@ describe("DiagramStateFunctions", () => {
             };
             assert.deepStrictEqual(result2, expected2);
         });
+
+        test("keep if empty", () => {
+            const verbPhrase: TypedDiagramStateItem<"verbPhrase"> = {
+                type: "verbPhrase",
+                value: {
+                    id: "verbPhrase",
+                    phraseType: "verb",
+                    head: { type: "verb", id: "verb" }
+                }
+            };
+            const verb: TypedDiagramStateItem<"verb"> = {
+                type: "verb",
+                ref: "verbPhrase",
+                value: {
+                    id: "verb",
+                    posType: "verb"
+                }
+            };
+            const input: DiagramState = {
+                lexemes: [],
+                elements: { verbPhrase, verb }
+            };
+            const result = DiagramStateFunctions.deleteReference(input, "verbPhrase", "head", "verb", true);
+            const expectedVerbPhrase: TypedDiagramStateItem<"verbPhrase"> = {
+                type: "verbPhrase",
+                value: {
+                    id: "verbPhrase",
+                    phraseType: "verb"
+                }
+            };
+            const expectedVerb: TypedDiagramStateItem<"verb"> = {
+                type: "verb",
+                value: {
+                    id: "verb",
+                    posType: "verb"
+                }
+            };
+            assert.deepStrictEqual(
+                DiagramState.getItem(result, "verbPhrase"),
+                expectedVerbPhrase
+            );
+            assert.deepStrictEqual(
+                DiagramState.getItem(result, "verb"),
+                expectedVerb
+            );
+        });
+
+        test("do not keep if empty", () => {
+            const verbPhrase: TypedDiagramStateItem<"verbPhrase"> = {
+                type: "verbPhrase",
+                value: {
+                    id: "verbPhrase",
+                    phraseType: "verb",
+                    head: { type: "verb", id: "verb" }
+                }
+            };
+            const verb: TypedDiagramStateItem<"verb"> = {
+                type: "verb",
+                ref: "verbPhrase",
+                value: {
+                    id: "verb",
+                    posType: "verb"
+                }
+            };
+            const input: DiagramState = {
+                lexemes: [],
+                elements: { verbPhrase, verb }
+            };
+            const result = DiagramStateFunctions.deleteReference(input, "verbPhrase", "head", "verb");
+            const expectedVerb: TypedDiagramStateItem<"verb"> = {
+                type: "verb",
+                value: {
+                    id: "verb",
+                    posType: "verb"
+                }
+            };
+            assert.hasAllKeys(result.elements, ["verb"]);
+            assert.deepStrictEqual(
+                DiagramState.getItem(result, "verb"),
+                expectedVerb
+            );
+        });
     });
 
     test("deleteAll", () => {

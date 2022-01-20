@@ -80,7 +80,8 @@ function _deleteIfEmpty(elements: DiagramState["elements"], id: ElementId): void
     }
 }
 
-function _deleteParentToChildReference(elements: DiagramState["elements"], parentId: ElementId, key: string, childId: ElementId): void {
+function _deleteParentToChildReference(elements: DiagramState["elements"], parentId: ElementId, key: string, childId: ElementId, keepIfEmpty?: boolean): void {
+    const defKeepIfEmpty = !!keepIfEmpty;
     const parent = elements[parentId];
     const parentValue = castToRecord(parent.value);
     const property = parentValue[key];
@@ -103,14 +104,18 @@ function _deleteParentToChildReference(elements: DiagramState["elements"], paren
             parentValue[key] = newProperty;
         } else {
             delete parentValue[key];
-            _deleteIfEmpty(elements, parentId);
+            if (!defKeepIfEmpty) {
+                _deleteIfEmpty(elements, parentId);
+            }
         }
     } else {
         if (property.id !== childId) {
             throw `Parent property '${key}' does not reference child '${childId}'`;
         }
         delete parentValue[key];
-        _deleteIfEmpty(elements, parentId);
+        if (!defKeepIfEmpty) {
+            _deleteIfEmpty(elements, parentId);
+        }
     }
 }
 
@@ -228,9 +233,9 @@ function addReference(state: DiagramState, parentId: ElementId, key: string, chi
     return output;
 }
 
-function deleteReference(state: DiagramState, parentId: ElementId, key: string, childId: ElementId): DiagramState {
+function deleteReference(state: DiagramState, parentId: ElementId, key: string, childId: ElementId, keepIfEmpty?: boolean): DiagramState {
     const output = cloneElements(state);
-    _deleteParentToChildReference(output.elements, parentId, key, childId);
+    _deleteParentToChildReference(output.elements, parentId, key, childId, keepIfEmpty);
     _selectiveDeleteChildToParentReferences(output.elements, parentId, childId);
     return output;
 }
