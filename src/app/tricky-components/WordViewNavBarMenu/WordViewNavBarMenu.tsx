@@ -4,8 +4,7 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import React, { useRef } from "react";
 import { AddMenu, AddMenuProps } from "../AddMenu";
 import { DeleteMenu, DeleteMenuProps } from "../DeleteMenu";
-import { EditActiveMenu, EditActiveMenuProps } from "../EditActiveMenu";
-import { EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
+import { EditActiveMenuInterface, EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
 import styles from "./_styles.scss";
@@ -127,7 +126,7 @@ export const WordViewNavBarMenu = makeRefComponent<HTMLDivElement, WordViewNavBa
                                 <EditBrowseMenu/>
                             }
                             {mode === "edit.active" &&
-                                <EditActiveMenu {...props as EditActiveMenuProps}/>
+                                <EditActiveMenuInterface {...props as EditActiveMenuInterfaceProps}/>
                             }
                             {mode === "delete" &&
                                 <DeleteMenu {...props as DeleteMenuProps}/>
