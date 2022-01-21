@@ -18,7 +18,10 @@
 }
 
 .icon {
-    @include main.smMdScreen {
+    @include main.smScreen {
+        font-size: 24px;
+    }
+    @include main.mdScreen {
         font-size: 30px;
     }
     @include main.lgScreen {
@@ -27,7 +30,10 @@
 }
 
 .children {
-    @include main.smMdScreen {
+    @include main.smScreen {
+        font-size: 10px;
+    }
+    @include main.mdScreen {
         font-size: 12px;
     }
     @include main.lgScreen {

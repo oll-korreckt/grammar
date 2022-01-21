@@ -2,7 +2,6 @@
 @use "./sizes.scss" as *;
 
 .addMenu {
-    @include addMenuWidth;
     @include addMenuHeight;
     display: grid;
     grid-template-columns: auto 1fr;
@@ -24,7 +23,6 @@
         padding-left: 10px;
         padding-right: 10px;
     }
-    margin-left: 5px;
     margin-right: 5px;
 }
 

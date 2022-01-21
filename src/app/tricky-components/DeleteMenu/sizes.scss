@@ -15,8 +15,11 @@
 }
 
 @mixin deleteMenuWidth {
-    @include main.smMdScreen {
-        width: calc(#{calcWidth($deleteMenuPromptSmMdWidth, $deleteMenuButtonSmMdDiameter)});
+    @include main.smScreen {
+        width: calc(#{calcWidth($deleteMenuPromptSmMdWidth, $deleteMenuButtonSmDiameter)});
+    }
+    @include main.mdScreen {
+        width: calc(#{calcWidth($deleteMenuPromptSmMdWidth, $deleteMenuButtonMdDiameter)});
     }
     @include main.lgScreen {
         width: calc(#{calcWidth($deleteMenuPromptLgWidth, $deleteMenuButtonLgDiameter)});
@@ -24,8 +27,11 @@
 }
 
 @mixin deleteMenuHeight {
-    @include main.smMdScreen {
-        height: max($deleteMenuPromptSmMdHeight, $deleteMenuButtonSmMdDiameter);
+    @include main.smScreen {
+        height: max($deleteMenuPromptSmMdHeight, $deleteMenuButtonSmDiameter);
+    }
+    @include main.mdScreen {
+        height: max($deleteMenuPromptSmMdHeight, $deleteMenuButtonMdDiameter);
     }
     @include main.lgScreen {
         height: max($deleteMenuPromptLgHeight, $deleteMenuButtonLgDiameter);

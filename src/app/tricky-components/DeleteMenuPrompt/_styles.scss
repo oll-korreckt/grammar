@@ -4,7 +4,11 @@
 .deleteMenuPrompt {
     @include deleteMenuPromptWidth;
     @include deleteMenuPromptHeight;
-    @include main.smMdScreen {
+    @include main.smScreen {
+        font-size: 12px;
+        line-height: 12px;
+    }
+    @include main.mdScreen {
         font-size: 16px;
         line-height: 16px;
     }

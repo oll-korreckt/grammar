@@ -2,7 +2,6 @@
 @use "./sizes.scss" as *;
 
 .navigateMenu {
-    @include navigateMenuWidth;
     @include navigateMenuHeight;
     display: grid;
     grid-template-columns: auto 1fr;
