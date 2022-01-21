@@ -1,4 +1,4 @@
-import { DiagramState, ElementDisplayInfo, WordViewMode } from "@app/utils";
+import { DiagramState, ElementDisplayInfo, LabelFormMode } from "@app/utils";
 import { ElementCategory, ElementId, ElementRecord, ElementType, getElementDefinition } from "@domain/language";
 import { ElementLexeme, Lexeme } from "../LabelView";
 import { LabelSettings } from "../LabelView/LabelView";
@@ -110,11 +110,11 @@ function getLabelData(diagram: DiagramState, { category, expanded }: DisplaySett
 }
 
 export type LabelSettingsMode = EditActiveLabelSettingsMode | {
-    type: Exclude<WordViewMode, "edit.active">;
+    type: Exclude<LabelFormMode, "edit.active">;
 }
 
 interface EditActiveLabelSettingsMode {
-    type: Extract<WordViewMode, "edit.active">;
+    type: Extract<LabelFormMode, "edit.active">;
     id: ElementId;
     property?: string;
 }

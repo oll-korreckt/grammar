@@ -1,4 +1,4 @@
-import { DiagramState, WordViewMode } from "@app/utils";
+import { DiagramState, LabelFormMode } from "@app/utils";
 import { Element, ElementId, ElementType } from "@domain/language";
 import React from "react";
 import { AddMenuProps } from "../AddMenu";
@@ -9,9 +9,9 @@ import { EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenuProps } from "../NavigateMenu";
 import { WordViewNavBarAssemblyProps } from "../WordViewNavBarAssembly";
 import { getAddMenuElements } from "./add-menu-elements";
-import { State, WordViewAssemblyAction } from "./types";
+import { State, LabelFormAction } from "./types";
 
-export function createEditActiveDispatch(dispatch: React.Dispatch<WordViewAssemblyAction>): EditActiveMenuDispatch {
+export function createEditActiveDispatch(dispatch: React.Dispatch<LabelFormAction>): EditActiveMenuDispatch {
     return (action) => {
         switch (action.type) {
             case "submit":
@@ -46,7 +46,7 @@ export function createEditActiveDispatch(dispatch: React.Dispatch<WordViewAssemb
     };
 }
 
-export function createOnModeChange(state: State, dispatch: React.Dispatch<WordViewAssemblyAction>): (newMode: WordViewMode) => void {
+export function createOnModeChange(state: State, dispatch: React.Dispatch<LabelFormAction>): (newMode: LabelFormMode) => void {
     if (state.mode === "edit.active") {
         return (newMode) => {
             if (newMode === "edit.active") {
@@ -60,7 +60,7 @@ export function createOnModeChange(state: State, dispatch: React.Dispatch<WordVi
     }
     return (newMode) => {
         if (newMode === "edit.active") {
-            const dispatchType: WordViewAssemblyAction["type"] = "edit.active: switch mode";
+            const dispatchType: LabelFormAction["type"] = "edit.active: switch mode";
             throw `Cannot switch to '${newMode}' via '${dispatchType}' action`;
         }
         dispatch({
@@ -70,7 +70,7 @@ export function createOnModeChange(state: State, dispatch: React.Dispatch<WordVi
     };
 }
 
-export function convertToMenuProps(state: State, dispatch: React.Dispatch<WordViewAssemblyAction>): WordViewNavBarAssemblyProps["props"] {
+export function convertToMenuProps(state: State, dispatch: React.Dispatch<LabelFormAction>): WordViewNavBarAssemblyProps["props"] {
     switch (state.mode) {
         case "navigate": {
             const output: NavigateMenuProps = {
@@ -122,7 +122,7 @@ export function convertToMenuProps(state: State, dispatch: React.Dispatch<WordVi
     }
 }
 
-export function createOnLabelClick(state: State, dispatch: React.Dispatch<WordViewAssemblyAction>): (id: ElementId) => void {
+export function createOnLabelClick(state: State, dispatch: React.Dispatch<LabelFormAction>): (id: ElementId) => void {
     switch (state.mode) {
         case "navigate":
             return (id) => dispatch({

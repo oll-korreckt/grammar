@@ -4,11 +4,11 @@ import { LabelViewAssembly } from "../LabelViewAssembly";
 import { WordViewNavBarAssembly } from "../WordViewNavBarAssembly";
 import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./adapter";
 import { useWordViewAssembly } from "./reducer";
-import { NewWordViewAssemblyProps } from "./types";
+import { LabelFormProps } from "./types";
 import { LabelSettingsMode, Utils } from "./utils";
 import styles from "./_styles.scss";
 
-export const NewWordViewAssembly: React.VFC<NewWordViewAssemblyProps> = (props) => {
+export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const [state, dispatch] = useWordViewAssembly(props);
     const onModeChange = createOnModeChange(state, dispatch);
     const menuProps = convertToMenuProps(state, dispatch);

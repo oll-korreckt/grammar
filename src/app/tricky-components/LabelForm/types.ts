@@ -1,11 +1,11 @@
-import { DiagramState, WordViewMode } from "@app/utils";
+import { DiagramState, LabelFormMode } from "@app/utils";
 import { ElementCategory, ElementId, ElementType } from "@domain/language";
 
-const navigateMode: WordViewMode = "navigate";
-const addMode: WordViewMode = "add";
-const editBrowseMode: WordViewMode = "edit.browse";
-const editActiveMode: WordViewMode = "edit.active";
-const deleteMode: WordViewMode = "delete";
+const navigateMode: LabelFormMode = "navigate";
+const addMode: LabelFormMode = "add";
+const editBrowseMode: LabelFormMode = "edit.browse";
+const editActiveMode: LabelFormMode = "edit.active";
+const deleteMode: LabelFormMode = "delete";
 
 interface StateBase {
     display: DisplaySettings;
@@ -50,16 +50,16 @@ export interface DisplaySettings {
 
 export type DiagramChange = (newDiagram: DiagramState) => void;
 
-export interface NewWordViewAssemblyProps {
+export interface LabelFormProps {
     initialDiagram: DiagramState;
-    initialMode?: WordViewMode;
+    initialMode?: LabelFormMode;
     initialDisplay?: DisplaySettings;
     onDiagramChange?: DiagramChange;
 }
 
-export type WordViewAssemblyAction = {
+export type LabelFormAction = {
     type: "switch mode";
-    target: Exclude<WordViewMode, "edit.active">;
+    target: Exclude<LabelFormMode, "edit.active">;
 } | {
     type: "navigate: category";
     category: ElementCategory;
@@ -94,7 +94,7 @@ export type WordViewAssemblyAction = {
     id: ElementId;
 } | {
     type: "edit.active: switch mode";
-    target: Exclude<WordViewMode, "edit.active">;
+    target: Exclude<LabelFormMode, "edit.active">;
 } | {
     type: "delete: element";
     id: ElementId;

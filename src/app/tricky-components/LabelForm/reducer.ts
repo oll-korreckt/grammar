@@ -1,14 +1,14 @@
 
-import { DiagramState, DiagramStateFunctions, WordViewMode } from "@app/utils";
+import { DiagramState, DiagramStateFunctions, LabelFormMode } from "@app/utils";
 import { ElementCategory, ElementId } from "@domain/language";
 import { SimpleObject } from "@lib/utils";
 import React, { useReducer } from "react";
-import { State, AddState, DeleteState, EditActiveState, EditBrowseState, NavigateState, WordViewAssemblyAction, NewWordViewAssemblyProps, DiagramChange, DisplaySettings } from "./types";
+import { State, AddState, DeleteState, EditActiveState, EditBrowseState, NavigateState, LabelFormAction, LabelFormProps, DiagramChange, DisplaySettings } from "./types";
 
-function switchMode(state: State, target: Exclude<WordViewMode, "edit.active">): State {
+function switchMode(state: State, target: Exclude<LabelFormMode, "edit.active">): State {
     if (state.mode === "edit.active") {
-        const actionName: WordViewAssemblyAction["type"] = "switch mode";
-        const mode: WordViewMode = "edit.active";
+        const actionName: LabelFormAction["type"] = "switch mode";
+        const mode: LabelFormMode = "edit.active";
         throw `'${actionName}' is not intended for switching out of '${mode}'`;
     }
     const mixin: Pick<State, "diagram" | "display"> = {
@@ -50,7 +50,7 @@ function getPriorMode({ priorMode, diagram }: EditActiveState): AddState | EditB
     };
 }
 
-function editActiveSwitchMode(state: EditActiveState, target: Exclude<WordViewMode, "edit.active">): State {
+function editActiveSwitchMode(state: EditActiveState, target: Exclude<LabelFormMode, "edit.active">): State {
     const priorMode = getPriorMode(state);
     switch (target) {
         case "navigate":
@@ -91,7 +91,7 @@ function createDisplaySettings(category: ElementCategory | undefined, expanded: 
     return output;
 }
 
-type StateMapper<T extends WordViewMode> =
+type StateMapper<T extends LabelFormMode> =
     T extends "navigate" ? NavigateState
         : T extends "add" ? AddState
         : T extends "edit.browse" ? EditBrowseState
@@ -99,7 +99,7 @@ type StateMapper<T extends WordViewMode> =
         : T extends "delete" ? DeleteState
         : never;
 
-function castState<T extends WordViewMode>(mode: T, state: State): StateMapper<T> {
+function castState<T extends LabelFormMode>(mode: T, state: State): StateMapper<T> {
     if (mode !== state.mode) {
         throw "";
     }
@@ -121,7 +121,7 @@ function getUpExpanded(diagram: DiagramState, display: DisplaySettings): Element
     return categoryFilter(parentCategory) ? expandedItem.ref : undefined;
 }
 
-function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange?: DiagramChange | undefined): State {
+function reducerFn(state: State, action: LabelFormAction, onDiagramChange?: DiagramChange | undefined): State {
     const invokeDiagramChange: DiagramChange = (newDiagram) => {
         if (onDiagramChange === undefined) {
             return;
@@ -288,8 +288,8 @@ function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange
     }
 }
 
-function initializer({ initialDiagram, initialMode, initialDisplay }: NewWordViewAssemblyProps): State {
-    function getMode(): WordViewMode {
+function initializer({ initialDiagram, initialMode, initialDisplay }: LabelFormProps): State {
+    function getMode(): LabelFormMode {
         return initialMode !== undefined ? initialMode : "navigate";
     }
     function getDisplay(): DisplaySettings {
@@ -303,11 +303,11 @@ function initializer({ initialDiagram, initialMode, initialDisplay }: NewWordVie
     } as any;
 }
 
-function createReducer(onDiagramChange: DiagramChange | undefined): React.Reducer<State, WordViewAssemblyAction> {
+function createReducer(onDiagramChange: DiagramChange | undefined): React.Reducer<State, LabelFormAction> {
     return (state, action) => reducerFn(state, action, onDiagramChange);
 }
 
-export function useWordViewAssembly(props: NewWordViewAssemblyProps): [State, React.Dispatch<WordViewAssemblyAction>] {
+export function useWordViewAssembly(props: LabelFormProps): [State, React.Dispatch<LabelFormAction>] {
     const reducer = createReducer(props.onDiagramChange);
     return useReducer(reducer, props, initializer);
 }
