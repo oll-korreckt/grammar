@@ -37,6 +37,19 @@ export type ChildVariants = {
     exit?: Variant;
 }
 
+export type LabelFormMode =
+    | "navigate"
+    | "add"
+    | "edit.browse"
+    | "edit.active"
+    | "delete";
+
+export const LabelFormMode = {
+    getDefault(mode?: LabelFormMode): LabelFormMode {
+        return mode !== undefined ? mode : "navigate";
+    }
+};
+
 export const EVENTS = {
     initial: "hidden",
     animate: "show",
