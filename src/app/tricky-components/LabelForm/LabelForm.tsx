@@ -1,15 +1,15 @@
 import { accessClassName } from "@app/utils";
 import React from "react";
 import { LabelViewAssembly } from "../LabelViewAssembly";
-import { WordViewNavBarAssembly } from "../WordViewNavBarAssembly";
+import { LabelViewNavBarAssembly } from "../LabelViewNavBarAssembly";
 import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./adapter";
-import { useWordViewAssembly } from "./reducer";
+import { useLabelForm } from "./reducer";
 import { LabelFormProps } from "./types";
 import { LabelSettingsMode, Utils } from "./utils";
 import styles from "./_styles.scss";
 
 export const LabelForm: React.VFC<LabelFormProps> = (props) => {
-    const [state, dispatch] = useWordViewAssembly(props);
+    const [state, dispatch] = useLabelForm(props);
     const onModeChange = createOnModeChange(state, dispatch);
     const menuProps = convertToMenuProps(state, dispatch);
     const lexemes = Utils.getLabelData(state.diagram, state.display);
@@ -20,7 +20,7 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const onLabelClick = createOnLabelClick(state, dispatch);
 
     return (
-        <div className={accessClassName(styles, "wordViewAssembly")}>
+        <div className={accessClassName(styles, "labelForm")}>
             <LabelViewAssembly
                 mode={state.mode}
                 settings={settings}
@@ -28,7 +28,7 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
             >
                 {lexemes}
             </LabelViewAssembly>
-            <WordViewNavBarAssembly
+            <LabelViewNavBarAssembly
                 mode={state.mode}
                 onModeChange={onModeChange}
                 props={menuProps}

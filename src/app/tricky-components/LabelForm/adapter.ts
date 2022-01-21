@@ -7,7 +7,7 @@ import { EditActiveMenuDispatch } from "../EditActiveMenu";
 import { EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 import { EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenuProps } from "../NavigateMenu";
-import { WordViewNavBarAssemblyProps } from "../WordViewNavBarAssembly";
+import { LabelViewNavBarAssemblyProps } from "../LabelViewNavBarAssembly";
 import { getAddMenuElements } from "./add-menu-elements";
 import { State, LabelFormAction } from "./types";
 
@@ -70,7 +70,7 @@ export function createOnModeChange(state: State, dispatch: React.Dispatch<LabelF
     };
 }
 
-export function convertToMenuProps(state: State, dispatch: React.Dispatch<LabelFormAction>): WordViewNavBarAssemblyProps["props"] {
+export function convertToMenuProps(state: State, dispatch: React.Dispatch<LabelFormAction>): LabelViewNavBarAssemblyProps["props"] {
     switch (state.mode) {
         case "navigate": {
             const output: NavigateMenuProps = {

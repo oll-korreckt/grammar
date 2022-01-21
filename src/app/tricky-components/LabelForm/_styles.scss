@@ -1,6 +1,6 @@
-@use "../WordViewNavBar/sizes.scss" as *;
+@use "../LabelViewNavBar/sizes.scss" as *;
 
-.wordViewAssembly {
+.labelForm {
     display: grid;
     grid-template-rows: 1fr auto;
     height: 100%;

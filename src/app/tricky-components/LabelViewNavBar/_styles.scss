@@ -1,9 +1,9 @@
 @use "main";
 @use "./sizes.scss" as *;
 
-.wordViewNavBar {
+.labelViewNavBar {
     @include main.center-content;
-    @include wordViewNavBarHeight;
+    @include labelViewNavBarHeight;
     position: relative;
     border-top: 1px solid black;
 }

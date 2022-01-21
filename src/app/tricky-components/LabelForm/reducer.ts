@@ -307,7 +307,7 @@ function createReducer(onDiagramChange: DiagramChange | undefined): React.Reduce
     return (state, action) => reducerFn(state, action, onDiagramChange);
 }
 
-export function useWordViewAssembly(props: LabelFormProps): [State, React.Dispatch<LabelFormAction>] {
+export function useLabelForm(props: LabelFormProps): [State, React.Dispatch<LabelFormAction>] {
     const reducer = createReducer(props.onDiagramChange);
     return useReducer(reducer, props, initializer);
 }

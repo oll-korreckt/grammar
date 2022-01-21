@@ -7,7 +7,7 @@ import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
 import styles from "./_styles.scss";
 
-export interface WordViewNavBarProps {
+export interface LabelViewNavBarProps {
     mode?: LabelFormMode;
     onModeChange?: (newMode: LabelFormMode) => void;
 }
@@ -17,7 +17,7 @@ interface Item {
     onClick?: () => void;
 }
 
-export const WordViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren<WordViewNavBarProps>>("WordViewNavBar", ({ mode, onModeChange, children }, ref) => {
+export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren<LabelViewNavBarProps>>("LabelViewNavBar", ({ mode, onModeChange, children }, ref) => {
     const currentMode = LabelFormMode.getDefault(mode);
 
     function invokeModeChange(newMode: LabelFormMode): void {
@@ -29,7 +29,7 @@ export const WordViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren
     return (
         <div
             ref={ref}
-            className={accessClassName(styles, "wordViewNavBar")}
+            className={accessClassName(styles, "labelViewNavBar")}
         >
             {children}
             <div className={accessClassName(styles, "itemContainer")}>

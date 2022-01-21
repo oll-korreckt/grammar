@@ -1,6 +1,6 @@
 @use "main";
 
-@mixin wordViewNavBarHeight {
+@mixin labelViewNavBarHeight {
     @include main.smMdScreen {
         height: 65px;
     }

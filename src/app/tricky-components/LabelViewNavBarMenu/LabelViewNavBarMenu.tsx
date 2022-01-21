@@ -9,7 +9,7 @@ import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
 import styles from "./_styles.scss";
 
-export type WordViewNavBarMenuProps =
+export type LabelViewNavBarMenuProps =
     | MenuState<"navigate">
     | MenuState<"add">
     | MenuState<"edit.browse">
@@ -85,7 +85,7 @@ const containerClasses: Record<LabelFormMode, string[]> = {
     "delete": ["deleteContainer"]
 };
 
-export const WordViewNavBarMenu = makeRefComponent<HTMLDivElement, WordViewNavBarMenuProps>("WordViewNavBarMenu", ({ mode, props }, ref) => {
+export const LabelViewNavBarMenu = makeRefComponent<HTMLDivElement, LabelViewNavBarMenuProps>("LabelViewNavBarMenu", ({ mode, props }, ref) => {
     const prevMode = useRef(mode);
     const directionRef = useRef<Direction>();
 
