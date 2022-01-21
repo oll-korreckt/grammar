@@ -1,4 +1,4 @@
-import { accessClassName, WordViewMode } from "@app/utils";
+import { accessClassName, LabelFormMode } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { PropsWithChildren } from "react";
@@ -8,19 +8,19 @@ import { RiEdit2Fill } from "react-icons/ri";
 import styles from "./_styles.scss";
 
 export interface WordViewNavBarProps {
-    mode?: WordViewMode;
-    onModeChange?: (newMode: WordViewMode) => void;
+    mode?: LabelFormMode;
+    onModeChange?: (newMode: LabelFormMode) => void;
 }
 
 interface Item {
-    mode: WordViewMode;
+    mode: LabelFormMode;
     onClick?: () => void;
 }
 
 export const WordViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren<WordViewNavBarProps>>("WordViewNavBar", ({ mode, onModeChange, children }, ref) => {
-    const currentMode = WordViewMode.getDefault(mode);
+    const currentMode = LabelFormMode.getDefault(mode);
 
-    function invokeModeChange(newMode: WordViewMode): void {
+    function invokeModeChange(newMode: LabelFormMode): void {
         if (onModeChange) {
             onModeChange(newMode);
         }

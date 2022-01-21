@@ -1,4 +1,4 @@
-import { accessClassName, WordViewMode } from "@app/utils";
+import { accessClassName, LabelFormMode } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import React, { useRef } from "react";
@@ -16,7 +16,7 @@ export type WordViewNavBarMenuProps =
     | MenuState<"edit.active">
     | MenuState<"delete">;
 
-type MenuState<TMode extends WordViewMode> =
+type MenuState<TMode extends LabelFormMode> =
     TMode extends "navigate" ? { mode: TMode; props: NavigateMenuProps; }
         : TMode extends "add" ? { mode: TMode; props: AddMenuProps; }
         : TMode extends "edit.browse" ? { mode: TMode; props: EditBrowseMenuProps; }
@@ -26,7 +26,7 @@ type MenuState<TMode extends WordViewMode> =
 
 type Direction = "fromLeft" | "fromRight";
 
-const modeOrder: Record<WordViewMode, number> = {
+const modeOrder: Record<LabelFormMode, number> = {
     "navigate": 0,
     "add": 1,
     "edit.browse": 2,
@@ -34,11 +34,11 @@ const modeOrder: Record<WordViewMode, number> = {
     "delete": 4
 };
 
-const allModes: WordViewMode[] = Object.entries(modeOrder)
+const allModes: LabelFormMode[] = Object.entries(modeOrder)
     .sort(([, value1], [, value2]) => value2 - value1)
-    .map(([mode]) => mode as WordViewMode);
+    .map(([mode]) => mode as LabelFormMode);
 
-function getDirection(prevMode: WordViewMode, currMode: WordViewMode): Direction | undefined {
+function getDirection(prevMode: LabelFormMode, currMode: LabelFormMode): Direction | undefined {
     const prevModeOrder = modeOrder[prevMode];
     const currModeOrder = modeOrder[currMode];
     const diff = currModeOrder - prevModeOrder;
@@ -77,7 +77,7 @@ const variants: Variants = {
     }
 };
 
-const containerClasses: Record<WordViewMode, string[]> = {
+const containerClasses: Record<LabelFormMode, string[]> = {
     "navigate": ["navigateContainer"],
     "add": ["addContainer"],
     "edit.browse": ["editBrowseContainer"],

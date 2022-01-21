@@ -1,14 +1,14 @@
-import { accessClassName, WordViewMode } from "@app/utils";
+import { accessClassName, LabelFormMode } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import React from "react";
 import { LabelView, LabelViewProps } from "../LabelView";
 import styles from "./_styles.scss";
 
 export interface LabelViewAssemblyProps extends LabelViewProps {
-    mode: WordViewMode;
+    mode: LabelFormMode;
 }
 
-function mapToClass(mode: WordViewMode): string {
+function mapToClass(mode: LabelFormMode): string {
     switch (mode) {
         case "edit.browse":
             return "editBrowse";
