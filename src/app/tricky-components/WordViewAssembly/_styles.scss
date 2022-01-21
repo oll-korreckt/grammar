@@ -1,5 +1,18 @@
 @use "main";
 
+.textBorder {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid black;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.wordViewAssembly {
+    display: grid;
+    grid-template-rows: 1fr auto;
+}
+
 .disable {
     pointer-events: none;
 }
@@ -114,6 +127,8 @@ $transition: 2000ms;
 .editActiveContainer {
     @include main.center-content;
     padding: 10px;
+    position: sticky;
+    bottom: 0;
     height: max(320px, 30vh);
 }
 
@@ -128,8 +143,9 @@ $transition: 2000ms;
 
 .bottomContainer {
     display: inline-block;
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: sticky;
+    // position: absolute;
+    // bottom: 0;
+    // left: 0;
     width: 100%;
 }

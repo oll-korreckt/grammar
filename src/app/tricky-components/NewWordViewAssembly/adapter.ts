@@ -1,4 +1,4 @@
-import { DerivationTree, DerivationTreeItem, DiagramState, WordViewMode } from "@app/utils";
+import { DiagramState, WordViewMode } from "@app/utils";
 import { Element, ElementId, ElementType } from "@domain/language";
 import React from "react";
 import { AddMenuProps } from "../AddMenu";
@@ -8,8 +8,8 @@ import { EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 import { EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenuProps } from "../NavigateMenu";
 import { WordViewNavBarAssemblyProps } from "../WordViewNavBarAssembly";
-import { DisplaySettings, State, WordViewAssemblyAction } from "./types";
-import { Utils } from "./utils";
+import { getAddMenuElements } from "./add-menu-elements";
+import { State, WordViewAssemblyAction } from "./types";
 
 export function createEditActiveDispatch(dispatch: React.Dispatch<WordViewAssemblyAction>): EditActiveMenuDispatch {
     return (action) => {
@@ -70,47 +70,6 @@ export function createOnModeChange(state: State, dispatch: React.Dispatch<WordVi
     };
 }
 
-function extractElementTypes({ primaryType, coordType }: DerivationTreeItem): Exclude<ElementType, "word">[] {
-    const output: Exclude<ElementType, "word">[] = [];
-    if (primaryType !== undefined) {
-        output.push(primaryType.type);
-    }
-    if (coordType !== undefined) {
-        output.push(coordType.type);
-    }
-    return output;
-}
-
-function extractDerivationTreeElements(tree: DerivationTree | undefined): Exclude<ElementType, "word">[] {
-    if (tree === undefined) {
-        return [];
-    }
-    const { partOfSpeech, phrase, clause } = tree;
-    const output = new Set<Exclude<ElementType, "word">>();
-    if (partOfSpeech !== undefined) {
-        partOfSpeech.forEach((item) => extractElementTypes(item).forEach((element) => output.add(element)));
-    }
-    if (phrase !== undefined) {
-        phrase.forEach((item) => extractElementTypes(item).forEach((element) => output.add(element)));
-    }
-    if (clause !== undefined) {
-        clause.forEach((item) => extractElementTypes(item).forEach((element) => output.add(element)));
-    }
-    return Array.from(output);
-}
-
-function getAddMenuElements(diagram: DiagramState, display: DisplaySettings): Exclude<ElementType, "word">[] {
-    const output = new Set<Exclude<ElementType, "word">>();
-    const visibleElementTypes = new Set(Utils.getLabelData(diagram, display).filter(Utils.isElementLabel).map(({ id }) => {
-        return DiagramState.getItem(diagram, id).type;
-    }));
-    visibleElementTypes.forEach((visibleElementType) => {
-        const tree = DerivationTree.getDerivationTree(visibleElementType);
-        extractDerivationTreeElements(tree).forEach((element) => output.add(element));
-    });
-    return Array.from(output);
-}
-
 export function convertToMenuProps(state: State, dispatch: React.Dispatch<WordViewAssemblyAction>): WordViewNavBarAssemblyProps["props"] {
     switch (state.mode) {
         case "navigate": {
@@ -166,9 +125,43 @@ export function convertToMenuProps(state: State, dispatch: React.Dispatch<WordVi
 export function createOnLabelClick(state: State, dispatch: React.Dispatch<WordViewAssemblyAction>): (id: ElementId) => void {
     switch (state.mode) {
         case "navigate":
-            return (id) => {
-                dispatch({ type: "navigate: expanded", expanded: id });
-            };
+            return (id) => dispatch({
+                type: "navigate: expanded",
+                expanded: id
+            });
+        case "edit.browse":
+            return (id) => dispatch({
+                type: "edit.browse: edit.active",
+                id: id
+            });
+        case "edit.active": {
+            const { diagram, property } = state;
+            if (property === undefined) {
+                return () => { return; };
+            } else {
+                return (id) => {
+                    const item = DiagramState.getItem(diagram, id);
+                    if (item.ref === state.id) {
+                        dispatch({
+                            type: "edit.active: remove reference",
+                            property: property,
+                            id: id
+                        });
+                    } else {
+                        dispatch({
+                            type: "edit.active: add reference",
+                            property: property,
+                            id: id
+                        });
+                    }
+                };
+            }
+        }
+        case "delete":
+            return (id) => dispatch({
+                type: "delete: element",
+                id: id
+            });
     }
     return () => { return; };
 }

@@ -115,13 +115,10 @@ function getUpExpanded(diagram: DiagramState, display: DisplaySettings): Element
         return undefined;
     }
     const parentItem = DiagramState.getItem(diagram, expandedItem.ref);
-    if (parentItem.ref === undefined) {
-        return undefined;
-    }
     const category = ElementCategory.getDefault(display.category);
     const categoryFilter = ElementCategory.getLayerFilter(category);
     const parentCategory = ElementCategory.getElementCategory(parentItem.type);
-    return categoryFilter(parentCategory) ? parentItem.ref : undefined;
+    return categoryFilter(parentCategory) ? expandedItem.ref : undefined;
 }
 
 function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange?: DiagramChange | undefined): State {
@@ -169,7 +166,10 @@ function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange
             return {
                 mode: "edit.active",
                 diagram: newDiagram,
-                display: state.display, // fix?
+                display: {
+                    ...state.display,
+                    expanded: newId
+                },
                 id: newId,
                 priorMode: {
                     mode: "add",
@@ -182,7 +182,10 @@ function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange
             return {
                 mode: "edit.active",
                 diagram: SimpleObject.clone(state.diagram),
-                display: state.display, // fix?
+                display: {
+                    ...state.display,
+                    expanded: action.id
+                },
                 id: action.id,
                 priorMode: {
                     mode: "edit.browse",
@@ -252,7 +255,8 @@ function reducerFn(state: State, action: WordViewAssemblyAction, onDiagramChange
                 editActive.diagram,
                 editActive.id,
                 action.property,
-                action.id
+                action.id,
+                true
             );
             const output: EditActiveState = {
                 ...editActive,

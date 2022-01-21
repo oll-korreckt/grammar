@@ -1,5 +1,5 @@
 import { DiagramState, ElementDisplayInfo, WordViewMode } from "@app/utils";
-import { ElementCategory, ElementId, ElementRecord, ElementType } from "@domain/language";
+import { ElementCategory, ElementId, ElementRecord, ElementType, getElementDefinition } from "@domain/language";
 import { ElementLexeme, Lexeme } from "../LabelView";
 import { LabelSettings } from "../LabelView/LabelView";
 import { DisplaySettings } from "./types";
@@ -109,12 +109,14 @@ function getLabelData(diagram: DiagramState, { category, expanded }: DisplaySett
     });
 }
 
-export type LabelSettingsMode = {
+export type LabelSettingsMode = EditActiveLabelSettingsMode | {
+    type: Exclude<WordViewMode, "edit.active">;
+}
+
+interface EditActiveLabelSettingsMode {
     type: Extract<WordViewMode, "edit.active">;
     id: ElementId;
     property?: string;
-} | {
-    type: Exclude<WordViewMode, "edit.active">;
 }
 
 function _getPropertyHeader(keys: string | [string, string], info: ElementDisplayInfo): string {
@@ -134,68 +136,96 @@ function _getPropertyHeader(keys: string | [string, string], info: ElementDispla
     throw "unexpected data type";
 }
 
-function _isSelectedProperty(selectedProperty: string | undefined, properties: string | [string, string]): boolean {
-    if (selectedProperty === undefined) {
-        return false;
+function _getEditActiveLabelSettings(mode: EditActiveLabelSettingsMode, diagram: DiagramState, lexemes: Lexeme[]): Record<ElementId, LabelSettings> {
+    const output: Record<ElementId, LabelSettings> = {};
+    const parent = DiagramState.getItem(diagram, mode.id);
+    if (parent.type === "word") {
+        throw `element '${mode.id}' is a word. words cannot be edited`;
     }
-    if (typeof properties === "string") {
-        return properties === selectedProperty;
+    const parentInfo = ElementDisplayInfo.getDisplayInfo(parent.type);
+    if (mode.property === undefined) {
+        // display mode
+        lexemes.filter(Utils.isElementLabel).forEach((element) => {
+            const item = DiagramState.getItem(diagram, element.id);
+            if (item.ref === mode.id) {
+                const keys = DiagramState.getReferencingProperties(
+                    parent.type as Exclude<ElementType, "word">,
+                    parent.value,
+                    element.id
+                );
+                if (keys === undefined) {
+                    throw `element '${element.id}' claims to reference '${mode.id}' but is not in the properties of '${mode.id}'`;
+                }
+                const header = _getPropertyHeader(keys, parentInfo);
+                const itemInfo = ElementDisplayInfo.getDisplayInfo(item.type);
+                output[element.id] = {
+                    header: header,
+                    color: itemInfo.color
+                };
+            }
+        });
     } else {
-        return properties.includes(selectedProperty);
+        // edit property mode
+        const parentDef = getElementDefinition(parent.type);
+        if (!(mode.property in parentDef)) {
+            throw `no property definition for '${mode.property}' in '${parent.type}' element`;
+        }
+        const children = DiagramState.getElementReferences(parent.type, parent.value);
+        const childrenIds: ElementId[] = mode.property in children
+            ? children[mode.property].map((child) => child.id)
+            : [];
+        const childrenIdSet = new Set(childrenIds);
+        const [, validPropTypes] = parentDef[mode.property];
+        const validPropTypeSet = new Set(validPropTypes);
+        lexemes.filter(Utils.isElementLabel).forEach((element) => {
+            const item = DiagramState.getItem(diagram, element.id);
+            const itemInfo = ElementDisplayInfo.getDisplayInfo(item.type);
+            if (childrenIdSet.has(element.id)) {
+                const keys = DiagramState.getReferencingProperties(
+                    parent.type as Exclude<ElementType, "word">,
+                    parent.value,
+                    element.id
+                );
+                if (keys === undefined) {
+                    throw `element '${element.id}' claims to reference '${mode.id}' but is not in the properties of '${mode.id}'`;
+                }
+                output[element.id] = {
+                    color: itemInfo.color,
+                    header: _getPropertyHeader(keys, parentInfo)
+                };
+            } else if (item.ref === undefined && validPropTypeSet.has(item.type)) {
+                output[element.id] = {
+                    fade: true,
+                    color: itemInfo.color,
+                    header: itemInfo.header
+                };
+            }
+        });
     }
+    return output;
 }
 
 function getLabelSettings(mode: LabelSettingsMode, diagram: DiagramState, lexemes: Lexeme[]): Record<ElementId, LabelSettings> {
-    const output: Record<ElementId, LabelSettings> = {};
     if (mode.type === "edit.active") {
-        const parent = DiagramState.getItem(diagram, mode.id);
-        if (parent.type === "word") {
-            throw "hi";
+        return _getEditActiveLabelSettings(mode, diagram, lexemes);
+    }
+    const output: Record<ElementId, LabelSettings> = {};
+    for (let index = 0; index < lexemes.length; index++) {
+        const lexeme = lexemes[index];
+        if (!Utils.isElementLabel(lexeme)) {
+            continue;
         }
-        const parentInfo = ElementDisplayInfo.getDisplayInfo(parent.type);
-        for (let index = 0; index < lexemes.length; index++) {
-            const lexeme = lexemes[index];
-            if (!Utils.isElementLabel(lexeme)) {
-                continue;
-            }
-            const { id } = lexeme;
-            if (id in output) {
-                continue;
-            }
-            const properties = DiagramState.getReferencingProperties(
-                parent.type as Exclude<ElementType, "word">,
-                parent.value,
-                id
-            );
-            if (properties === undefined) {
-                continue;
-            }
-            const elementType = DiagramState.getItem(diagram, id).type;
-            const header = _getPropertyHeader(properties, parentInfo);
-            output[id] = {
-                fade: _isSelectedProperty(mode.property, properties),
-                header: header,
-                color: ElementDisplayInfo.getDisplayInfo(elementType).color
-            };
+        const { id } = lexeme;
+        if (id in output) {
+            continue;
         }
-    } else {
-        for (let index = 0; index < lexemes.length; index++) {
-            const lexeme = lexemes[index];
-            if (!Utils.isElementLabel(lexeme)) {
-                continue;
-            }
-            const { id } = lexeme;
-            if (id in output) {
-                continue;
-            }
-            const item = DiagramState.getItem(diagram, id);
-            const itemInfo = ElementDisplayInfo.getDisplayInfo(item.type);
-            const header = !!item.ref ? `🔗 ${itemInfo.header}` : itemInfo.header;
-            output[id] = {
-                color: itemInfo.color,
-                header
-            };
-        }
+        const item = DiagramState.getItem(diagram, id);
+        const itemInfo = ElementDisplayInfo.getDisplayInfo(item.type);
+        const header = !!item.ref ? `🔗 ${itemInfo.header}` : itemInfo.header;
+        output[id] = {
+            color: itemInfo.color,
+            header
+        };
     }
     return output;
 }
