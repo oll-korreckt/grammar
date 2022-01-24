@@ -7,17 +7,17 @@ import { ErrorList, ErrorListItem } from "../ErrorList";
 import { TextEditor } from "../TextEditor";
 import styles from "./_styles.scss";
 
-export interface SentenceInputProps {
+export interface InputFormProps {
     initialValue?: string;
-    onStateChange?: (state: SentenceInputState) => void;
+    onStateChange?: (state: InputFormState) => void;
 }
 
-export interface SentenceInputState {
+export interface InputFormState {
     value: string;
-    errorState: SentenceInputErrorState;
+    errorState: InputFormErrorState;
 }
 
-export type SentenceInputErrorState = "none" | "errors" | "calculating";
+export type InputFormErrorState = "none" | "errors" | "calculating";
 
 interface State {
     input: string;
@@ -57,7 +57,7 @@ function extractInput(children: string | undefined): string {
 
 const errorDelay = 500;
 
-export const SentenceInput: React.VFC<SentenceInputProps> = ({ initialValue, onStateChange }) => {
+export const InputForm: React.VFC<InputFormProps> = ({ initialValue, onStateChange }) => {
     const [errorListAnimate, setErrorListAnimate] = useState<boolean>(false);
     const [state, dispatch] = useReducer(
         reducer,
@@ -71,7 +71,7 @@ export const SentenceInput: React.VFC<SentenceInputProps> = ({ initialValue, onS
     const [selectedErr, setSelectedErr] = useState<string>();
     const currentInputRef = useRef<string>();
 
-    function invokeOnStateChange(newState: SentenceInputState): void {
+    function invokeOnStateChange(newState: InputFormState): void {
         if (onStateChange) {
             onStateChange(newState);
         }
@@ -102,52 +102,48 @@ export const SentenceInput: React.VFC<SentenceInputProps> = ({ initialValue, onS
     });
 
     return (
-        <div className={accessClassName(styles, "container")}>
-            <div className={accessClassName(styles, "editorContainer")}>
-                <ExtendedTextEditor
-                    editor={editor}
-                    editorRef={editorRef}
-                    onErrorChange={(newErrors) => {
-                        const input: string = currentInputRef.current !== undefined
-                            ? currentInputRef.current
-                            : state.input;
-                        invokeOnStateChange({
-                            value: input,
-                            errorState: newErrors.length === 0 ? "none" : "errors"
-                        });
-                        dispatch({
-                            type: "update errors",
-                            errors: newErrors
-                        });
-                    }}
-                    className={accessClassName(styles, "editor")}
-                    onInputChange={(newInput) => {
-                        invokeOnStateChange({
-                            value: newInput,
-                            errorState: "calculating"
-                        });
-                        currentInputRef.current = newInput;
-                        dispatch({
-                            type: "update input",
-                            input: newInput
-                        });
-                    }}
-                    errorChangeInvoke="always"
-                    errorDelay={errorDelay}
-                >
-                    {state.input}
-                </ExtendedTextEditor>
-            </div>
-            <div className={accessClassName(styles, "errorListContainer")}>
-                <ExtendedErrorList
-                    onItemSelect={setCursor}
-                    selectedKey={selectedErr}
-                    className={accessClassName(styles, "errorList")}
-                    showAnimation={errorListAnimate}
-                >
-                    {errListItems}
-                </ExtendedErrorList>
-            </div>
+        <div className={accessClassName(styles, "inputForm")}>
+            <ExtendedTextEditor
+                editor={editor}
+                editorRef={editorRef}
+                onErrorChange={(newErrors) => {
+                    const input: string = currentInputRef.current !== undefined
+                        ? currentInputRef.current
+                        : state.input;
+                    invokeOnStateChange({
+                        value: input,
+                        errorState: newErrors.length === 0 ? "none" : "errors"
+                    });
+                    dispatch({
+                        type: "update errors",
+                        errors: newErrors
+                    });
+                }}
+                className={accessClassName(styles, "extendedTextEditor")}
+                onInputChange={(newInput) => {
+                    invokeOnStateChange({
+                        value: newInput,
+                        errorState: "calculating"
+                    });
+                    currentInputRef.current = newInput;
+                    dispatch({
+                        type: "update input",
+                        input: newInput
+                    });
+                }}
+                errorChangeInvoke="always"
+                errorDelay={errorDelay}
+            >
+                {state.input}
+            </ExtendedTextEditor>
+            <ExtendedErrorList
+                onItemSelect={setCursor}
+                selectedKey={selectedErr}
+                className={accessClassName(styles, "extendedErrorList")}
+                showAnimation={errorListAnimate}
+            >
+                {errListItems}
+            </ExtendedErrorList>
         </div>
     );
 };
