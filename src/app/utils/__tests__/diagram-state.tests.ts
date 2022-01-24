@@ -48,6 +48,14 @@ describe("DiagramState", () => {
         });
     });
 
+    test("getText", () => {
+        const result = DiagramState.getText(state);
+        assert.strictEqual(
+            result,
+            "The quick brown fox jumps over the lazy dog."
+        );
+    });
+
     describe("getItem", () => {
         test("error", () => {
             assert.throw(

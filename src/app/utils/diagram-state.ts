@@ -54,6 +54,19 @@ function initEmpty(): DiagramState {
     };
 }
 
+function getText(state: DiagramState): string {
+    let output = "";
+    state.lexemes.forEach((lexeme) => {
+        if (lexeme.type === "word") {
+            const { value } = getTypedItem(state, "word", lexeme.id);
+            output += value.lexeme;
+        } else {
+            output += lexeme.lexeme;
+        }
+    });
+    return output;
+}
+
 function fromText(text: string): DiagramState {
     const output: DiagramState = {
         lexemes: [],
@@ -590,6 +603,7 @@ function createDeleteEmptyElements(state: DiagramState): AtomicChange[] {
 
 export const DiagramState = {
     initEmpty: initEmpty,
+    getText: getText,
     fromText: fromText,
     getWordIndex: getWordIndex,
     isWordLexeme: isWordLexeme,
