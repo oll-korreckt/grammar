@@ -47,6 +47,13 @@ export function getNewItemId(): string {
     return SerialId.getNextId();
 }
 
+function initEmpty(): DiagramState {
+    return {
+        lexemes: [],
+        elements: {}
+    };
+}
+
 function fromText(text: string): DiagramState {
     const output: DiagramState = {
         lexemes: [],
@@ -582,6 +589,7 @@ function createDeleteEmptyElements(state: DiagramState): AtomicChange[] {
 }
 
 export const DiagramState = {
+    initEmpty: initEmpty,
     fromText: fromText,
     getWordIndex: getWordIndex,
     isWordLexeme: isWordLexeme,
