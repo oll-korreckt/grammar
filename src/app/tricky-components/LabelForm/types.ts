@@ -51,7 +51,7 @@ export interface DisplaySettings {
 export type DiagramChange = (newDiagram: DiagramState) => void;
 
 export interface LabelFormProps {
-    initialDiagram: DiagramState;
+    initialDiagram?: DiagramState;
     initialMode?: LabelFormMode;
     initialDisplay?: DisplaySettings;
     onDiagramChange?: DiagramChange;

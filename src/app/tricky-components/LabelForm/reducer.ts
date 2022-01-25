@@ -292,13 +292,18 @@ function initializer({ initialDiagram, initialMode, initialDisplay }: LabelFormP
     function getMode(): LabelFormMode {
         return initialMode !== undefined ? initialMode : "navigate";
     }
+    function getDiagram(): DiagramState {
+        return initialDiagram !== undefined
+            ? initialDiagram
+            : DiagramState.initEmpty();
+    }
     function getDisplay(): DisplaySettings {
         return initialDisplay !== undefined ? initialDisplay : {};
     }
 
     return {
         mode: getMode(),
-        diagram: initialDiagram,
+        diagram: getDiagram(),
         display: getDisplay()
     } as any;
 }
