@@ -1,0 +1,43 @@
+@use "main";
+
+$calc-width: "calc(100% - 10px * 2)";
+$calc-height: "calc(100% - 15px)";
+
+.messageBox {
+    @include main.smMdScreen {
+        width: min(#{$calc-width}, 400px);
+    }
+    @include main.lgScreen {
+        width: min(#{$calc-width}, 500px);
+    }
+    padding: 15px;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    border-radius: 5px;
+    background-color: white;
+}
+
+.messageSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 5px;
+    @include main.smMdScreen {
+        font-size: 20px;
+    }
+    @include main.lgScreen {
+        font-size: 24px;
+    }
+}
+
+.buttonSection {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.button {
+    font-size: 16px;
+    padding: 5px 20px;
+}
