@@ -3,7 +3,7 @@ import { DiagramState, DiagramStateFunctions, LabelFormMode } from "@app/utils";
 import { ElementCategory, ElementId } from "@domain/language";
 import { SimpleObject } from "@lib/utils";
 import React, { useReducer } from "react";
-import { State, AddState, DeleteState, EditActiveState, EditBrowseState, NavigateState, LabelFormAction, LabelFormProps, DiagramChange, DisplaySettings } from "./types";
+import { State, AddState, DeleteState, EditActiveState, EditBrowseState, NavigateState, LabelFormAction, LabelFormProps, DisplaySettings } from "./types";
 
 function switchMode(state: State, target: Exclude<LabelFormMode, "edit.active">): State {
     if (state.mode === "edit.active") {
@@ -121,13 +121,7 @@ function getUpExpanded(diagram: DiagramState, display: DisplaySettings): Element
     return categoryFilter(parentCategory) ? expandedItem.ref : undefined;
 }
 
-function reducerFn(state: State, action: LabelFormAction, onDiagramChange?: DiagramChange | undefined): State {
-    const invokeDiagramChange: DiagramChange = (newDiagram) => {
-        if (onDiagramChange === undefined) {
-            return;
-        }
-        onDiagramChange(newDiagram);
-    };
+function reducer(state: State, action: LabelFormAction): State {
     switch (action.type) {
         case "switch mode": {
             return switchMode(state, action.target);
@@ -199,7 +193,7 @@ function reducerFn(state: State, action: LabelFormAction, onDiagramChange?: Diag
             if (priorMode === undefined) {
                 throw "no prior mode provided";
             }
-            invokeDiagramChange(state.diagram);
+            // invokeDiagramChange(state.diagram);
             return {
                 ...priorMode,
                 diagram: state.diagram
@@ -270,7 +264,7 @@ function reducerFn(state: State, action: LabelFormAction, onDiagramChange?: Diag
         }
         case "delete: element": {
             const newDiagram = DiagramStateFunctions.deleteItem(state.diagram, action.id);
-            invokeDiagramChange(newDiagram);
+            // invokeDiagramChange(newDiagram);
             return {
                 ...state,
                 diagram: newDiagram
@@ -278,7 +272,7 @@ function reducerFn(state: State, action: LabelFormAction, onDiagramChange?: Diag
         }
         case "delete: all": {
             const newDiagram = DiagramStateFunctions.deleteAll(state.diagram);
-            invokeDiagramChange(newDiagram);
+            // invokeDiagramChange(newDiagram);
             return {
                 ...state,
                 diagram: newDiagram,
@@ -308,11 +302,6 @@ function initializer({ initialDiagram, initialMode, initialDisplay }: LabelFormP
     } as any;
 }
 
-function createReducer(onDiagramChange: DiagramChange | undefined): React.Reducer<State, LabelFormAction> {
-    return (state, action) => reducerFn(state, action, onDiagramChange);
-}
-
 export function useLabelForm(props: LabelFormProps): [State, React.Dispatch<LabelFormAction>] {
-    const reducer = createReducer(props.onDiagramChange);
     return useReducer(reducer, props, initializer);
 }
