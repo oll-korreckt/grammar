@@ -30,11 +30,30 @@ $calc-height: "calc(100% - 15px)";
     }
 }
 
-.buttonSection {
+.oneButtonSection, .twoButtonSections {
+    display: grid;
+}
+
+.oneButtonSection {
+    grid-template-columns: 1fr;
+}
+
+.twoButtonSections {
+    grid-template-columns: 1fr 1fr;
+}
+
+.leftButtonSection, .rightButtonSection {
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     gap: 5px;
+}
+
+.leftButtonSection {
+    justify-content: flex-start;
+}
+
+.rightButtonSection {
+    justify-content: flex-end;
 }
 
 .button {
