@@ -188,6 +188,7 @@ function extractText(descendents: Descendant[]): string {
 
 export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("TextEditor", ({ children, errorDelay, errorChangeInvoke, onErrorChange, onInputChange, editor, editorRef }, ref) => {
     const timerId = useRef<any>();
+    const privateTextEditorRef = useRef<HTMLDivElement>(null);
     const [descendents, setDescendents] = useState<Descendant[]>(initChildren(children));
     const [decorations, setDecorations] = useDecorations(
         descendents,
@@ -201,13 +202,18 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Tex
     const textRef = useRef<string>(extractText(descendents));
     const extendedRef = extendRef<HTMLDivElement>(ref, (instance) => {
         if (instance === null
-            || instance.firstElementChild === null
-            || editorRef === undefined
-            || editorRef === null) {
+            || instance.firstElementChild === null) {
             return;
         }
 
         const editorInstance = instance.firstElementChild as HTMLDivElement;
+        (privateTextEditorRef.current as any) = editorInstance;
+
+        if (editorRef === undefined
+            || editorRef === null) {
+            return;
+        }
+
         switch (typeof editorRef) {
             case "object":
                 (editorRef.current as any) = editorInstance;
@@ -231,6 +237,11 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Tex
         <div
             ref={extendedRef}
             className={accessClassName(styles, "editor")}
+            onClick={() => {
+                if (privateTextEditorRef.current !== null) {
+                    privateTextEditorRef.current.focus();
+                }
+            }}
         >
             <Slate
                 editor={editor}
