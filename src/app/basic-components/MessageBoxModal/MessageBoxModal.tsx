@@ -1,16 +1,21 @@
 import React from "react";
-import { MessageBox, MessageBoxResponse, MessageBoxType } from "../MessageBox/MessageBox";
+import { MessageBox, MessageBoxButton } from "../MessageBox/MessageBox";
 import { ModalBackdrop } from "../ModalBackdrop";
 
 export interface MessageBoxModalProps {
-    type: MessageBoxType;
+    buttons: MessageBoxButton[];
     children: string;
     onResponse?: (response: MessageBoxModalResponse) => void;
 }
 
-export type MessageBoxModalResponse = MessageBoxResponse | "off screen click";
+export type MessageBoxModalResponse = {
+    type: "off screen click";
+} | {
+    type: "button";
+    text: string;
+}
 
-export const MessageBoxModal: React.VFC<MessageBoxModalProps> = ({ type, children, onResponse }) => {
+export const MessageBoxModal: React.VFC<MessageBoxModalProps> = ({ buttons, children, onResponse }) => {
     function invokeResponse(response: MessageBoxModalResponse): void {
         if (onResponse) {
             onResponse(response);
@@ -18,10 +23,10 @@ export const MessageBoxModal: React.VFC<MessageBoxModalProps> = ({ type, childre
     }
 
     return (
-        <ModalBackdrop onClick={() => invokeResponse("off screen click")}>
+        <ModalBackdrop onClick={() => invokeResponse({ type: "off screen click" })}>
             <MessageBox
-                type={type}
-                onResponse={(response) => invokeResponse(response)}
+                buttons={buttons}
+                onButtonClick={(text) => invokeResponse({ type: "button", text })}
             >
                 {children}
             </MessageBox>

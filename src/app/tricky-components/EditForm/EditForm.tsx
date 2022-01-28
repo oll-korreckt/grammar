@@ -49,14 +49,21 @@ export const EditForm: React.VFC<EditFormProps> = (props) => {
             />
             {inputStuff.askReplace &&
                 <MessageBoxModal
-                    type="yes no"
+                    buttons={[
+                        { text: "Discard Changes", alignment: "left" },
+                        { text: "Yes", alignment: "right" },
+                        { text: "No", alignment: "right" }
+                    ]}
                     onResponse={(response) => {
-                        switch (response) {
-                            case "yes":
+                        if (response.type === "off screen click") {
+                            dispatch({ type: "input: reject replace" });
+                            return;
+                        }
+                        switch (response.text) {
+                            case "Yes":
                                 dispatch({ type: "input: accept replace" });
                                 break;
-                            case "no":
-                            case "off screen click":
+                            case "No":
                                 dispatch({ type: "input: reject replace" });
                                 break;
                         }

@@ -60,6 +60,8 @@ export type Action = {
 } | {
     type: "input: reject replace";
 } | {
+    type: "input: discard changes";
+} | {
     type: "label: update diagram";
     diagram: DiagramState;
 }
@@ -201,6 +203,17 @@ export function reducer(state: State, action: Action): State {
                 ...state,
                 inputStuff: {
                     ...inputStuff,
+                    askReplace: false
+                }
+            };
+        }
+        case "input: discard changes": {
+            const { inputStuff } = state;
+            return {
+                ...state,
+                inputStuff: {
+                    ...inputStuff,
+                    currentValue: inputStuff.initialValue,
                     askReplace: false
                 }
             };

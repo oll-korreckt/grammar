@@ -221,6 +221,30 @@ describe("reducer", () => {
             );
         });
 
+        test("input: discard changes", () => {
+            runTest(
+                {
+                    stage: "input",
+                    inputStuff: {
+                        initialValue: "the",
+                        currentValue: "the dog",
+                        askReplace: true
+                    },
+                    labelStuff: {}
+                },
+                {
+                    stage: "input",
+                    inputStuff: {
+                        initialValue: "the",
+                        currentValue: "the",
+                        askReplace: false
+                    },
+                    labelStuff: {}
+                },
+                { type: "input: discard changes" }
+            );
+        });
+
         test("label: update diagram", () => {
             const oldDiagram = DiagramState.fromText("the dog");
             const newDiagram = DiagramState.fromText("the dog");
