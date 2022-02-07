@@ -110,9 +110,9 @@ function moveLabel(state: State, index: number, hParams: Hyperparameters): State
     }
 
     const [{ label, target }] = output[index];
-    const { upperX: leftX, lowerX: rightX, upperY: upY, lowerY: downY } = getMoveBounds(label, hParams);
-    const moveX = randomInt(leftX, rightX);
-    const moveY = randomInt(downY, upY);
+    const { upperX, lowerX, upperY, lowerY } = getMoveBounds(label, hParams);
+    const moveX = randomInt(lowerX, upperX);
+    const moveY = randomInt(lowerY, upperY);
 
     const movedLabel = Polygon.translateLinear(label, moveX, moveY);
     const newData = LabelData.init(index, movedLabel, target);
