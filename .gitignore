@@ -22,3 +22,10 @@ yarn-error.log*
 
 # vs-code
 /.vscode
+
+# next.js
+/.next/
+/out/
+
+# vercel
+.vercel
