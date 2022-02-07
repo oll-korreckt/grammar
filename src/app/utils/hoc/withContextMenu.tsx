@@ -1,7 +1,7 @@
 import React, { MutableRefObject, Dispatch, SetStateAction, ReactChild, useState, useRef } from "react";
 import { Rect, PartialRect, useClientRect, accessClassName } from "@app/utils";
 import { RefComponent } from "./higher-order-components";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 import { useOutsideClick } from "../hooks";
 
 function callDispatch<TElement extends HTMLElement>(instance: TElement | null, dispatch: MutableRefObject<Dispatch<SetStateAction<Rect | undefined>> | undefined>): void {
