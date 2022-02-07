@@ -3,7 +3,7 @@ import { accessClassName } from "@app/utils";
 import React from "react";
 import { EditActiveMenuDispatch, PropertyState } from "../types";
 import { Property } from "../_Property";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface PropertySectionProps {
     type: "Assigned" | "Unassigned";
@@ -17,7 +17,7 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
         <div className={accessClassName(styles, "propertySection")}>
             <div className={accessClassName(styles, "header")}>
                 <span>{type}</span>
-                <div className={accessClassName(styles, "headerLine")}/>
+                <div className={accessClassName(styles, "headerLine")} />
             </div>
             <div className={accessClassName(styles, "items")}>
                 {children.map((prop) => {

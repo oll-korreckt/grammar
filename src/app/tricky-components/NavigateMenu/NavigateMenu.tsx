@@ -5,7 +5,7 @@ import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup, FaAngleUp } from "react-icons/fa";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface NavigateMenuProps {
     category?: ElementCategory;
@@ -39,7 +39,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                 >
                     Up
                 </ExtendedItem>
-                <div className={accessClassName(styles, "border")}/>
+                <div className={accessClassName(styles, "border")} />
             </div>
             <div className={accessClassName(styles, "categoryContainer")}>
                 <AnimateSharedLayout type="crossfade">
@@ -95,7 +95,7 @@ const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClic
                 className={accessClassName(styles, "itemContent")}
                 onClick={() => onClick && onClick()}
             >
-                <Icon className={accessClassName(styles, "icon")}/>
+                <Icon className={accessClassName(styles, "icon")} />
                 <div className={accessClassName(styles, "children")}>
                     {children}
                 </div>

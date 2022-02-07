@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import React from "react";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 interface BannerProps {
     children?: string;
@@ -17,7 +17,7 @@ export const Banner: React.VFC<BannerProps> = ({ children, onBack, onCancel }) =
                     className={accessClassName(styles, "backColumn")}
                     onClick={() => onBack && onBack()}
                 >
-                    <FaArrowLeft/>
+                    <FaArrowLeft />
                 </div>
             }
             <div className={accessClassName(styles, "textColumn")}>
@@ -28,7 +28,7 @@ export const Banner: React.VFC<BannerProps> = ({ children, onBack, onCancel }) =
                     className={accessClassName(styles, "cancelColumn")}
                     onClick={() => onCancel && onCancel()}
                 >
-                    <FaTimes/>
+                    <FaTimes />
                 </div>
             }
         </div>

@@ -2,7 +2,7 @@ import { accessClassName } from "@app/utils";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 import { PropertyState } from "../types";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 type PropertyClick = () => void;
 

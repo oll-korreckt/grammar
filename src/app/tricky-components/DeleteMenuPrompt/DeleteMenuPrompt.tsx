@@ -1,10 +1,10 @@
 import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 
-export const DeleteMenuPrompt = makeRefComponent<HTMLSpanElement>("DeleteMenuPrompt", ({}, ref) => {
+export const DeleteMenuPrompt = makeRefComponent<HTMLSpanElement>("DeleteMenuPrompt", ({ }, ref) => {
     return (
         <span
             ref={ref}

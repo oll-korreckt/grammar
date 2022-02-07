@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface MessageBoxProps {
     buttons: MessageBoxButton[];
@@ -95,7 +95,7 @@ export const MessageBox = makeRefComponent<HTMLDivElement, MessageBoxProps>("Mes
                             <button
                                 key={text}
                                 className={accessClassName(styles, "button")}
-                                onClick={() =>invokeOnButtonClick(text)}
+                                onClick={() => invokeOnButtonClick(text)}
                             >
                                 {text}
                             </button>

@@ -1,6 +1,6 @@
 import { withClassNameProp } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 import { LabelViewNavBar, LabelViewNavBarProps } from "../LabelViewNavBar";
 import { LabelViewNavBarMenu, LabelViewNavBarMenuProps } from "../LabelViewNavBarMenu";
 import { accessClassName, LabelFormMode } from "@app/utils";

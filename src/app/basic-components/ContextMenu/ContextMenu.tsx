@@ -1,6 +1,6 @@
 import React from "react";
 import { accessClassName, useOutsideClick } from "@app/utils";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ContextMenuProps {
     children: [string, ...string[]];

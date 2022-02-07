@@ -1,7 +1,7 @@
 import React from "react";
 import { makeRefComponent } from "@app/utils/hoc";
 import { accessClassName } from "@app/utils";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ProgressBarProps {
     percentage: number;

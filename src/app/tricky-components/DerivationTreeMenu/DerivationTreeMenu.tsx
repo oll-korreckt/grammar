@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useContext } from "react";
 import { Banner } from "./Banner";
 import { DerivationContext } from "./derivation-context";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface RefinedDerivationTarget {
     type: Exclude<ElementType, "word">;
@@ -31,7 +31,7 @@ export const DerivationTreeMenu: React.VFC<DerivationTreeMenuProps> = ({ childre
             {state === undefined
                 ?
                 <>
-                    <Banner onCancel={callOnCancel}/>
+                    <Banner onCancel={callOnCancel} />
                     <div className={accessClassName(styles, "menuBody")}>
                         <TypeSelectPrompt
                             callFinal={callOnSelect}

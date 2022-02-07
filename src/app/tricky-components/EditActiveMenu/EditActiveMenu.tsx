@@ -8,7 +8,7 @@ import { FadeTransport } from "../FadeTransport";
 import { EditActiveMenuDispatch, EditActiveMenuAction, PropertyState } from "./types";
 import { Property } from "./_Property";
 import { PropertySection } from "./_PropertySection";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 
 export interface EditActiveMenuProps {

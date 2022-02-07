@@ -2,7 +2,7 @@ import { accessClassName, LabelFormMode } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import React from "react";
 import { LabelView, LabelViewProps } from "../LabelView";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface LabelViewAssemblyProps extends LabelViewProps {
     mode: LabelFormMode;
@@ -30,7 +30,7 @@ export const LabelViewAssembly = makeRefComponent<HTMLDivElement, LabelViewAssem
                 className={accessClassName(styles, "labelView")}
                 {...rest}
             />
-            <div className={accessClassName(styles, mapToClass(mode))}/>
+            <div className={accessClassName(styles, mapToClass(mode))} />
         </div>
     );
 });

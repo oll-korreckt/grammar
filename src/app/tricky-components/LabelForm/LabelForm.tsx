@@ -6,7 +6,7 @@ import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./ad
 import { useLabelForm } from "./reducer";
 import { LabelFormAction, LabelFormProps } from "./types";
 import { LabelSettingsMode, Utils } from "./utils";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const [state, dispatch] = useLabelForm(props);

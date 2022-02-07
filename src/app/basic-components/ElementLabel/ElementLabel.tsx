@@ -1,7 +1,7 @@
 import React from "react";
 import { Colors, accessClassName } from "@app/utils";
 import { RefComponent, makeRefComponent } from "@app/utils/hoc";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ElementLabelProps {
     color: Colors;

@@ -6,7 +6,7 @@ import { FaEdit, FaTag } from "react-icons/fa";
 import { InputForm, InputFormProps } from "../InputForm";
 import { LabelForm } from "../LabelForm";
 import { LabelFormProps } from "../LabelForm/types";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface EditFormViewProps {
     mode?: EditFormViewMode;
@@ -64,7 +64,7 @@ export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, 
                             transition={transition}
                             className={accessClassName(styles, "contentPanel")}
                         >
-                            <InputForm {...defInputFormProps}/>
+                            <InputForm {...defInputFormProps} />
                         </motion.div>
                     }
                     {defMode === "label" &&
@@ -76,7 +76,7 @@ export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, 
                             transition={transition}
                             className={accessClassName(styles, "contentPanel")}
                         >
-                            <LabelForm {...defLabelFormProps}/>
+                            <LabelForm {...defLabelFormProps} />
                         </motion.div>
                     }
                 </AnimatePresence>
@@ -105,7 +105,7 @@ const Item: React.VFC<ItemProps> = ({ onClick, icon, selected, children, disable
                 className={accessClassName(styles, ...classes)}
                 onClick={() => onClick && onClick()}
             >
-                <Icon className={accessClassName(styles, "itemIcon")}/>
+                <Icon className={accessClassName(styles, "itemIcon")} />
                 <div className={accessClassName(styles, "itemChildren")}>
                     {children}
                 </div>

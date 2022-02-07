@@ -7,7 +7,7 @@ import { SimpleObject } from "@lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { Descendant, Editor as SlateEditor, Node, NodeEntry, Path, Text } from "slate";
 import { Editable, Slate } from "slate-react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface TextEditorProps {
     children?: string;
@@ -64,9 +64,9 @@ const renderLeaf: RenderLeaf = (props) => {
     const text = getTextType(leaf);
     switch (text.type) {
         case "plainText":
-            return <PlainTextLeaf leaf={text.data} {...rest}/>;
+            return <PlainTextLeaf leaf={text.data} {...rest} />;
         case "errorToken":
-            return <ErrorTokenLeaf leaf={text.data} {...rest}/>;
+            return <ErrorTokenLeaf leaf={text.data} {...rest} />;
         default:
             throw "unhandled leaf type";
     }
@@ -149,7 +149,7 @@ function useDecorations(initial: Descendant[], errorChangeInvoke: ErrorChangeInv
     useEffect(() => {
         // immediately fire on first render
         onErrorChange(extractErrors(decorationsOutput));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return [

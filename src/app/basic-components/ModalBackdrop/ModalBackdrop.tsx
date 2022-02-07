@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { makeRefComponent, mergeRefs } from "@app/utils/hoc";
 import React, { useRef } from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ModalBackdropProps {
     onClick?: () => void;

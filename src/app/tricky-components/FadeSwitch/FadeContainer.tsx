@@ -3,7 +3,7 @@ import { makeRefComponent } from "@app/utils/hoc";
 import { motion } from "framer-motion";
 import React, { createContext, useContext, useRef, useState } from "react";
 import { FadeSwitchContext } from "../FadeSwitch/FadeSwitch";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 
 /*
@@ -46,7 +46,7 @@ const FadeIn: React.VFC = () => {
                     switchComplete();
                 }
             }}
-            transition={{ delay: duration / 2,  duration: duration / 2 }}
+            transition={{ delay: duration / 2, duration: duration / 2 }}
         >
         </motion.div>
     );
@@ -135,13 +135,13 @@ const Canvas = makeRefComponent<HTMLDivElement, CanvasProps>("Cavas", ({ childre
 
     const variants: ChildVariants = {
         hidden: () => {
-            return { };
+            return {};
         },
         show: () => {
-            return { };
+            return {};
         },
         exit: () => {
-            return { };
+            return {};
         }
     };
 

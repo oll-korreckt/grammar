@@ -2,7 +2,7 @@ import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface UpLevelProps {
     children: string;

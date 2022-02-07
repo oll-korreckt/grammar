@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { withClassNameProp } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 import { DeleteMenuButton } from "../DeleteMenuButton";
 import { DeleteMenuPrompt } from "../DeleteMenuPrompt";
 
@@ -12,7 +12,7 @@ export interface DeleteMenuProps {
 export const DeleteMenu: React.VFC<DeleteMenuProps> = ({ onDeleteAll }) => {
     return (
         <div className={accessClassName(styles, "deleteMenu")}>
-            <ExtendedDeleteMenuPrompt className={accessClassName(styles, "deleteMenuPrompt")}/>
+            <ExtendedDeleteMenuPrompt className={accessClassName(styles, "deleteMenuPrompt")} />
             <ExtendedDeleteMenuButton
                 className={accessClassName(styles, "deleteMenuButton")}
                 onClick={() => onDeleteAll && onDeleteAll()}

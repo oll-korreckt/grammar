@@ -1,6 +1,6 @@
 import React from "react";
 import { makeRefComponent } from "@app/utils/hoc";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 import { accessClassName, Colors } from "@app/utils";
 import { FaTimesCircle } from "react-icons/fa";
 
@@ -20,7 +20,7 @@ export const PropertyValueItem = makeRefComponent<HTMLDivElement, PropertyValueI
                 {children}
             </div>
             <div className={accessClassName(styles, "icon")}>
-                <FaTimesCircle/>
+                <FaTimesCircle />
             </div>
         </div>
     );

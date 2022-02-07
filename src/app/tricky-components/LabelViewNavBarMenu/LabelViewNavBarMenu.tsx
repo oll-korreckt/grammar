@@ -7,7 +7,7 @@ import { DeleteMenu, DeleteMenuProps } from "../DeleteMenu";
 import { EditActiveMenuInterface, EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export type LabelViewNavBarMenuProps =
     | MenuState<"navigate">
@@ -18,11 +18,11 @@ export type LabelViewNavBarMenuProps =
 
 type MenuState<TMode extends LabelFormMode> =
     TMode extends "navigate" ? { mode: TMode; props: NavigateMenuProps; }
-        : TMode extends "add" ? { mode: TMode; props: AddMenuProps; }
-        : TMode extends "edit.browse" ? { mode: TMode; props: EditBrowseMenuProps; }
-        : TMode extends "edit.active" ? { mode: TMode; props: EditActiveMenuInterfaceProps; }
-        : TMode extends "delete" ? { mode: TMode; props: DeleteMenuProps; }
-        : never;
+    : TMode extends "add" ? { mode: TMode; props: AddMenuProps; }
+    : TMode extends "edit.browse" ? { mode: TMode; props: EditBrowseMenuProps; }
+    : TMode extends "edit.active" ? { mode: TMode; props: EditActiveMenuInterfaceProps; }
+    : TMode extends "delete" ? { mode: TMode; props: DeleteMenuProps; }
+    : never;
 
 type Direction = "fromLeft" | "fromRight";
 
@@ -117,19 +117,19 @@ export const LabelViewNavBarMenu = makeRefComponent<HTMLDivElement, LabelViewNav
                             transition={{ ease: [0.25, 0.1, 0.25, 1], duration: 0.5 }}
                         >
                             {mode === "navigate" &&
-                                <NavigateMenu {...props as NavigateMenuProps}/>
+                                <NavigateMenu {...props as NavigateMenuProps} />
                             }
                             {mode === "add" &&
-                                <AddMenu {...props as AddMenuProps}/>
+                                <AddMenu {...props as AddMenuProps} />
                             }
                             {mode === "edit.browse" &&
-                                <EditBrowseMenu/>
+                                <EditBrowseMenu />
                             }
                             {mode === "edit.active" &&
-                                <EditActiveMenuInterface {...props as EditActiveMenuInterfaceProps}/>
+                                <EditActiveMenuInterface {...props as EditActiveMenuInterfaceProps} />
                             }
                             {mode === "delete" &&
-                                <DeleteMenu {...props as DeleteMenuProps}/>
+                                <DeleteMenu {...props as DeleteMenuProps} />
                             }
                         </motion.div>
                     );

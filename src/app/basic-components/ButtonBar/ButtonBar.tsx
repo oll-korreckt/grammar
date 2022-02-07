@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ButtonBarProps {
     buildFn?: (Component: RefComponent<HTMLDivElement>, item: string) => RefComponent<HTMLDivElement>;
@@ -29,7 +29,7 @@ export const ButtonBar = makeRefComponent<HTMLDivElement, ButtonBarProps>("Butto
                 if (buildFn) {
                     Output = buildFn(Output, item);
                 }
-                return <Output key={item}/>;
+                return <Output key={item} />;
             })}
         </div>
     );

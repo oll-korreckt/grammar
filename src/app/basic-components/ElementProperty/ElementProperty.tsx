@@ -2,7 +2,7 @@ import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import { IoPricetag, IoPricetagOutline, IoPricetags, IoPricetagsOutline } from "react-icons/io5";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ElementPropertyProps {
     children: string;
@@ -25,11 +25,11 @@ export const ElementProperty = makeRefComponent<HTMLDivElement, ElementPropertyP
             <span>&nbsp;</span>
             {selectionType === "single"
                 ? status === "complete"
-                    ? <IoPricetag/>
-                    : <IoPricetagOutline/>
+                    ? <IoPricetag />
+                    : <IoPricetagOutline />
                 : status === "complete"
-                    ? <IoPricetags/>
-                    : <IoPricetagsOutline/>
+                    ? <IoPricetags />
+                    : <IoPricetagsOutline />
             }
         </div>
     );

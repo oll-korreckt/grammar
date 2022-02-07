@@ -3,7 +3,7 @@ import React from "react";
 import { useCallback } from "react";
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface ElementPropertySelectorProps {
     children: JSX.Element | JSX.Element[];
@@ -169,7 +169,7 @@ export const CategorySelector: React.VFC<ElementPropertySelectorProps> = ({ chil
         >
             <div className={accessClassName(styles, ...leftArrow)}>
                 <div className={accessClassName(styles, "arrowIcon")}>
-                    <FaChevronLeft/>
+                    <FaChevronLeft />
                 </div>
                 <div></div>
             </div>
@@ -181,7 +181,7 @@ export const CategorySelector: React.VFC<ElementPropertySelectorProps> = ({ chil
             <div className={accessClassName(styles, ...rightArrow)}>
                 <div></div>
                 <div className={accessClassName(styles, "arrowIcon")}>
-                    <FaChevronRight/>
+                    <FaChevronRight />
                 </div>
             </div>
         </div>

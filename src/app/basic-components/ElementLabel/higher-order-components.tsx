@@ -2,14 +2,14 @@ import React from "react";
 import { ElementLabel, ElementLabelProps } from "./ElementLabel";
 import { accessClassName, Colors } from "@app/utils";
 import { makeRefComponent, RefComponent, withClassName } from "@app/utils/hoc";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 type ElementLabelType = typeof ElementLabel;
 export type SideBorderType = "left" | "right";
 
 export function withHeadLabel(Component: ElementLabelType, headLabel: string): ElementLabelType {
     return makeRefComponent<HTMLDivElement, ElementLabelProps>("withHeadLabel", (props, ref) => {
-        const headClass = accessClassName(styles,`${props.color}HeadElementLabel`);
+        const headClass = accessClassName(styles, `${props.color}HeadElementLabel`);
         const textClass = accessClassName(
             styles,
             `${props.color}HeadElementLabelText`,

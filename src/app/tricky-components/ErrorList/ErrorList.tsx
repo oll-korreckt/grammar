@@ -2,7 +2,7 @@ import { accessClassName, ErrorToken } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimatePresence, AnimateSharedLayout, motion, Variants } from "framer-motion";
 import React, { useLayoutEffect, useState } from "react";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export type ErrorListItem = Pick<ErrorToken, "key" | "message">;
 

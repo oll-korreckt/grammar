@@ -3,7 +3,7 @@ import { ElementReference, ElementType, getElementDefinition } from "@domain/lan
 import React from "react";
 import { CategorySelector } from "../CategorySelector";
 import { IoPricetagOutline, IoPricetag, IoPricetagsOutline, IoPricetags } from "react-icons/io5";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface PropertySelectorProps {
     item: DiagramStateItem;
@@ -66,11 +66,11 @@ export const PropertySelector: React.VFC<PropertySelectorProps> = ({ item, selec
                         <div className={accessClassName(styles, "icon")}>
                             {property.isArray
                                 ? property.hasItems
-                                    ? <IoPricetags/>
-                                    : <IoPricetagsOutline/>
+                                    ? <IoPricetags />
+                                    : <IoPricetagsOutline />
                                 : property.hasItems
-                                    ? <IoPricetag/>
-                                    : <IoPricetagOutline/>
+                                    ? <IoPricetag />
+                                    : <IoPricetagOutline />
                             }
                         </div>
                     </div>

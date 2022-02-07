@@ -5,7 +5,7 @@ import React, { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
-import styles from "./_styles.scss";
+import styles from "./_styles.modules.scss";
 
 export interface LabelViewNavBarProps {
     mode?: LabelFormMode;
@@ -83,7 +83,7 @@ const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, children }) => {
                 className={accessClassName(styles, "itemContent")}
                 onClick={() => onClick && onClick()}
             >
-                <Icon className={accessClassName(styles, "icon")}/>
+                <Icon className={accessClassName(styles, "icon")} />
                 <div className={accessClassName(styles, "children")}>
                     {children}
                 </div>
