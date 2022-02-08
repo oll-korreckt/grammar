@@ -5,7 +5,7 @@ import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup, FaAngleUp } from "react-icons/fa";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface NavigateMenuProps {
     category?: ElementCategory;

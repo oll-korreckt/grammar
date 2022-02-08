@@ -2,7 +2,7 @@ import React from "react";
 import { ElementLabel, ElementLabelProps } from "./ElementLabel";
 import { accessClassName, Colors } from "@app/utils";
 import { makeRefComponent, RefComponent, withClassName } from "@app/utils/hoc";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 type ElementLabelType = typeof ElementLabel;
 export type SideBorderType = "left" | "right";

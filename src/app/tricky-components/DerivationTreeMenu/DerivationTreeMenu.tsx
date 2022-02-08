@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useContext } from "react";
 import { Banner } from "./Banner";
 import { DerivationContext } from "./derivation-context";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface RefinedDerivationTarget {
     type: Exclude<ElementType, "word">;

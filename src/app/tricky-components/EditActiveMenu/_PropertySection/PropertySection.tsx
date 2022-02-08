@@ -3,7 +3,7 @@ import { accessClassName } from "@app/utils";
 import React from "react";
 import { EditActiveMenuDispatch, PropertyState } from "../types";
 import { Property } from "../_Property";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface PropertySectionProps {
     type: "Assigned" | "Unassigned";

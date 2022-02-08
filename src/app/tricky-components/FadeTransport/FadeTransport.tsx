@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import React, { useContext } from "react";
 import { FadeContainerContext } from "../FadeSwitch/FadeContainer";
 import { FadeSwitchContext } from "../FadeSwitch/FadeSwitch";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface FadeTransportProps {
     transportId: string;

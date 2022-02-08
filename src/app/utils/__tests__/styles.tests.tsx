@@ -1,4 +1,4 @@
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 import { accessClassName, appendClassName } from "../styles";
 import { assert } from "chai";
 

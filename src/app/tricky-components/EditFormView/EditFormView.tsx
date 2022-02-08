@@ -6,7 +6,7 @@ import { FaEdit, FaTag } from "react-icons/fa";
 import { InputForm, InputFormProps } from "../InputForm";
 import { LabelForm } from "../LabelForm";
 import { LabelFormProps } from "../LabelForm/types";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface EditFormViewProps {
     mode?: EditFormViewMode;

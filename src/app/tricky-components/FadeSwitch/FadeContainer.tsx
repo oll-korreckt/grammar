@@ -3,7 +3,7 @@ import { makeRefComponent } from "@app/utils/hoc";
 import { motion } from "framer-motion";
 import React, { createContext, useContext, useRef, useState } from "react";
 import { FadeSwitchContext } from "../FadeSwitch/FadeSwitch";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 
 /*

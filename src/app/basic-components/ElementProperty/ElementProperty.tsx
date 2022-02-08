@@ -2,7 +2,7 @@ import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import { IoPricetag, IoPricetagOutline, IoPricetags, IoPricetagsOutline } from "react-icons/io5";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface ElementPropertyProps {
     children: string;

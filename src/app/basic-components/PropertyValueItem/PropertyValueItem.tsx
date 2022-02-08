@@ -1,6 +1,6 @@
 import React from "react";
 import { makeRefComponent } from "@app/utils/hoc";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 import { accessClassName, Colors } from "@app/utils";
 import { FaTimesCircle } from "react-icons/fa";
 

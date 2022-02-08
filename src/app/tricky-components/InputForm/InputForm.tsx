@@ -5,7 +5,7 @@ import { createEditor, Transforms } from "slate";
 import { withReact } from "slate-react";
 import { ErrorList, ErrorListItem } from "../ErrorList";
 import { TextEditor } from "../TextEditor";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface InputFormProps {
     initialValue?: string;

@@ -2,7 +2,7 @@ import { accessClassName, ElementFilterType } from "@app/utils";
 import { useOutsideClick } from "@app/utils/hooks";
 import React, { ReactNode, useReducer } from "react";
 import { FaFilter } from "react-icons/fa";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 const ELEMENT_FILTER_ITEMS: [ElementFilterType, React.VFC<ElementFilterItemProps>][] = [
     createElementFilterItem("word", "Word"),

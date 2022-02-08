@@ -7,7 +7,7 @@ import { DeleteMenu, DeleteMenuProps } from "../DeleteMenu";
 import { EditActiveMenuInterface, EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export type LabelViewNavBarMenuProps =
     | MenuState<"navigate">

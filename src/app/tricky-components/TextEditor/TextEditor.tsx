@@ -7,7 +7,7 @@ import { SimpleObject } from "@lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { Descendant, Editor as SlateEditor, Node, NodeEntry, Path, Text } from "slate";
 import { Editable, Slate } from "slate-react";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface TextEditorProps {
     children?: string;

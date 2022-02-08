@@ -3,7 +3,7 @@ import { ElementReference, ElementType, getElementDefinition } from "@domain/lan
 import React from "react";
 import { CategorySelector } from "../CategorySelector";
 import { IoPricetagOutline, IoPricetag, IoPricetagsOutline, IoPricetags } from "react-icons/io5";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface PropertySelectorProps {
     item: DiagramStateItem;

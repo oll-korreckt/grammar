@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup } from "react-icons/fa";
-import styles from "./_styles.scss";
+import styles from "./_styles.module.scss";
 
 export interface AddMenuProps {
     children?: Exclude<ElementType, "word">[];

@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React, { ReactNode } from "react";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface CircleContainerProps {
     children?: ReactNode;

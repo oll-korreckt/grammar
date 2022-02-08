@@ -5,7 +5,7 @@ import React, { PropsWithChildren } from "react";
 import { IconType } from "react-icons";
 import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface LabelViewNavBarProps {
     mode?: LabelFormMode;

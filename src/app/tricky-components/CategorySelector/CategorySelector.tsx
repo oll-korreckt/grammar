@@ -3,7 +3,7 @@ import React from "react";
 import { useCallback } from "react";
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface ElementPropertySelectorProps {
     children: JSX.Element | JSX.Element[];

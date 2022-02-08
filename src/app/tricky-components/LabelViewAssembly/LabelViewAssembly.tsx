@@ -2,7 +2,7 @@ import { accessClassName, LabelFormMode } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import React from "react";
 import { LabelView, LabelViewProps } from "../LabelView";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface LabelViewAssemblyProps extends LabelViewProps {
     mode: LabelFormMode;

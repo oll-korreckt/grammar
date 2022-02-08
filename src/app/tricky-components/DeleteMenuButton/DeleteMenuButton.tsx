@@ -2,7 +2,7 @@ import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import React from "react";
 import { FaBomb } from "react-icons/fa";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface DeleteMenuButtonProps {
     onClick?: () => void;

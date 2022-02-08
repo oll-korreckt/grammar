@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 import { accessClassName } from "@app/utils";
 
 export interface AnimateThenDisappearProps {

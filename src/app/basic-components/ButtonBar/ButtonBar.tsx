@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { makeRefComponent, RefComponent } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 
 export interface ButtonBarProps {
     buildFn?: (Component: RefComponent<HTMLDivElement>, item: string) => RefComponent<HTMLDivElement>;

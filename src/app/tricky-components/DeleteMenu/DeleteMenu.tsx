@@ -1,7 +1,7 @@
 import { accessClassName } from "@app/utils";
 import { withClassNameProp } from "@app/utils/hoc";
 import React from "react";
-import styles from "./_styles.modules.scss";
+import styles from "./_styles.module.scss";
 import { DeleteMenuButton } from "../DeleteMenuButton";
 import { DeleteMenuPrompt } from "../DeleteMenuPrompt";
 
