@@ -2,15 +2,13 @@ import { marked } from "marked";
 
 export type MarkdownTokenType =
     | "paragraph"
-    // | "space"
     | "text"
     | "heading"
-    | "link"
+    | "anchor"
     | "italic"
     | "bold"
 export type MarkdownToken =
     | MarkdownParagraph
-    // | MarkdownSpace
     | MarkdownText
     | MarkdownHeading
     | MarkdownLink
@@ -20,10 +18,6 @@ export interface MarkdownParagraph {
     type: "paragraph";
     tokens: MarkdownToken[];
 }
-// export interface MarkdownSpace {
-//     type: "space";
-//     content: string;
-// }
 export interface MarkdownText {
     type: "text";
     content: string;
@@ -34,8 +28,8 @@ export interface MarkdownHeading {
     tokens: MarkdownToken[];
 }
 export interface MarkdownLink {
-    type: "link";
-    link: string;
+    type: "anchor";
+    href: string;
     tokens: MarkdownToken[];
 }
 export interface MarkdownItalic {
@@ -54,7 +48,6 @@ export type HeadingType =
     | 5
     | 6
 
-type LexTokenType = marked.Token["type"];
 type LexToken = marked.Token;
 
 
@@ -64,7 +57,9 @@ function toTokens(rawMarkdown: string): MarkdownToken[] {
 }
 
 function _toMarkdownTokens(lTokens: LexToken[]): MarkdownToken[] {
-    return lTokens.map((lToken) => _toMarkdownToken(lToken));
+    return lTokens
+        .filter(({ type }) => type !== "space")
+        .map((lToken) => _toMarkdownToken(lToken));
 }
 
 function _toMarkdownToken(lToken: LexToken): MarkdownToken {
@@ -100,17 +95,10 @@ function _toMarkdownText(lToken: marked.Tokens.Text | marked.Tokens.Tag): Markdo
     };
 }
 
-// function _toMarkdownSpace(lToken: marked.Tokens.Space): MarkdownSpace {
-//     return {
-//         type: "space",
-//         content: lToken.raw
-//     };
-// }
-
 function _toMarkdownLink(lToken: marked.Tokens.Link): MarkdownLink {
     return {
-        type: "link",
-        link: lToken.href,
+        type: "anchor",
+        href: lToken.href,
         tokens: _toMarkdownTokens(lToken.tokens)
     };
 }

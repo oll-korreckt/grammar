@@ -1,4 +1,3 @@
-import { makeRefComponent } from "@app/utils/hoc";
 import { HeadingType, MarkdownBold, MarkdownHeading, MarkdownItalic, MarkdownLink, MarkdownParagraph, MarkdownToken } from "@lib/utils/markdown";
 import React, { DetailedHTMLProps, HTMLAttributes } from "react";
 
@@ -6,9 +5,9 @@ export interface MarkdownRenderProps {
     paragraphProps?: MarkdownElementProps<ParagraphProps, MarkdownParagraph>;
     italicProps?: MarkdownElementProps<ItalicProps, MarkdownItalic>;
     headingProps?: MarkdownElementProps<HeadingProps, MarkdownHeading>;
-    linkProps?: MarkdownElementProps<LinkProps, MarkdownLink>;
+    anchorProps?: MarkdownElementProps<AnchorProps, MarkdownLink>;
     boldProps?: MarkdownElementProps<BoldProps, MarkdownBold>;
-    children: MarkdownToken[];
+    children: MarkdownToken | MarkdownToken[];
 }
 
 
@@ -22,12 +21,12 @@ type ElementProps =
     | ParagraphProps
     | ItalicProps
     | HeadingProps
-    | LinkProps
+    | AnchorProps
     | BoldProps;
 export type ParagraphProps = ChildlessElementProps<HTMLParagraphElement>;
 export type ItalicProps = ChildlessElementProps<HTMLElement>;
 export type HeadingProps = ChildlessElementProps<HTMLHeadingElement>;
-export type LinkProps = Omit<DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, "children">;
+export type AnchorProps = Omit<DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>, "children">;
 export type BoldProps = ChildlessElementProps<HTMLElement>;
 
 interface TokenRenderProps extends Omit<MarkdownRenderProps, "children"> {
@@ -47,20 +46,20 @@ function getProps<TElementProps extends ElementProps, TMarkdownToken extends Mar
     }
 }
 
-const HeadingRender: React.FC<{ headingType: HeadingType; headerProps: HeadingProps; }> = ({ children, headingType, headerProps }) => {
+const HeadingRender: React.FC<{ headingType: HeadingType; headingProps: HeadingProps; }> = ({ children, headingType, headingProps }) => {
     switch (headingType) {
         case 1:
-            return <h1 {...headerProps}>{children}</h1>;
+            return <h1 {...headingProps}>{children}</h1>;
         case 2:
-            return <h2 {...headerProps}>{children}</h2>;
+            return <h2 {...headingProps}>{children}</h2>;
         case 3:
-            return <h3 {...headerProps}>{children}</h3>;
+            return <h3 {...headingProps}>{children}</h3>;
         case 4:
-            return <h4 {...headerProps}>{children}</h4>;
+            return <h4 {...headingProps}>{children}</h4>;
         case 5:
-            return <h5 {...headerProps}>{children}</h5>;
+            return <h5 {...headingProps}>{children}</h5>;
         case 6:
-            return <h6 {...headerProps}>{children}</h6>;
+            return <h6 {...headingProps}>{children}</h6>;
         default:
             throw "";
     }
@@ -71,7 +70,7 @@ const TokenRender: React.VFC<TokenRenderProps> = ({ children, ...passThrough }) 
         paragraphProps,
         headingProps,
         italicProps,
-        linkProps,
+        anchorProps,
         boldProps
     } = passThrough;
     switch (children.type) {
@@ -87,7 +86,7 @@ const TokenRender: React.VFC<TokenRenderProps> = ({ children, ...passThrough }) 
             return (
                 <HeadingRender
                     headingType={children.headingType}
-                    headerProps={getProps(headingProps, children)}
+                    headingProps={getProps(headingProps, children)}
                 >
                     <SubMarkdownRender passThrough={passThrough}>
                         {children.tokens}
@@ -104,10 +103,10 @@ const TokenRender: React.VFC<TokenRenderProps> = ({ children, ...passThrough }) 
                     </SubMarkdownRender>
                 </i>
             );
-        case "link":
-            const aProps: LinkProps = {
-                href: children.link,
-                ...getProps(linkProps, children)
+        case "anchor":
+            const aProps: AnchorProps = {
+                href: children.href,
+                ...getProps(anchorProps, children)
             };
             return (
                 <a {...aProps}>
@@ -151,12 +150,10 @@ const SubMarkdownRender: React.VFC<SubMarkdownRenderProps> = ({ children, passTh
     );
 };
 
-export const MarkdownRender = makeRefComponent<HTMLDivElement, MarkdownRenderProps>("MarkdownRender", ({ children, ...passThrough }, ref) => {
+export const MarkdownRender: React.VFC<MarkdownRenderProps> = ({ children, ...passThrough }) => {
     return (
-        <div ref={ref}>
-            <SubMarkdownRender passThrough={passThrough}>
-                {children}
-            </SubMarkdownRender>
-        </div>
+        <SubMarkdownRender passThrough={passThrough}>
+            {Array.isArray(children) ? children : [children]}
+        </SubMarkdownRender>
     );
-});
+};
