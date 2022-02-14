@@ -1,0 +1,2 @@
+<!-- #error -->
+This should fail.
