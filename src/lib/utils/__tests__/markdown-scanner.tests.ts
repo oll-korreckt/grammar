@@ -1,43 +1,7 @@
 import { assert } from "chai";
-import { MarkdownScanner, MarkdownToken, MarkdownTokenType } from "../markdown-scanner";
-import { getTestFileContent } from "./utils";
+import { MarkdownScanner } from "../markdown-scanner";
+import { getTestFileContent, TokenResult, toResult } from "./utils";
 
-interface TokenResult {
-    type: MarkdownTokenType;
-    tokens?: TokenResult[];
-    items?: TokenResult[];
-    href?: string;
-    depth?: number;
-    text?: string;
-}
-
-function toResult(token: MarkdownToken): TokenResult {
-    const output: TokenResult = { type: token.type };
-    const tokens = (token as any).tokens as undefined | MarkdownToken[];
-    if (tokens !== undefined) {
-        output.tokens = tokens.map((t) => toResult(t));
-    }
-    const items = (token as any).items as undefined | MarkdownToken[];
-    if (items !== undefined) {
-        output.items = items.map((i) => toResult(i));
-    }
-    switch (token.type) {
-        case "text":
-            output.text = token.text;
-            break;
-        case "image":
-            output.href = token.href;
-            output.text = token.text;
-            break;
-        case "link":
-            output.href = token.href;
-            break;
-        case "heading":
-            output.depth = token.depth;
-            break;
-    }
-    return output;
-}
 
 function runScan(content: string): TokenResult[] {
     return MarkdownScanner.scan(content).map((token) => toResult(token));
@@ -45,9 +9,13 @@ function runScan(content: string): TokenResult[] {
 
 describe("MarkdownScanner", () => {
     test("comment", () => {
-        const content = getTestFileContent("comment.md");
+        const content = getTestFileContent("comments.md");
         const result = runScan(content);
-        const expected: TokenResult[] = [{ type: "html" }];
+        const expected: TokenResult[] = [
+            { type: "html" },
+            { type: "comment_link", link: "link" },
+            { type: "comment_snippet", name: "section" }
+        ];
         assert.deepStrictEqual(result, expected);
     });
 

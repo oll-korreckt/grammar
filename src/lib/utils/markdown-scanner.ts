@@ -31,12 +31,22 @@ export type MarkdownSpace = Tokens.Space;
 export type MarkdownStrong = RemoveTokens<Tokens.Strong> & OverrideTokens;
 export type MarkdownTable = Tokens.Table;
 export type MarkdownText = Tokens.Text;
+export interface MarkdownCommentLink extends Omit<Tokens.HTML, "type"> {
+    type: "comment_link";
+    link: string;
+}
+export interface MarkdownCommentSnippet extends Omit<Tokens.HTML, "type"> {
+    type: "comment_snippet";
+    name: string;
+}
 
 export type MarkdownToken =
     | MarkdownBlockquote
     | MarkdownBr
     | MarkdownCode
     | MarkdownCodespan
+    | MarkdownCommentLink
+    | MarkdownCommentSnippet
     | MarkdownDef
     | MarkdownDel
     | MarkdownEm
@@ -58,6 +68,8 @@ export type MarkdownTokenType =
     | "br"
     | "code"
     | "codespan"
+    | "comment_link"
+    | "comment_snippet"
     | "def"
     | "del"
     | "em"
@@ -103,7 +115,6 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
         case "codespan":
         case "def":
         case "escape":
-        case "html":
         case "hr":
         case "image":
         case "space":
@@ -129,6 +140,8 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
                 depth: _toMarkdownHeadingDepth(token.depth),
                 tokens: _toMarkdownTokens(token.tokens)
             };
+        case "html":
+            return _toHTMLToken(token);
         case "list":
             return {
                 ...token,
@@ -139,6 +152,31 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
                     };
                 })
             };
+    }
+}
+
+function _extractCommentText(comment: string): string {
+    const startIndex = "<!--".length;
+    const endIndex = comment.length - "-->".length - 1;
+    return comment.slice(startIndex, endIndex).trim();
+}
+
+function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentLink | MarkdownCommentSnippet {
+    const commentText = _extractCommentText(token.text);
+    if (commentText.startsWith("#")) {
+        return {
+            ...token,
+            type: "comment_link",
+            link: commentText.slice(1)
+        };
+    } else if (commentText.startsWith("!")) {
+        return {
+            ...token,
+            type: "comment_snippet",
+            name: commentText.slice(1)
+        };
+    } else {
+        return token;
     }
 }
 
