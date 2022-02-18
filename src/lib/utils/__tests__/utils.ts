@@ -10,7 +10,7 @@ export interface TokenResult {
     depth?: number;
     text?: string;
     name?: string;
-    link?: string;
+    id?: string;
 }
 
 export function toResult(token: MarkdownToken): TokenResult {
@@ -37,10 +37,10 @@ export function toResult(token: MarkdownToken): TokenResult {
         case "heading":
             output.depth = token.depth;
             break;
-        case "comment_link":
-            output.link = token.link;
+        case "comment.id":
+            output.id = token.id;
             break;
-        case "comment_snippet":
+        case "comment.snippet":
             output.name = token.name;
             break;
     }

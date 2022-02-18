@@ -13,8 +13,8 @@ describe("MarkdownScanner", () => {
         const result = runScan(content);
         const expected: TokenResult[] = [
             { type: "html" },
-            { type: "comment_link", link: "link" },
-            { type: "comment_snippet", name: "section" }
+            { type: "comment.id", id: "id" },
+            { type: "comment.snippet", name: "section" }
         ];
         assert.deepStrictEqual(result, expected);
     });
