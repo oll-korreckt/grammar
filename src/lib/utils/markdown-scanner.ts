@@ -156,9 +156,10 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
 }
 
 function _extractCommentText(comment: string): string {
+    const trimmedComment = comment.trim();
     const startIndex = "<!--".length;
-    const endIndex = comment.length - "-->".length - 1;
-    return comment.slice(startIndex, endIndex).trim();
+    const endIndex = trimmedComment.length - "-->".length - 1;
+    return trimmedComment.slice(startIndex, endIndex).trim();
 }
 
 function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentId | MarkdownCommentSnippet {
