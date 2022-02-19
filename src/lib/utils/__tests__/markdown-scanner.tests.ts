@@ -288,9 +288,10 @@ describe("MarkdownScanner", () => {
         assert.deepStrictEqual(result, expected);
     });
 
-    // test("line-breaks", () => {
-    //     const content = getTestFileContent("line-breaks.md");
-    //     const result = runScan(content);
-    //     const a = 1;
-    // });
+    test("invalid newline", () => {
+        assert.throws(
+            () => runFileScan("invalid-newline.md"),
+            /token contains invalid newline character/i
+        );
+    });
 });
