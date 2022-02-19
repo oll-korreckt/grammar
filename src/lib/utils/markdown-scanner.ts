@@ -116,16 +116,13 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
         case "def":
         case "escape":
         case "hr":
-        case "image":
         case "space":
         case "table":
-        case "text":
             return token;
         // tokens with a 'tokens' property
         case "blockquote":
         case "del":
         case "em":
-        case "link":
         case "list_item":
         case "paragraph":
         case "strong":
@@ -152,6 +149,30 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
                     };
                 })
             };
+        case "image":
+            if (token.href === "") {
+                throw "'image' tokens must contain a non-empty 'href' property";
+            }
+            if (token.text === "") {
+                throw "'image' tokens must contain a non-empty 'text' property";
+            }
+            return token;
+        case "link":
+            if (token.href === "") {
+                throw "'link' tokens must contain a non-empty 'href' property";
+            }
+            if (token.text === "") {
+                throw "'link' tokens must contain a non-empty 'text' property";
+            }
+            return {
+                ...token,
+                tokens: _toMarkdownTokens(token.tokens)
+            };
+        case "text":
+            if (token.text.includes("\n")) {
+                throw "token contains invalid newline character";
+            }
+            return token;
     }
 }
 

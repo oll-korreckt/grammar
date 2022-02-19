@@ -7,6 +7,11 @@ function runScan(content: string): TokenResult[] {
     return MarkdownScanner.scan(content).map((token) => toResult(token));
 }
 
+function runFileScan(filename: string): TokenResult[] {
+    const content = getTestFileContent(filename);
+    return runScan(content);
+}
+
 describe("MarkdownScanner", () => {
     test("comment", () => {
         const content = getTestFileContent("comments.md");
@@ -50,7 +55,8 @@ describe("MarkdownScanner", () => {
                         type: "del",
                         tokens: [{ type: "text", text: "strikethrough" }]
                     },
-                    { type: "text", text: "\nnewline" }
+                    { type: "br" },
+                    { type: "text", text: "newline" }
                 ]
             }
         ];
@@ -64,49 +70,47 @@ describe("MarkdownScanner", () => {
             type: "paragraph",
             tokens: [
                 { type: "image", text: "", href: "" },
-                { type: "text", text: "\n" },
+                { type: "br" },
                 { type: "image", text: "No link", href: "" },
-                { type: "text", text: "\n" },
+                { type: "br" },
                 { type: "image", text: "", href: "link" },
-                { type: "text", text: "\n" },
+                { type: "br" },
                 { type: "image", text: "Text and link", href: "link" }
             ]
         }];
         assert.deepStrictEqual(result, expected);
     });
 
-    test("links", () => {
-        const content = getTestFileContent("links.md");
-        const result = runScan(content);
-        const expected: TokenResult[] = [{
-            type: "paragraph",
-            tokens: [
-                {
-                    type: "link",
-                    href: "",
-                    tokens: []
-                },
-                { type: "text", text: "\n" },
-                {
-                    type: "link",
-                    href: "",
-                    tokens: [{ type: "text", text: "No link" }]
-                },
-                { type: "text", text: "\n" },
-                {
-                    type: "link",
-                    href: "link",
-                    tokens: []
-                },
-                { type: "text", text: "\n" },
-                {
-                    type: "link",
-                    href: "link",
-                    tokens: [{ type: "text", text: "Text and link" }]
-                }
-            ]
-        }];
-        assert.deepStrictEqual(result, expected);
+    describe("links", () => {
+        test("success", () => {
+            const content = getTestFileContent("link.md");
+            const result = runScan(content);
+            const expected: TokenResult[] = [{
+                type: "paragraph",
+                tokens: [
+                    {
+                        type: "link",
+                        href: "link",
+                        tokens: [{ type: "text", text: "Text and link" }]
+                    }
+                ]
+            }];
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("no href", () => {
+            assert.throws(
+                () => runFileScan("link-no-href.md"),
+                /non-empty \'href\'/i
+            );
+        });
+
+        test("no text", () => {
+            assert.throws(
+                () => runFileScan("link-no-text.md"),
+                /non-empty \'text\'/i
+            );
+        });
     });
 
     test("headings", () => {
@@ -272,4 +276,10 @@ describe("MarkdownScanner", () => {
         }];
         assert.deepStrictEqual(result, expected);
     });
+
+    // test("line-breaks", () => {
+    //     const content = getTestFileContent("line-breaks.md");
+    //     const result = runScan(content);
+    //     const a = 1;
+    // });
 });
