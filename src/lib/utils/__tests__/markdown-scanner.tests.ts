@@ -63,22 +63,33 @@ describe("MarkdownScanner", () => {
         assert.deepStrictEqual(result, expected);
     });
 
-    test("images", () => {
-        const content = getTestFileContent("images.md");
-        const result = runScan(content);
-        const expected: TokenResult[] = [{
-            type: "paragraph",
-            tokens: [
-                { type: "image", text: "", href: "" },
-                { type: "br" },
-                { type: "image", text: "No link", href: "" },
-                { type: "br" },
-                { type: "image", text: "", href: "link" },
-                { type: "br" },
-                { type: "image", text: "Text and link", href: "link" }
-            ]
-        }];
-        assert.deepStrictEqual(result, expected);
+    describe("images", () => {
+        test("success", () => {
+            const result = runFileScan("image.md");
+            const expected: TokenResult[] = [{
+                type: "paragraph",
+                tokens: [{
+                    type: "image",
+                    text: "Text and link",
+                    href: "link"
+                }]
+            }];
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("no href", () => {
+            assert.throws(
+                () => runFileScan("image-no-href.md"),
+                /non-empty \'href\'/i
+            );
+        });
+
+        test("no text", () => {
+            assert.throws(
+                () => runFileScan("image-no-text.md"),
+                /non-empty \'text\'/i
+            );
+        });
     });
 
     describe("links", () => {
