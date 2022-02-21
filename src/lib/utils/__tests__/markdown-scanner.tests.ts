@@ -102,7 +102,18 @@ describe("MarkdownScanner", () => {
                     {
                         type: "link",
                         href: "link",
-                        tokens: [{ type: "text", text: "Text and link" }]
+                        tokens: [
+                            { type: "text", text: "Text " },
+                            {
+                                type: "strong",
+                                tokens: [{ type: "text", text: "and" }]
+                            },
+                            { type: "text", text: " " },
+                            {
+                                type: "em",
+                                tokens: [{ type: "text", text: "link" }]
+                            }
+                        ]
                     }
                 ]
             }];
@@ -183,19 +194,11 @@ describe("MarkdownScanner", () => {
             items: [
                 {
                     type: "list_item",
-                    tokens: [{
-                        type: "text",
-                        text: "Item 1",
-                        tokens: [{ type: "text", text: "Item 1" }]
-                    }]
+                    tokens: [{ type: "text", text: "Item 1" }]
                 },
                 {
                     type: "list_item",
-                    tokens: [{
-                        type: "text",
-                        text: "Item 2",
-                        tokens: [{ type: "text", text: "Item 2" }]
-                    }]
+                    tokens: [{ type: "text", text: "Item 2" }]
                 }
             ]
         }];
@@ -210,19 +213,11 @@ describe("MarkdownScanner", () => {
             items: [
                 {
                     type: "list_item",
-                    tokens: [{
-                        type: "text",
-                        text: "Item 1",
-                        tokens: [{ type: "text", text: "Item 1" }]
-                    }]
+                    tokens: [{ type: "text", text: "Item 1" }]
                 },
                 {
                     type: "list_item",
-                    tokens: [{
-                        type: "text",
-                        text: "Item 2",
-                        tokens: [{ type: "text", text: "Item 2" }]
-                    }]
+                    tokens: [{ type: "text", text: "Item 2" }]
                 }
             ]
         }];
@@ -323,19 +318,11 @@ describe("MarkdownScanner", () => {
             items: [
                 {
                     type: "list_item",
-                    tokens: [{
-                        type: "text",
-                        text: "unchecked",
-                        tokens: [{ type: "text", text: "unchecked" }]
-                    }]
+                    tokens: [{ type: "text", text: "unchecked" }]
                 },
                 {
                     type: "list_item",
-                    tokens: [{
-                        type: "text",
-                        text: "checked",
-                        tokens: [{ type: "text", text: "checked" }]
-                    }]
+                    tokens: [{ type: "text", text: "checked" }]
                 }
             ]
         }];
