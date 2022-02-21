@@ -46,4 +46,54 @@ describe("Strings", () => {
             );
         });
     });
+
+    describe("isEnglishLetterChar", () => {
+        test("lowercase", () => {
+            assert.isTrue(Strings.isEnglishLetterChar("a"));
+            assert.isTrue(Strings.isEnglishLetterChar("z"));
+            assert.isTrue(Strings.isEnglishLetterChar("b"));
+        });
+
+        test("uppercase", () => {
+            assert.isTrue(Strings.isEnglishLetterChar("A"));
+            assert.isTrue(Strings.isEnglishLetterChar("Z"));
+            assert.isTrue(Strings.isEnglishLetterChar("S"));
+        });
+
+        test("false", () => {
+            assert.isFalse(Strings.isEnglishLetterChar("ä"));
+            assert.isFalse(Strings.isEnglishLetterChar("Ä"));
+            assert.isFalse(Strings.isEnglishLetterChar("ö"));
+            assert.isFalse(Strings.isEnglishLetterChar("Ö"));
+            assert.isFalse(Strings.isEnglishLetterChar("ü"));
+            assert.isFalse(Strings.isEnglishLetterChar("Ü"));
+            assert.isFalse(Strings.isEnglishLetterChar("@"));
+            assert.isFalse(Strings.isEnglishLetterChar("ñ"));
+        });
+
+        test("error", () => {
+            assert.throws(() => Strings.isEnglishLetterChar(""));
+            assert.throws(() => Strings.isEnglishLetterChar("bc"));
+        });
+    });
+
+    describe("isNumericChar", () => {
+        test("true", () => {
+            assert.isTrue(Strings.isNumericChar("0"));
+            assert.isTrue(Strings.isNumericChar("9"));
+            assert.isTrue(Strings.isNumericChar("4"));
+        });
+
+        test("false", () => {
+            assert.isFalse(Strings.isNumericChar("o"));
+            assert.isFalse(Strings.isNumericChar("I"));
+            assert.isFalse(Strings.isNumericChar("l"));
+            assert.isFalse(Strings.isNumericChar("O"));
+        });
+
+        test("error", () => {
+            assert.throws(() => Strings.isNumericChar(""));
+            assert.throws(() => Strings.isNumericChar("00"));
+        });
+    });
 });
