@@ -1,1 +1,1 @@
-[Text and link](link)
+[Text **and** *link*](link)
