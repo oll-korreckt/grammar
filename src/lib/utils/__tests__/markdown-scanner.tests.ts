@@ -229,36 +229,90 @@ describe("MarkdownScanner", () => {
         assert.deepStrictEqual(result, expected);
     });
 
-    test("indented-list", () => {
-        const content = getTestFileContent("indented-list.md");
-        const result = runScan(content);
-        const expected: TokenResult[] = [{
-            type: "list",
-            items: [
-                {
-                    type: "list_item",
-                    tokens: [
-                        {
-                            type: "text",
-                            text: "Item 1",
-                            tokens: [{ type: "text", text: "Item 1" }]
-                        },
-                        {
-                            type: "list",
-                            items: [{
-                                type: "list_item",
-                                tokens: [{
-                                    type: "text",
-                                    text: "Item 1a",
+    describe("indented-list", () => {
+        test("success", () => {
+            const content = getTestFileContent("indented-list.md");
+            const result = runScan(content);
+            const expected: TokenResult[] = [{
+                type: "list",
+                items: [
+                    {
+                        type: "list_item",
+                        tokens: [
+                            { type: "text", text: "Item 1 " },
+                            {
+                                type: "em",
+                                tokens: [{ type: "text", text: "and" }]
+                            },
+                            { type: "text", text: " " },
+                            {
+                                type: "strong",
+                                tokens: [{ type: "text", text: "stylized" }]
+                            },
+                            { type: "text", text: " " },
+                            {
+                                type: "del",
+                                tokens: [{ type: "text", text: "stuff" }]
+                            },
+                            {
+                                type: "list",
+                                items: [{
+                                    type: "list_item",
                                     tokens: [{ type: "text", text: "Item 1a" }]
                                 }]
-                            }]
-                        }
-                    ]
-                }
-            ]
-        }];
-        assert.deepStrictEqual(result, expected);
+                            }
+                        ]
+                    },
+                    {
+                        type: "list_item",
+                        tokens: [{ type: "text", text: "Item 2" }]
+                    },
+                    {
+                        type: "list_item",
+                        tokens: [
+                            { type: "text", text: "Item 3" },
+                            {
+                                type: "list",
+                                items: [
+                                    {
+                                        type: "list_item",
+                                        tokens: [{ type: "text", text: "Item 3a" }]
+                                    },
+                                    {
+                                        type: "list_item",
+                                        tokens: [
+                                            { type: "text", text: "Item 3b" },
+                                            {
+                                                type: "list",
+                                                items: [
+                                                    {
+                                                        type: "list_item",
+                                                        tokens: [{ type: "text", text: "Item 3b1" }]
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        tokens: [{ type: "text", text: "Item 3b2" }]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: "list_item",
+                                        tokens: [{ type: "text", text: "Item 3c" }]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        type: "list_item",
+                        tokens: [{ type: "text", text: "Item 4" }]
+                    }
+                ]
+            }];
+            assert.deepStrictEqual(result, expected);
+        });
     });
 
     test("task-list", () => {

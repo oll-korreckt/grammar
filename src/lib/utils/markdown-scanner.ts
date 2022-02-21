@@ -30,7 +30,7 @@ export type MarkdownParagraph = RemoveTokens<Tokens.Paragraph> & OverrideTokens;
 export type MarkdownSpace = Tokens.Space;
 export type MarkdownStrong = RemoveTokens<Tokens.Strong> & OverrideTokens;
 export type MarkdownTable = Tokens.Table;
-export type MarkdownText = Tokens.Text;
+export type MarkdownText = RemoveTokens<Tokens.Text>;
 export interface MarkdownCommentId extends Omit<Tokens.HTML, "type"> {
     type: "comment.id";
     id: string;
@@ -39,6 +39,7 @@ export interface MarkdownCommentSnippet extends Omit<Tokens.HTML, "type"> {
     type: "comment.snippet";
     name: string;
 }
+type ListItemTextToken = Omit<Tokens.Text, "tokens"> & Required<Pick<Tokens.Text, "tokens">>;
 
 export type MarkdownToken =
     | MarkdownBlockquote
@@ -123,7 +124,6 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
         case "blockquote":
         case "del":
         case "em":
-        case "list_item":
         case "paragraph":
         case "strong":
             return {
@@ -145,10 +145,13 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
                 items: token.items.map((item) => {
                     return {
                         ...item,
-                        tokens: _toMarkdownTokens(item.tokens)
+                        tokens: _convertListItemTokens(item.tokens)
                     };
                 })
             };
+        case "list_item": {
+            throw "'list_item' should only appear in the 'items' property of a 'list' token";
+        }
         case "image":
             if (token.href === "") {
                 throw "'image' tokens must contain a non-empty 'href' property";
@@ -171,6 +174,9 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
         case "text":
             if (token.text.includes("\n")) {
                 throw "token contains invalid newline character";
+            }
+            if (token.tokens !== undefined) {
+                throw "'text' tokens should not contain children";
             }
             return token;
     }
@@ -206,8 +212,48 @@ function _toMarkdownTokens(tokens: marked.Token[]): MarkdownToken[] {
     return tokens.map((token) => _toMarkdownToken(token));
 }
 
+function _convertListItemTokens(tokens: marked.Token[]): MarkdownToken[] {
+    switch (tokens.length) {
+        case 0:
+            throw "a 'list_item' should contain at least 1 token";
+        case 1: {
+            const [textToken] = tokens;
+            if (!_isListItemTextToken(textToken)) {
+                throw "a 'list_item' token containing only 1 token should contain a 'text' token with populated 'tokens'";
+            }
+            return _toMarkdownTokens(textToken.tokens);
+        }
+        case 2: {
+            const [textToken, listToken] = tokens;
+            if (!_isListItemTextToken(textToken)) {
+                throw "the first token of a 'list_item' token containing 2 tokens should be a 'text' token with populated 'tokens'";
+            }
+            if (listToken.type !== "list") {
+                throw "the second token of a 'list_item' token containing 2 tokens should be a 'list' token";
+            }
+            const textTokenSubTokensOutput = _toMarkdownTokens(textToken.tokens);
+            const listTokenOutput = _toMarkdownToken(listToken);
+            return [
+                ...textTokenSubTokensOutput,
+                listTokenOutput
+            ];
+        }
+        default:
+            throw "a 'list_item' token should not contain more than 2 tokens";
+    }
+}
+
+function _isListItemTextToken(token: marked.Token): token is ListItemTextToken {
+    if (_isTag(token)) {
+        return false;
+    }
+    return token.type === "text" && token.tokens !== undefined;
+
+}
+
 function scan(content: string): MarkdownToken[] {
-    const tokens = _toMarkdownTokens(marked.lexer(content));
+    const lexerTokens = marked.lexer(content);
+    const tokens = _toMarkdownTokens(lexerTokens);
     return tokens;
 }
 
