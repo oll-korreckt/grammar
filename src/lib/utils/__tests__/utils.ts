@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { MarkdownToken, MarkdownTokenType } from "../markdown-scanner";
+import { MarkdownTable, MarkdownTableCell, MarkdownToken, MarkdownTokenType } from "../markdown-scanner";
 
 export interface TokenResult {
     type: MarkdownTokenType;
@@ -11,6 +11,13 @@ export interface TokenResult {
     text?: string;
     name?: string;
     id?: string;
+    header?: TableCellResult[];
+    rows?: TableCellResult[][];
+    align?: MarkdownTable["align"];
+}
+
+export interface TableCellResult {
+    tokens: TokenResult[];
 }
 
 export function toResult(token: MarkdownToken): TokenResult {
@@ -43,8 +50,20 @@ export function toResult(token: MarkdownToken): TokenResult {
         case "comment.snippet":
             output.name = token.name;
             break;
+        case "table":
+            output.align = token.align;
+            output.header = toTableCellResult(token.header);
+            output.rows = token.rows.map((row) => toTableCellResult(row));
     }
     return output;
+}
+
+function toTableCellResult(tableCells: MarkdownTableCell[]): TableCellResult[] {
+    return tableCells.map((cell) => {
+        return {
+            tokens: cell.tokens.map((token) => toResult(token))
+        };
+    });
 }
 
 export const TokenResult = {

@@ -310,6 +310,83 @@ describe("MarkdownScanner", () => {
         });
     });
 
+    describe("tables", () => {
+        test("default", () => {
+            const content = getTestFileContent("table.md");
+            const result = runScan(content);
+            const expected: TokenResult[] = [{
+                type: "table",
+                align: [null, "left", "right", "center"],
+                header: [
+                    {
+                        tokens: [
+                            {
+                                type: "em",
+                                tokens: [{ type: "text", text: "No" }]
+                            },
+                            {
+                                type: "text",
+                                text: " "
+                            },
+                            {
+                                type: "strong",
+                                tokens: [{ type: "text", text: "align" }]
+                            }
+                        ]
+                    },
+                    { tokens: [{ type: "text", text: "Align Left" }] },
+                    {
+                        tokens: [{
+                            type: "strong",
+                            tokens: [{ type: "text", text: "Align Right" }]
+                        }]
+                    },
+                    {
+                        tokens: [{
+                            type: "del",
+                            tokens: [{ type: "text", text: "Align Center" }]
+                        }]
+                    }
+                ],
+                rows: [
+                    [
+                        {
+                            tokens: [{
+                                type: "strong",
+                                tokens: [{ type: "text", text: "bold" }]
+                            }]
+                        },
+                        { tokens: [{ type: "text", text: "12" }] },
+                        { tokens: [{ type: "text", text: "13" }] },
+                        { tokens: [{ type: "text", text: "14" }] }
+                    ],
+                    [
+                        { tokens: [{ type: "text", text: "21" }] },
+                        {
+                            tokens: [{
+                                type: "em",
+                                tokens: [{ type: "text", text: "italic" }]
+                            }]
+                        },
+                        { tokens: [{ type: "text", text: "23" }] },
+                        { tokens: [{ type: "text", text: "24" }] }
+                    ],
+                    [
+                        { tokens: [{ type: "text", text: "31" }] },
+                        { tokens: [{ type: "text", text: "32" }] },
+                        { tokens: [{ type: "text", text: "33" }] },
+                        { tokens: [{ type: "text", text: "34" }] }
+                    ]
+                ]
+            }];
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("error", () => {
+            assert.throws(() => runFileScan("table-error.md"));
+        });
+    });
+
     test("task-list", () => {
         const content = getTestFileContent("task-list.md");
         const result = runScan(content);

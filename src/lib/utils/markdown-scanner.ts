@@ -29,7 +29,11 @@ export type MarkdownListItem = RemoveTokens<Tokens.ListItem> & OverrideTokens;
 export type MarkdownParagraph = RemoveTokens<Tokens.Paragraph> & OverrideTokens;
 export type MarkdownSpace = Tokens.Space;
 export type MarkdownStrong = RemoveTokens<Tokens.Strong> & OverrideTokens;
-export type MarkdownTable = Tokens.Table;
+export interface MarkdownTable extends Omit<Tokens.Table, "header" | "rows"> {
+    header: MarkdownTableCell[];
+    rows: MarkdownTableCell[][];
+}
+export type MarkdownTableCell = RemoveTokens<Tokens.TableCell> & OverrideTokens;
 export type MarkdownText = RemoveTokens<Tokens.Text>;
 export interface MarkdownCommentId extends Omit<Tokens.HTML, "type"> {
     type: "comment.id";
@@ -118,7 +122,6 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
         case "escape":
         case "hr":
         case "space":
-        case "table":
             return token;
         // tokens with a 'tokens' property
         case "blockquote":
@@ -136,6 +139,13 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
                 ...token,
                 depth: _toMarkdownHeadingDepth(token.depth),
                 tokens: _toMarkdownTokens(token.tokens)
+            };
+        case "table":
+            const columnCnt = token.header.length;
+            return {
+                ...token,
+                header: _convertTableCellTokens(token.header, columnCnt),
+                rows: token.rows.map((row) => _convertTableCellTokens(row, columnCnt))
             };
         case "html":
             return _toHTMLToken(token);
@@ -210,6 +220,18 @@ function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentId | Ma
 
 function _toMarkdownTokens(tokens: marked.Token[]): MarkdownToken[] {
     return tokens.map((token) => _toMarkdownToken(token));
+}
+
+function _convertTableCellTokens(tokens: Tokens.TableCell[], expectedLength: number): MarkdownTableCell[] {
+    if (tokens.length !== expectedLength) {
+        throw `Table expected to have ${expectedLength} column(s) but contains a set of cells with ${tokens.length} column(s)`;
+    }
+    return tokens.map((token) => {
+        return {
+            ...token,
+            tokens: _toMarkdownTokens(token.tokens)
+        };
+    });
 }
 
 function _convertListItemTokens(tokens: marked.Token[]): MarkdownToken[] {
