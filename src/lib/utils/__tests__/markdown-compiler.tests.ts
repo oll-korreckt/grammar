@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { HTMLObject, MarkdownCompiler } from "../markdown-compiler";
+import { HTMLObject, HTMLTableObject, MarkdownCompiler } from "../markdown-compiler";
 import { MarkdownParser } from "../markdown-parser";
 import { MarkdownScanner } from "../markdown-scanner";
 import { getTestFileContent } from "./utils";
@@ -168,6 +168,73 @@ describe("MarkdownCompiler", () => {
                     ]
                 },
                 { type: "list_item", content: "Item 4" }
+            ]
+        };
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("table", () => {
+        const result = toCompilerResult("table.md");
+        const expected: HTMLTableObject = {
+            type: "table",
+            headers: {
+                type: "header_row",
+                cells: [
+                    {
+                        type: "th",
+                        content: [
+                            { type: "italic", content: "No" },
+                            " ",
+                            { type: "bold", content: "align" }
+                        ]
+                    },
+                    { type: "th", align: "left", content: "Align Left" },
+                    {
+                        type: "th",
+                        align: "right",
+                        content: { type: "bold", content: "Align Right" }
+                    },
+                    {
+                        type: "th",
+                        align: "center",
+                        content: { type: "del", content: "Align Center" }
+                    }
+                ]
+            },
+            rows: [
+                {
+                    type: "tr",
+                    cells: [
+                        {
+                            type: "td",
+                            content: { type: "bold", content: "bold" }
+                        },
+                        { type: "td", content: "12" },
+                        { type: "td", content: "13" },
+                        { type: "td", content: "14" }
+                    ]
+                },
+                {
+                    type: "tr",
+                    cells: [
+                        { type: "td", content: "21" },
+                        {
+                            type: "td",
+                            content: { type: "italic", content: "italic" }
+                        },
+                        { type: "td", content: "23" },
+                        { type: "td", content: "24" }
+                    ]
+                },
+                {
+                    type: "tr",
+                    cells: [
+                        { type: "td", content: "31" },
+                        { type: "td", content: "32" },
+                        { type: "td", content: "33" },
+                        { type: "td", content: "34" }
+                    ]
+                }
             ]
         };
         assert.deepStrictEqual(result, expected);

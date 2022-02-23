@@ -1,4 +1,4 @@
-import { MarkdownHeading, MarkdownHeadingDepth, MarkdownList, MarkdownListItem, MarkdownToken } from "@lib/utils/markdown-scanner";
+import { MarkdownHeading, MarkdownHeadingDepth, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken } from "@lib/utils/markdown-scanner";
 import { Container } from "./markdown-parser";
 
 
@@ -19,6 +19,11 @@ export type HTMLObjectType =
     | "link"
     | "ordered_list"
     | "unordered_list"
+    | "table"
+    | "header_row"
+    | "tr"
+    | "th"
+    | "td"
     | "task_list"
     | "list_item"
     | "paragraph"
@@ -42,6 +47,11 @@ export type HTMLObject =
     | HTMLLinkObject
     | HTMLOrderedListObject
     | HTMLUnorderedListObject
+    | HTMLTableObject
+    | HTMLTableHeaderObject
+    | HTMLTableHeaderRowObject
+    | HTMLTableRowObject
+    | HTMLTableDataObject
     | HTMLTaskListObject
     | HTMLListItemObject
     | HTMLParagraphObject
@@ -125,6 +135,30 @@ export interface HTMLBoldObject extends HTMLContentObject {
 export interface HTMLCheckboxObject extends HTMLObjectBase {
     type: "checkbox";
     checked?: true | undefined;
+}
+export interface HTMLTableObject extends HTMLObjectBase {
+    type: "table";
+    headers: HTMLTableHeaderRowObject;
+    rows: HTMLTableRowObject[];
+}
+export type HTMLTableColumnAlign =
+    | "left"
+    | "right"
+    | "center";
+export interface HTMLTableHeaderRowObject extends HTMLObjectBase {
+    type: "header_row";
+    cells: HTMLTableHeaderObject[];
+}
+export interface HTMLTableHeaderObject extends HTMLContentObject {
+    type: "th";
+    align?: HTMLTableColumnAlign;
+}
+export interface HTMLTableRowObject extends HTMLObjectBase {
+    type: "tr";
+    cells: HTMLTableDataObject[];
+}
+export interface HTMLTableDataObject extends HTMLContentObject {
+    type: "td";
 }
 
 function _setContent(obj: HTMLContentObject, content: HTMLContent): void {
@@ -280,6 +314,14 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
             };
             return output;
         }
+        case "table": {
+            const output: HTMLTableObject = {
+                type: "table",
+                headers: _getTableHeaders(token),
+                rows: _getTableRows(token.rows)
+            };
+            return output;
+        }
         case "text":
             return token.text !== ""
                 ? token.text
@@ -305,6 +347,43 @@ function _toHTMLContent(tokens: MarkdownToken[]): HTMLContent {
         : output.length === 1
             ? output[0]
             : output;
+}
+
+function _getTableHeaders({ header, align }: MarkdownTable): HTMLTableHeaderRowObject {
+    const output: HTMLTableHeaderObject[] = [];
+    for (let index = 0; index < header.length; index++) {
+        const headerCell = header[index];
+        const headerAlign = align[index];
+        const item: HTMLTableHeaderObject = {
+            type: "th"
+        };
+        const content = _toHTMLContent(headerCell.tokens);
+        _setContent(item, content);
+        if (headerAlign !== null) {
+            item.align = headerAlign;
+        }
+        output.push(item);
+    }
+    return {
+        type: "header_row",
+        cells: output
+    };
+}
+
+function _getTableRows(rowTokens: MarkdownTableCell[][]): HTMLTableRowObject[] {
+    return rowTokens.map((rowToken) => {
+        return {
+            type: "tr",
+            cells: rowToken.map((cellToken) => {
+                const cell: HTMLTableDataObject = {
+                    type: "td"
+                };
+                const content = _toHTMLContent(cellToken.tokens);
+                _setContent(cell, content);
+                return cell;
+            })
+        };
+    });
 }
 
 function _compileContainer(container: Container): HTMLObject[] {
