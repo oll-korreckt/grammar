@@ -142,6 +142,9 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
             };
         case "table":
             const columnCnt = token.header.length;
+            if (token.align.length !== columnCnt) {
+                throw "length of align property of 'table' token should be equal to header length";
+            }
             return {
                 ...token,
                 header: _convertTableCellTokens(token.header, columnCnt),
