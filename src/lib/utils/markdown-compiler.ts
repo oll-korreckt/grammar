@@ -7,7 +7,7 @@ export type HTMLObjectType =
     | "br"
     | "code"
     | "del"
-    | "italic" // from em
+    | "i" // from em
     | "h1"
     | "h2"
     | "h3"
@@ -15,19 +15,16 @@ export type HTMLObjectType =
     | "h5"
     | "h6"
     | "hr"
-    | "image"
-    | "link"
-    | "ordered_list"
-    | "unordered_list"
+    | "img"
+    | "a"
+    | "list"
     | "table"
-    | "header_row"
     | "tr"
     | "th"
     | "td"
-    | "task_list"
-    | "list_item"
-    | "paragraph"
-    | "bold" // from strong
+    | "li"
+    | "p"
+    | "b" // from strong
     | "checkbox"
 export type HTMLObject =
     | string
@@ -44,15 +41,12 @@ export type HTMLObject =
     | HTMLH6Object
     | HTMLHrObject
     | HTMLImageObject
-    | HTMLLinkObject
-    | HTMLOrderedListObject
-    | HTMLUnorderedListObject
+    | HTMLAnchorObject
+    | HTMLListObject
     | HTMLTableObject
     | HTMLTableHeaderObject
-    | HTMLTableHeaderRowObject
     | HTMLTableRowObject
     | HTMLTableDataObject
-    | HTMLTaskListObject
     | HTMLListItemObject
     | HTMLParagraphObject
     | HTMLBoldObject
@@ -78,7 +72,7 @@ export interface HTMLDelObject extends HTMLContentObject {
     type: "del";
 }
 export interface HTMLItalicObject extends HTMLContentObject {
-    type: "italic";
+    type: "i";
 }
 export type HTMLHeadingType = MarkdownHeadingDepth;
 export interface HTMLH1Object extends HTMLContentObject {
@@ -103,34 +97,27 @@ export interface HTMLHrObject extends HTMLObjectBase {
     type: "hr";
 }
 export interface HTMLImageObject extends HTMLObjectBase {
-    type: "image";
+    type: "img";
     src: string;
     alt: string;
 }
-export interface HTMLLinkObject extends HTMLContentObject {
-    type: "link";
+export interface HTMLAnchorObject extends HTMLContentObject {
+    type: "a";
     href: string;
 }
-export interface HTMLOrderedListObject extends HTMLObjectBase {
-    type: "ordered_list";
-    items: HTMLListItemObject[];
-}
-export interface HTMLUnorderedListObject extends HTMLObjectBase {
-    type: "unordered_list";
-    items: HTMLListItemObject[];
-}
-export interface HTMLTaskListObject extends HTMLObjectBase {
-    type: "task_list";
+export interface HTMLListObject extends HTMLObjectBase {
+    type: "list";
+    listType: "ordered" | "unordered" | "task";
     items: HTMLListItemObject[];
 }
 export interface HTMLListItemObject extends HTMLContentObject {
-    type: "list_item";
+    type: "li";
 }
 export interface HTMLParagraphObject extends HTMLContentObject {
-    type: "paragraph";
+    type: "p";
 }
 export interface HTMLBoldObject extends HTMLContentObject {
-    type: "bold";
+    type: "b";
 }
 export interface HTMLCheckboxObject extends HTMLObjectBase {
     type: "checkbox";
@@ -138,24 +125,28 @@ export interface HTMLCheckboxObject extends HTMLObjectBase {
 }
 export interface HTMLTableObject extends HTMLObjectBase {
     type: "table";
-    headers: HTMLTableHeaderRowObject;
-    rows: HTMLTableRowObject[];
+    headers: HTMLTableRowObject<"header">;
+    rows: HTMLTableRowObject<"data">[];
 }
 export type HTMLTableColumnAlign =
     | "left"
     | "right"
     | "center";
-export interface HTMLTableHeaderRowObject extends HTMLObjectBase {
-    type: "header_row";
-    cells: HTMLTableHeaderObject[];
-}
 export interface HTMLTableHeaderObject extends HTMLContentObject {
     type: "th";
     align?: HTMLTableColumnAlign;
 }
-export interface HTMLTableRowObject extends HTMLObjectBase {
+export type HTMLTableRowObject<Type extends "data" | "header" = "data"> =
+    Type extends "data" ? DataRow
+    : Type extends "header" ? HeaderRow : never;
+interface DataRow extends HTMLObjectBase {
     type: "tr";
     cells: HTMLTableDataObject[];
+}
+interface HeaderRow extends HTMLObjectBase {
+    type: "tr";
+    header: true;
+    cells: HTMLTableHeaderObject[];
 }
 export interface HTMLTableDataObject extends HTMLContentObject {
     type: "td";
@@ -184,20 +175,17 @@ function _toHeading(obj: MarkdownHeading): HeadingType {
     return output;
 }
 
-type ListType =
-    | HTMLOrderedListObject
-    | HTMLUnorderedListObject
-    | HTMLTaskListObject
-function _toList(obj: MarkdownList): ListType {
+function _toList(obj: MarkdownList): HTMLListObject {
     const listType = _getListType(obj);
     const items = obj.items.map((item) => _toListItem(item));
     return {
-        type: listType,
+        type: "list",
+        listType: listType,
         items
     };
 }
 
-function _getListType(obj: MarkdownList): "ordered_list" | "unordered_list" | "task_list" {
+function _getListType(obj: MarkdownList): "ordered" | "unordered" | "task" {
     const hasTask = 1 << 0;
     const hasNonTask = 1 << 1;
     let state = 0;
@@ -210,9 +198,9 @@ function _getListType(obj: MarkdownList): "ordered_list" | "unordered_list" | "t
     }
     switch (state) {
         case hasTask:
-            return "task_list";
+            return "task";
         case hasNonTask:
-            return obj.ordered ? "ordered_list" : "unordered_list";
+            return obj.ordered ? "ordered" : "unordered";
         case hasTask | hasNonTask:
             throw "cannot have a list that contains both task and non-task list items";
         default:
@@ -226,7 +214,7 @@ function _toListItem(obj: MarkdownListItem): HTMLListItemObject {
         const chkBox = _createCheckbox(obj);
         content = _insertCheckbox(chkBox, content);
     }
-    const output: HTMLListItemObject = { type: "list_item" };
+    const output: HTMLListItemObject = { type: "li" };
     _setContent(output, content);
     return output;
 }
@@ -254,7 +242,9 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
         case "del":
         case "paragraph": {
             const output: HTMLBlockquoteObject | HTMLDelObject | HTMLParagraphObject = {
-                type: token.type
+                type: token.type === "paragraph"
+                    ? "p"
+                    : token.type
             };
             const content = _toHTMLContent(token.tokens);
             _setContent(output, content);
@@ -262,8 +252,8 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
         }
         // special content types
         case "link": {
-            const output: HTMLLinkObject = {
-                type: "link",
+            const output: HTMLAnchorObject = {
+                type: "a",
                 href: token.href,
                 content: _toHTMLContent(token.tokens)
             };
@@ -288,7 +278,7 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
         // mapped types
         case "em": {
             const output: HTMLItalicObject = {
-                type: "italic"
+                type: "i"
             };
             const content = _toHTMLContent(token.tokens);
             _setContent(output, content);
@@ -296,7 +286,7 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
         }
         case "strong": {
             const output: HTMLBoldObject = {
-                type: "bold"
+                type: "b"
             };
             const content = _toHTMLContent(token.tokens);
             _setContent(output, content);
@@ -308,7 +298,7 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
         }
         case "image": {
             const output: HTMLImageObject = {
-                type: "image",
+                type: "img",
                 src: token.href,
                 alt: token.text
             };
@@ -349,7 +339,7 @@ function _toHTMLContent(tokens: MarkdownToken[]): HTMLContent {
             : output;
 }
 
-function _getTableHeaders({ header, align }: MarkdownTable): HTMLTableHeaderRowObject {
+function _getTableHeaders({ header, align }: MarkdownTable): HTMLTableRowObject<"header"> {
     const output: HTMLTableHeaderObject[] = [];
     for (let index = 0; index < header.length; index++) {
         const headerCell = header[index];
@@ -365,7 +355,8 @@ function _getTableHeaders({ header, align }: MarkdownTable): HTMLTableHeaderRowO
         output.push(item);
     }
     return {
-        type: "header_row",
+        type: "tr",
+        header: true,
         cells: output
     };
 }

@@ -15,16 +15,16 @@ describe("MarkdownCompiler", () => {
     test("styling", () => {
         const result = toCompilerResult("styling.md");
         const expected: HTMLObject = {
-            type: "paragraph",
+            type: "p",
             content: [
                 "plain ",
-                { type: "bold", content: "bold" },
+                { type: "b", content: "bold" },
                 " ",
-                { type: "italic", content: "italic" },
+                { type: "i", content: "italic" },
                 " ",
                 {
-                    type: "italic",
-                    content: { type: "bold", content: "bold and italic" }
+                    type: "i",
+                    content: { type: "b", content: "bold and italic" }
                 },
                 " ",
                 { type: "del", content: "strikethrough" },
@@ -38,9 +38,9 @@ describe("MarkdownCompiler", () => {
     test("image", () => {
         const result = toCompilerResult("image.md");
         const expected: HTMLObject = {
-            type: "paragraph",
+            type: "p",
             content: {
-                type: "image",
+                type: "img",
                 src: "link",
                 alt: "Text and link"
             }
@@ -51,15 +51,15 @@ describe("MarkdownCompiler", () => {
     test("link", () => {
         const result = toCompilerResult("link.md");
         const expected: HTMLObject = {
-            type: "paragraph",
+            type: "p",
             content: {
-                type: "link",
+                type: "a",
                 href: "link",
                 content: [
                     "Text ",
-                    { type: "bold", content: "and" },
+                    { type: "b", content: "and" },
                     " ",
-                    { type: "italic", content: "link" }
+                    { type: "i", content: "link" }
                 ]
             }
         };
@@ -69,14 +69,15 @@ describe("MarkdownCompiler", () => {
     test("ordered list", () => {
         const result = toCompilerResult("ordered-list.md");
         const expected: HTMLObject = {
-            type: "ordered_list",
+            type: "list",
+            listType: "ordered",
             items: [
                 {
-                    type: "list_item",
+                    type: "li",
                     content: "Item 1"
                 },
                 {
-                    type: "list_item",
+                    type: "li",
                     content: "Item 2"
                 }
             ]
@@ -87,10 +88,11 @@ describe("MarkdownCompiler", () => {
     test("unordered list", () => {
         const result = toCompilerResult("unordered-list.md");
         const expected: HTMLObject = {
-            type: "unordered_list",
+            type: "list",
+            listType: "unordered",
             items: [
-                { type: "list_item", content: "Item 1" },
-                { type: "list_item", content: "Item 2" }
+                { type: "li", content: "Item 1" },
+                { type: "li", content: "Item 2" }
             ]
         };
         assert.deepStrictEqual(result, expected);
@@ -99,17 +101,18 @@ describe("MarkdownCompiler", () => {
     test("task list", () => {
         const result = toCompilerResult("task-list.md");
         const expected: HTMLObject = {
-            type: "task_list",
+            type: "list",
+            listType: "task",
             items: [
                 {
-                    type: "list_item",
+                    type: "li",
                     content: [
                         { type: "checkbox" },
                         "unchecked"
                     ]
                 },
                 {
-                    type: "list_item",
+                    type: "li",
                     content: [
                         { type: "checkbox", checked: true },
                         "checked"
@@ -123,51 +126,55 @@ describe("MarkdownCompiler", () => {
     test("indented list", () => {
         const result = toCompilerResult("indented-list.md");
         const expected: HTMLObject = {
-            type: "ordered_list",
+            type: "list",
+            listType: "ordered",
             items: [
                 {
-                    type: "list_item",
+                    type: "li",
                     content: [
                         "Item 1 ",
-                        { type: "italic", content: "and" },
+                        { type: "i", content: "and" },
                         " ",
-                        { type: "bold", content: "stylized" },
+                        { type: "b", content: "stylized" },
                         " ",
                         { type: "del", content: "stuff" },
                         {
-                            type: "unordered_list",
-                            items: [{ type: "list_item", content: "Item 1a" }]
+                            type: "list",
+                            listType: "unordered",
+                            items: [{ type: "li", content: "Item 1a" }]
                         }
                     ]
                 },
-                { type: "list_item", content: "Item 2" },
+                { type: "li", content: "Item 2" },
                 {
-                    type: "list_item",
+                    type: "li",
                     content: [
                         "Item 3",
                         {
-                            type: "ordered_list",
+                            type: "list",
+                            listType: "ordered",
                             items: [
-                                { type: "list_item", content: "Item 3a" },
+                                { type: "li", content: "Item 3a" },
                                 {
-                                    type: "list_item",
+                                    type: "li",
                                     content: [
                                         "Item 3b",
                                         {
-                                            type: "unordered_list",
+                                            type: "list",
+                                            listType: "unordered",
                                             items: [
-                                                { type: "list_item", content: "Item 3b1" },
-                                                { type: "list_item", content: "Item 3b2" }
+                                                { type: "li", content: "Item 3b1" },
+                                                { type: "li", content: "Item 3b2" }
                                             ]
                                         }
                                     ]
                                 },
-                                { type: "list_item", content: "Item 3c" }
+                                { type: "li", content: "Item 3c" }
                             ]
                         }
                     ]
                 },
-                { type: "list_item", content: "Item 4" }
+                { type: "li", content: "Item 4" }
             ]
         };
         assert.deepStrictEqual(result, expected);
@@ -178,21 +185,22 @@ describe("MarkdownCompiler", () => {
         const expected: HTMLTableObject = {
             type: "table",
             headers: {
-                type: "header_row",
+                type: "tr",
+                header: true,
                 cells: [
                     {
                         type: "th",
                         content: [
-                            { type: "italic", content: "No" },
+                            { type: "i", content: "No" },
                             " ",
-                            { type: "bold", content: "align" }
+                            { type: "b", content: "align" }
                         ]
                     },
                     { type: "th", align: "left", content: "Align Left" },
                     {
                         type: "th",
                         align: "right",
-                        content: { type: "bold", content: "Align Right" }
+                        content: { type: "b", content: "Align Right" }
                     },
                     {
                         type: "th",
@@ -207,7 +215,7 @@ describe("MarkdownCompiler", () => {
                     cells: [
                         {
                             type: "td",
-                            content: { type: "bold", content: "bold" }
+                            content: { type: "b", content: "bold" }
                         },
                         { type: "td", content: "12" },
                         { type: "td", content: "13" },
@@ -220,7 +228,7 @@ describe("MarkdownCompiler", () => {
                         { type: "td", content: "21" },
                         {
                             type: "td",
-                            content: { type: "italic", content: "italic" }
+                            content: { type: "i", content: "italic" }
                         },
                         { type: "td", content: "23" },
                         { type: "td", content: "24" }
