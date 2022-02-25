@@ -1,28 +1,5 @@
-import { MarkdownHeading, MarkdownToken, MarkdownTokenType } from "@lib/utils/markdown-scanner";
-
-export type ContainerType =
-    | "idHeading"
-    | "snippet"
-
-export type Container =
-    | IdHeading
-    | Snippet
-
-interface ContainerBase {
-    type: ContainerType;
-}
-
-export interface IdHeading extends ContainerBase {
-    type: "idHeading";
-    id: string;
-    heading: MarkdownHeading;
-}
-
-export interface Snippet extends ContainerBase {
-    type: "snippet";
-    name?: string;
-    content: MarkdownToken[];
-}
+import { MarkdownToken, MarkdownTokenType } from "@lib/utils/markdown-scanner";
+import { ParseObject, Snippet } from "./_types";
 
 interface ParseData {
     tokens: MarkdownToken[];
@@ -31,7 +8,7 @@ interface ParseData {
     snippetNames: Set<string>;
 }
 
-function _idHeading(data: ParseData): Container {
+function _idHeading(data: ParseData): ParseObject {
     const currToken = _getCurrentToken(data);
     if (currToken.type === "comment.id") {
         const id = currToken.id;
@@ -55,7 +32,7 @@ function _idHeading(data: ParseData): Container {
     return _snippet(data);
 }
 
-function _snippet(data: ParseData): Container {
+function _snippet(data: ParseData): ParseObject {
     const currToken = _getCurrentToken(data);
     if (currToken.type === "comment.snippet") {
         _advance(data);
@@ -131,14 +108,14 @@ function _advance(data: ParseData): void {
     }
 }
 
-function parse(markdown: MarkdownToken[]): Container[] {
+function parse(markdown: MarkdownToken[]): ParseObject[] {
     const data: ParseData = {
         current: 0,
         tokens: markdown,
         idHeadings: new Set(),
         snippetNames: new Set()
     };
-    const content: Container[] = [];
+    const content: ParseObject[] = [];
     while (!_isAtEnd(data)) {
         const container = _idHeading(data);
         content.push(container);
