@@ -1,5 +1,6 @@
 import { assert } from "chai";
-import { HTMLObject, HTMLTableObject, MarkdownCompiler } from "../markdown-compiler";
+import { HTMLObject, HTMLTableObject } from "..";
+import { MarkdownCompiler } from "../markdown-compiler";
 import { MarkdownParser } from "../markdown-parser";
 import { MarkdownScanner } from "../markdown-scanner";
 import { getTestFileContent } from "./utils";

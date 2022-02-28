@@ -1,5 +1,4 @@
-import { MarkdownHeading, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken } from "@lib/utils/markdown-scanner";
-import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLContentObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLListObject, HTMLObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, ParseObject } from "./_types";
+import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLContentObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLListObject, HTMLObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, MarkdownHeading, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken, ParseObject } from "./_types";
 
 function _setContent(obj: HTMLContentObject, content: HTMLContent): void {
     if (content === undefined
