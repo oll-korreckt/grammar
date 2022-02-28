@@ -4,3 +4,4 @@
 Here is a section
 <!-- !section -->
 Unnamed section
+<!-- +injection -->

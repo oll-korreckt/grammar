@@ -1,5 +1,4 @@
-import { MarkdownToken, MarkdownTokenType } from "@lib/utils/markdown-scanner";
-import { ParseObject, Snippet } from "./_types";
+import { MarkdownToken, MarkdownTokenType, ParseObject, Snippet } from "./_types";
 
 interface ParseData {
     tokens: MarkdownToken[];
@@ -27,6 +26,18 @@ function _idHeading(data: ParseData): ParseObject {
             type: "idHeading",
             id: id,
             heading: headingToken
+        };
+    }
+    return _injection(data);
+}
+
+function _injection(data: ParseData): ParseObject {
+    const currToken = _getCurrentToken(data);
+    if (currToken.type === "comment.htmlInjection") {
+        _advance(data);
+        return {
+            type: "htmlInjection",
+            id: currToken.id
         };
     }
     return _snippet(data);
@@ -72,7 +83,7 @@ function _finishNamedSnippet(data: ParseData, name: string): Snippet {
 
 function _finishUnnamedSnippet(data: ParseData): Snippet {
     const content: MarkdownToken[] = [];
-    while (!_isAtEnd(data) && !_check(data, "comment.id", "comment.snippet")) {
+    while (!_isAtEnd(data) && !_check(data, "comment.id", "comment.snippet", "comment.htmlInjection")) {
         const currToken = _getCurrentToken(data);
         content.push(currToken);
         _advance(data);

@@ -1,10 +1,11 @@
 import { assert } from "chai";
-import { Container, ContainerType, MarkdownParser } from "../markdown-parser";
+import { ParseObject, ParseObjectType } from "..";
+import { MarkdownParser } from "../markdown-parser";
 import { MarkdownScanner } from "../markdown-scanner";
 import { getTestFileContent, TokenResult } from "./utils";
 
 interface ContainerResultBase {
-    type: ContainerType;
+    type: ParseObjectType;
 }
 
 interface SectionHeaderResult extends ContainerResultBase {
@@ -19,11 +20,17 @@ interface SnippetResult extends ContainerResultBase {
     content: TokenResult[];
 }
 
+interface HTMLInjectionResult extends ContainerResultBase {
+    type: "htmlInjection";
+    id: string;
+}
+
 type ContainerResult =
     | SectionHeaderResult
-    | SnippetResult;
+    | SnippetResult
+    | HTMLInjectionResult;
 
-function toContainerResult(result: Container): ContainerResult {
+function toContainerResult(result: ParseObject): ContainerResult {
     switch (result.type) {
         case "idHeading":
             return {
@@ -31,7 +38,7 @@ function toContainerResult(result: Container): ContainerResult {
                 id: result.id,
                 heading: TokenResult.toResult(result.heading)
             };
-        case "snippet":
+        case "snippet": {
             const output: SnippetResult = {
                 type: "snippet",
                 content: result.content.map((token) => TokenResult.toResult(token))
@@ -40,6 +47,13 @@ function toContainerResult(result: Container): ContainerResult {
                 output.name = result.name;
             }
             return output;
+        }
+        case "htmlInjection": {
+            return {
+                type: "htmlInjection",
+                id: result.id
+            };
+        }
     }
 }
 
@@ -84,6 +98,10 @@ describe("MarkdownParser", () => {
                         text: "Unnamed section"
                     }]
                 }]
+            },
+            {
+                type: "htmlInjection",
+                id: "injection"
             }
         ];
         assert.deepStrictEqual(result, expected);

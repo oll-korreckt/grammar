@@ -29,5 +29,6 @@ export interface Snippet extends ParseObjectBase {
 
 export interface HTMLInjection extends ParseObjectBase {
     type: "htmlInjection";
-    content: HTMLContent;
+    id: string;
+    content?: HTMLContent;
 }
