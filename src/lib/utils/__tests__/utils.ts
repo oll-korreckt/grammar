@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { MarkdownTable, MarkdownTableCell, MarkdownToken, MarkdownTokenType } from "../markdown-scanner";
+import { MarkdownTable, MarkdownTableCell, MarkdownToken, MarkdownTokenType } from "..";
 
 export interface TokenResult {
     type: MarkdownTokenType;
@@ -49,6 +49,9 @@ export function toResult(token: MarkdownToken): TokenResult {
             break;
         case "comment.snippet":
             output.name = token.name;
+            break;
+        case "comment.htmlInjection":
+            output.id = token.id;
             break;
         case "table":
             output.align = token.align;

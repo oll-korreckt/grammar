@@ -19,7 +19,8 @@ describe("MarkdownScanner", () => {
         const expected: TokenResult[] = [
             { type: "html" },
             { type: "comment.id", id: "id" },
-            { type: "comment.snippet", name: "section" }
+            { type: "comment.snippet", name: "section" },
+            { type: "comment.htmlInjection", id: "injection" }
         ];
         assert.deepStrictEqual(result, expected);
     });

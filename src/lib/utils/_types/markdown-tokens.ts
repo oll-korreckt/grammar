@@ -42,6 +42,10 @@ export interface MarkdownCommentSnippet extends Omit<Tokens.HTML, "type"> {
     type: "comment.snippet";
     name: string;
 }
+export interface MarkdownCommentHTMLInjection extends Omit<Tokens.HTML, "type"> {
+    type: "comment.htmlInjection";
+    id: string;
+}
 
 export type MarkdownToken =
     | MarkdownBlockquote
@@ -50,6 +54,7 @@ export type MarkdownToken =
     | MarkdownCodespan
     | MarkdownCommentId
     | MarkdownCommentSnippet
+    | MarkdownCommentHTMLInjection
     | MarkdownDef
     | MarkdownDel
     | MarkdownEm
@@ -73,6 +78,7 @@ export type MarkdownTokenType =
     | "codespan"
     | "comment.id"
     | "comment.snippet"
+    | "comment.htmlInjection"
     | "def"
     | "del"
     | "em"
