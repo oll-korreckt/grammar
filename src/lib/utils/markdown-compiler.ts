@@ -1,4 +1,4 @@
-import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLContentObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLListObject, HTMLObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, MarkdownHeading, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken, ParseObject } from "./_types";
+import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLContentObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLObject, HTMLOrderedListObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, HTMLTaskListObject, HTMLUnorderedListObject, MarkdownHeading, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken, ParseObject } from "./_types";
 
 function _setContent(obj: HTMLContentObject, content: HTMLContent): void {
     if (content === undefined
@@ -23,17 +23,16 @@ function _toHeading(obj: MarkdownHeading): HeadingType {
     return output;
 }
 
-function _toList(obj: MarkdownList): HTMLListObject {
+function _toList(obj: MarkdownList): HTMLOrderedListObject | HTMLUnorderedListObject | HTMLTaskListObject {
     const listType = _getListType(obj);
     const items = obj.items.map((item) => _toListItem(item));
     return {
-        type: "list",
-        listType: listType,
+        type: listType,
         items
     };
 }
 
-function _getListType(obj: MarkdownList): "ordered" | "unordered" | "task" {
+function _getListType(obj: MarkdownList): "ol" | "ul" | "tasklist" {
     const hasTask = 1 << 0;
     const hasNonTask = 1 << 1;
     let state = 0;
@@ -46,9 +45,9 @@ function _getListType(obj: MarkdownList): "ordered" | "unordered" | "task" {
     }
     switch (state) {
         case hasTask:
-            return "task";
+            return "tasklist";
         case hasNonTask:
-            return obj.ordered ? "ordered" : "unordered";
+            return obj.ordered ? "ol" : "ul";
         case hasTask | hasNonTask:
             throw "cannot have a list that contains both task and non-task list items";
         default:

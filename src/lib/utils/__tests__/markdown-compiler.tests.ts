@@ -70,8 +70,7 @@ describe("MarkdownCompiler", () => {
     test("ordered list", () => {
         const result = toCompilerResult("ordered-list.md");
         const expected: HTMLObject = {
-            type: "list",
-            listType: "ordered",
+            type: "ol",
             items: [
                 {
                     type: "li",
@@ -89,8 +88,7 @@ describe("MarkdownCompiler", () => {
     test("unordered list", () => {
         const result = toCompilerResult("unordered-list.md");
         const expected: HTMLObject = {
-            type: "list",
-            listType: "unordered",
+            type: "ul",
             items: [
                 { type: "li", content: "Item 1" },
                 { type: "li", content: "Item 2" }
@@ -102,8 +100,7 @@ describe("MarkdownCompiler", () => {
     test("task list", () => {
         const result = toCompilerResult("task-list.md");
         const expected: HTMLObject = {
-            type: "list",
-            listType: "task",
+            type: "tasklist",
             items: [
                 {
                     type: "li",
@@ -127,8 +124,7 @@ describe("MarkdownCompiler", () => {
     test("indented list", () => {
         const result = toCompilerResult("indented-list.md");
         const expected: HTMLObject = {
-            type: "list",
-            listType: "ordered",
+            type: "ol",
             items: [
                 {
                     type: "li",
@@ -140,8 +136,7 @@ describe("MarkdownCompiler", () => {
                         " ",
                         { type: "del", content: "stuff" },
                         {
-                            type: "list",
-                            listType: "unordered",
+                            type: "ul",
                             items: [{ type: "li", content: "Item 1a" }]
                         }
                     ]
@@ -152,8 +147,7 @@ describe("MarkdownCompiler", () => {
                     content: [
                         "Item 3",
                         {
-                            type: "list",
-                            listType: "ordered",
+                            type: "ol",
                             items: [
                                 { type: "li", content: "Item 3a" },
                                 {
@@ -161,8 +155,7 @@ describe("MarkdownCompiler", () => {
                                     content: [
                                         "Item 3b",
                                         {
-                                            type: "list",
-                                            listType: "unordered",
+                                            type: "ul",
                                             items: [
                                                 { type: "li", content: "Item 3b1" },
                                                 { type: "li", content: "Item 3b2" }

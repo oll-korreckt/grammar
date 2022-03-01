@@ -20,6 +20,9 @@ export type HTMLObjectType =
     | "tr"
     | "th"
     | "td"
+    | "ol"
+    | "ul"
+    | "tasklist"
     | "li"
     | "p"
     | "b" // from strong
@@ -40,11 +43,14 @@ export type HTMLObject =
     | HTMLHrObject
     | HTMLImageObject
     | HTMLAnchorObject
-    | HTMLListObject
     | HTMLTableObject
     | HTMLTableHeaderObject
-    | HTMLTableRowObject
+    | HTMLTableRowObject<"header">
+    | HTMLTableRowObject<"data">
     | HTMLTableDataObject
+    | HTMLOrderedListObject
+    | HTMLUnorderedListObject
+    | HTMLTaskListObject
     | HTMLListItemObject
     | HTMLParagraphObject
     | HTMLBoldObject
@@ -103,10 +109,17 @@ export interface HTMLAnchorObject extends HTMLContentObject {
     type: "a";
     href: string;
 }
-export interface HTMLListObject extends HTMLObjectBase {
-    type: "list";
-    listType: "ordered" | "unordered" | "task";
+interface HTMLListBase extends HTMLObjectBase {
     items: HTMLListItemObject[];
+}
+export interface HTMLOrderedListObject extends HTMLListBase {
+    type: "ol";
+}
+export interface HTMLUnorderedListObject extends HTMLListBase {
+    type: "ul";
+}
+export interface HTMLTaskListObject extends HTMLListBase {
+    type: "tasklist";
 }
 export interface HTMLListItemObject extends HTMLContentObject {
     type: "li";
