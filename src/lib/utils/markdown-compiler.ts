@@ -233,7 +233,7 @@ function _compileContainer(parseObj: ParseObject): HTMLObject[] {
                 case "undefined":
                     throw "";
             }
-            output.id = parseObj.id;
+            output.custom = parseObj.id;
             return [output];
         }
         case "snippet": {
