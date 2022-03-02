@@ -127,6 +127,29 @@ function createPropertyTable(type: Exclude<ElementType, "word">, property?: stri
         : _createPartialPropertyTable(info, property);
 }
 
+function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableObject {
+    const info = ElementDisplayInfo.getDisplayInfo(type);
+    return {
+        type: "table",
+        headers: {
+            type: "tr",
+            header: true,
+            cells: [
+                { type: "th", content: "Abbreviation" },
+                { type: "th", content: "Color" }
+            ]
+        },
+        rows: [{
+            type: "tr",
+            cells: [
+                { type: "td", content: info.header },
+                { type: "td", content: "$" + type }
+            ]
+        }]
+    };
+}
+
 export const ElementTable = {
+    createElementInfoTable: createElementInfoTable,
     createPropertyTable: createPropertyTable
 };
