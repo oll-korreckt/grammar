@@ -1,4 +1,4 @@
-import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLBrObject, HTMLCheckboxObject, HTMLCodeObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLHrObject, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLObject, HTMLOrderedListObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, HTMLTaskListObject, HTMLUnorderedListObject } from "@lib/utils";
+import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLBrObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLHrObject, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLObject, HTMLOrderedListObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, HTMLTaskListObject, HTMLUnorderedListObject } from "@lib/utils";
 import React, { DetailedHTMLProps, HTMLAttributes } from "react";
 
 export interface HTMLObjectRenderProps {
@@ -18,6 +18,7 @@ export interface HTMLObjectRenderProps {
     anchorProps?: ElementProps<HTMLAnchorObject, AnchorProps>;
     tableProps?: ElementProps<HTMLTableObject, TableProps>;
     tableHeaderProps?: ElementProps<HTMLTableHeaderObject, TableHeaderProps>;
+    tableHeaderRowProps?: ElementProps<HTMLTableHeaderObject, TableHeaderProps>;
     tableRowProps?: ElementProps<HTMLTableRowObject, TableRowProps>;
     tableDataProps?: ElementProps<HTMLTableDataObject, TableDataProps>;
     orderedListProps?: ElementProps<HTMLOrderedListObject, OrderedListProps>;
@@ -30,14 +31,13 @@ export interface HTMLObjectRenderProps {
     children: HTMLObject | HTMLObject[];
 }
 
-type ElementProps<THTMLObject extends HTMLObject, Props extends PropertyTypes> =
+type ElementProps<THTMLObject extends HTMLObject, Props extends PropertyType> =
     | Props
     | ElementPropsFunction<THTMLObject, Props>
-type ElementPropsFunction<THTMLObject extends HTMLObject, Props extends PropertyTypes> = (htmlObj: THTMLObject) => Props;
-type HTMLOmit<ElementType extends HTMLElement, Keys extends keyof ElementType> = Omit<DetailedHTMLProps<HTMLAttributes<ElementType>, ElementType>, Keys>;
-type ChildlessElementProps<T extends HTMLElement = HTMLElement> = HTMLOmit<T, "children">;
+type ElementPropsFunction<THTMLObject extends HTMLObject, Props extends PropertyType> = (htmlObj: THTMLObject) => Props;
+type ElementPropsAlias<T extends HTMLElement = HTMLElement> = DetailedHTMLProps<HTMLAttributes<T>, T>;
 
-type PropertyTypes =
+type PropertyType =
     | BlockquoteProps
     | BrProps
     | CodeProps
@@ -63,46 +63,74 @@ type PropertyTypes =
     | ParagraphProps
     | BoldProps
     | CheckboxProps
-export type BlockquoteProps = ChildlessElementProps;
-export type BrProps = ChildlessElementProps<HTMLBRElement>;
-export type CodeProps = ChildlessElementProps;
-export type DelProps = ChildlessElementProps;
-export type ItalicProps = ChildlessElementProps;
-type HeadingProps = ChildlessElementProps<HTMLHeadingElement>;
+export type BlockquoteProps = ElementPropsAlias;
+export type BrProps = ElementPropsAlias<HTMLBRElement>;
+export type CodeProps = ElementPropsAlias;
+export type DelProps = ElementPropsAlias;
+export type ItalicProps = ElementPropsAlias;
+type HeadingProps = ElementPropsAlias<HTMLHeadingElement>;
 export type H1Props = HeadingProps;
 export type H2Props = HeadingProps;
 export type H3Props = HeadingProps;
 export type H4Props = HeadingProps;
 export type H5Props = HeadingProps;
 export type H6Props = HeadingProps;
-export type HrProps = ChildlessElementProps<HTMLHRElement>;
-export type ImageProps = HTMLOmit<HTMLImageElement, "children" | "src" | "alt">;
-export type AnchorProps = HTMLOmit<HTMLAnchorElement, "children" | "href">;
-export type TableProps = ChildlessElementProps<HTMLTableElement>;
-type TableCellProps = HTMLOmit<HTMLTableCellElement, "children" | "align">;
+export type HrProps = ElementPropsAlias<HTMLHRElement>;
+export type ImageProps = ElementPropsAlias<HTMLImageElement>;
+export type AnchorProps = ElementPropsAlias<HTMLAnchorElement>;
+export type TableProps = ElementPropsAlias<HTMLTableElement>;
+type TableCellProps = ElementPropsAlias<HTMLTableCellElement>;
 export type TableHeaderProps = TableCellProps;
-export type TableRowProps = HTMLOmit<HTMLTableRowElement, "children" | "align">;
+export type TableRowProps = ElementPropsAlias<HTMLTableRowElement>;
 export type TableDataProps = TableCellProps;
-export type OrderedListProps = ChildlessElementProps<HTMLOListElement>;
-export type UnorderedListProps = ChildlessElementProps<HTMLUListElement>;
+export type OrderedListProps = ElementPropsAlias<HTMLOListElement>;
+export type UnorderedListProps = ElementPropsAlias<HTMLUListElement>;
 export type TaskListProps = UnorderedListProps;
-export type ListItemProps = ChildlessElementProps<HTMLLIElement>;
-export type ParagraphProps = ChildlessElementProps<HTMLParagraphElement>;
-export type BoldProps = ChildlessElementProps;
-export type CheckboxProps = HTMLOmit<HTMLInputElement, "type" | "checked">;
+export type ListItemProps = ElementPropsAlias<HTMLLIElement>;
+export type ParagraphProps = ElementPropsAlias<HTMLParagraphElement>;
+export type BoldProps = ElementPropsAlias;
+export type CheckboxProps = ElementPropsAlias<HTMLInputElement>;
 
 interface ContentRenderProps extends Omit<SubComponentProps, "children"> {
     children: HTMLObject;
 }
 
-function getProps<THTMLObject extends HTMLObject, TProps extends PropertyTypes>(props: ElementProps<THTMLObject, TProps> | undefined, obj: THTMLObject): TProps {
+type RawProps = Record<string, any>;
+type PropsFunction = (data: HTMLObject) => Record<string, any>;
+
+
+
+function createElement(tag: keyof React.ReactHTML, props: RawProps | PropsFunction | undefined, data: HTMLObject, passThrough: PassThroughProps, content?: HTMLContent): React.ReactElement<any, any> {
+    const elementProps = getProps(props, data);
+    if (content !== undefined && !("children" in elementProps)) {
+        elementProps.children = React.createElement(
+            SubComponent,
+            { passThrough },
+            content
+        );
+    }
+    return React.createElement(tag, elementProps);
+}
+
+function overrideProps<Type extends HTMLObject>(props: RawProps | PropsFunction | undefined, overrideFn: (data: Type) => RawProps): PropsFunction {
+    return (data) => {
+        const props1 = overrideFn(data as any);
+        const props2 = getProps(props, data);
+        return {
+            ...props1,
+            ...props2
+        };
+    };
+}
+
+function getProps(props: RawProps | PropsFunction | undefined, data: HTMLObject): RawProps {
     switch (typeof props) {
         case "object":
             return props;
         case "function":
-            return props(obj);
+            return props(data);
         case "undefined":
-            return {} as TProps;
+            return {};
     }
 }
 
@@ -129,6 +157,7 @@ const ContentRender: React.VFC<ContentRenderProps> = ({ children, passThrough })
         tableProps,
         tableRowProps,
         tableHeaderProps,
+        tableHeaderRowProps,
         tableDataProps,
         paragraphProps,
         boldProps,
@@ -141,212 +170,268 @@ const ContentRender: React.VFC<ContentRenderProps> = ({ children, passThrough })
     }
     switch (children.type) {
         case "blockquote":
-            return (
-                <blockquote {...getProps(blockquoteProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </blockquote>
-            );
+            return createElement("blockquote", blockquoteProps, children, passThrough, children.content);
+            // return (
+            //     <blockquote {...getProps(blockquoteProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </blockquote>
+            // );
         case "br":
-            return <br {...getProps(brProps, children)}/>;
+            return createElement("br", brProps, children, passThrough);
+            // return <br {...getProps(brProps, children)}/>;
         case "code":
-            return (
-                <code {...getProps(codeProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </code>
-            );
+            return createElement("code", codeProps, children, passThrough, children.content);
+            // return (
+            //     <code {...getProps(codeProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </code>
+            // );
         case "del":
-            return (
-                <del {...getProps(delProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </del>
-            );
+            return createElement("del", delProps, children, passThrough, children.content);
+            // return (
+            //     <del {...getProps(delProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </del>
+            // );
         case "i":
-            return (
-                <i {...getProps(italicProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </i>
-            );
+            return createElement("i", italicProps, children, passThrough, children.content);
+            // return (
+            //     <i {...getProps(italicProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </i>
+            // );
         case "h1":
-            return (
-                <h1 {...getProps(h1Props, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </h1>
-            );
+            return createElement("h1", h1Props, children, passThrough, children.content);
+            // return (
+            //     <h1 {...getProps(h1Props, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </h1>
+            // );
         case "h2":
-            return (
-                <h2 {...getProps(h2Props, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </h2>
-            );
+            return createElement("h2", h2Props, children, passThrough, children.content);
+            // return (
+            //     <h2 {...getProps(h2Props, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </h2>
+            // );
         case "h3":
-            return (
-                <h3 {...getProps(h3Props, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </h3>
-            );
+            return createElement("h3", h3Props, children, passThrough, children.content);
+            // return (
+            //     <h3 {...getProps(h3Props, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </h3>
+            // );
         case "h4":
-            return (
-                <h4 {...getProps(h4Props, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </h4>
-            );
+            return createElement("h4", h4Props, children, passThrough, children.content);
+            // return (
+            //     <h4 {...getProps(h4Props, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </h4>
+            // );
         case "h5":
-            return (
-                <h5 {...getProps(h5Props, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </h5>
-            );
+            return createElement("h5", h5Props, children, passThrough, children.content);
+            // return (
+            //     <h5 {...getProps(h5Props, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </h5>
+            // );
         case "h6":
-            return (
-                <h6 {...getProps(h6Props, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </h6>
-            );
+            return createElement("h6", h6Props, children, passThrough, children.content);
+            // return (
+            //     <h6 {...getProps(h6Props, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </h6>
+            // );
         case "hr":
-            return <hr {...getProps(hrProps, children)}/>;
-        case "img":
-            return (
-                <img
-                    src={children.src}
-                    alt={children.alt}
-                    {...getProps(imageProps, children)}
-                />
+            return createElement("hr", hrProps, children, passThrough);
+            // return <hr {...getProps(hrProps, children)}/>;
+        case "img": {
+            const newProps = overrideProps<HTMLImageObject>(
+                imageProps,
+                ({ src, alt }) => { return { src, alt }; }
             );
-        case "a":
-            return (
-                <a
-                    href={children.href}
-                    {...getProps(anchorProps, children)}
-                >
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </a>
-            );
-        case "ol":
-            return (
-                <ol {...getProps(orderedListProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.items}
-                    </SubComponent>
-                </ol>
-            );
-        case "ul":
-            return (
-                <ul {...getProps(unorderedListProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.items}
-                    </SubComponent>
-                </ul>
-            );
-        case "tasklist":
-            return (
-                <ul {...getProps(taskListProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.items}
-                    </SubComponent>
-                </ul>
-            );
-        case "li":
-            return (
-                <li {...getProps(listItemProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </li>
-            );
-        case "table":
-            return (
-                <table {...getProps(tableProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.headers}
-                    </SubComponent>
-                    <SubComponent passThrough={passThrough}>
-                        {children.rows}
-                    </SubComponent>
-                </table>
-            );
-        case "tr": {
-            return (
-                <tr {...getProps(tableRowProps, children as any)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.cells}
-                    </SubComponent>
-                </tr>
-            );
+            return createElement("img", newProps, children, passThrough);
+            // return (
+            //     <img
+            //         src={children.src}
+            //         alt={children.alt}
+            //         {...getProps(imageProps, children)}
+            //     />
+            // );
         }
-        case "th":
-            const alignProp: any = {};
-            if (children.align !== undefined) {
-                alignProp.align = children.align;
-            }
-            return (
-                <th
-                    {...alignProp}
-                    {...getProps(tableHeaderProps, children)}
-                >
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </th>
+        case "a": {
+            const newProps = overrideProps<HTMLAnchorObject>(
+                anchorProps,
+                ({ href }) => { return { href }; }
             );
-        case "td":
-            return (
-                <td {...getProps(tableDataProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </td>
+            return createElement("a", newProps, children, passThrough, children.content);
+            // return (
+            //     <a
+            //         href={children.href}
+            //         {...getProps(anchorProps, children)}
+            //     >
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </a>
+            // );
+        }
+        case "ol":
+            return createElement("ol", orderedListProps, children, passThrough, children.items);
+            // return (
+            //     <ol {...getProps(orderedListProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.items}
+            //         </SubComponent>
+            //     </ol>
+            // );
+        case "ul":
+            return createElement("ul", unorderedListProps, children, passThrough, children.items);
+            // return (
+            //     <ul {...getProps(unorderedListProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.items}
+            //         </SubComponent>
+            //     </ul>
+            // );
+        case "tasklist":
+            return createElement("ul", taskListProps, children, passThrough, children.items);
+            // return (
+            //     <ul {...getProps(taskListProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.items}
+            //         </SubComponent>
+            //     </ul>
+            // );
+        case "li":
+            return createElement("li", listItemProps, children, passThrough, children.content);
+            // return (
+            //     <li {...getProps(listItemProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </li>
+            // );
+        case "table": {
+            const tableContent: HTMLObject[] = [children.headers, ...children.rows];
+            return createElement("table", tableProps, children, passThrough, tableContent);
+            // return (
+            //     <table {...getProps(tableProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.headers}
+            //         </SubComponent>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.rows}
+            //         </SubComponent>
+            //     </table>
+            // );
+        }
+        case "tr": {
+            const props = "header" in children ? tableHeaderRowProps : tableRowProps;
+            return createElement("tr", props, children, passThrough, children.cells);
+            // return (
+            //     <tr {...getProps(tableRowProps, children as any)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.cells}
+            //         </SubComponent>
+            //     </tr>
+            // );
+        }
+        case "th": {
+            const newProps = overrideProps<HTMLTableHeaderObject>(
+                tableHeaderProps,
+                ({ align }) => { return align === undefined ? {} : { align }; }
             );
+            return createElement("th", newProps, children, passThrough, children.content);
+            // const alignProp: any = {};
+            // if (children.align !== undefined) {
+            //     alignProp.align = children.align;
+            // }
+            // return (
+            //     <th
+            //         {...alignProp}
+            //         {...getProps(tableHeaderProps, children)}
+            //     >
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </th>
+            // );
+        }
+        case "td": {
+            return createElement("td", tableDataProps, children, passThrough, children.content);
+            // return (
+            //     <td {...getProps(tableDataProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </td>
+            // );
+        }
         case "p":
-            return (
-                <p {...getProps(paragraphProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </p>
-            );
+            return createElement("p", paragraphProps, children, passThrough, children.content);
+            // return (
+            //     <p {...getProps(paragraphProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </p>
+            // );
         case "b":
-            return (
-                <b {...getProps(boldProps, children)}>
-                    <SubComponent passThrough={passThrough}>
-                        {children.content}
-                    </SubComponent>
-                </b>
-            );
+            return createElement("b", boldProps, children, passThrough, children.content);
+            // return (
+            //     <b {...getProps(boldProps, children)}>
+            //         <SubComponent passThrough={passThrough}>
+            //             {children.content}
+            //         </SubComponent>
+            //     </b>
+            // );
         case "checkbox":
-            return (
-                <input
-                    type="checkbox"
-                    checked={children.checked}
-                    {...getProps(checkboxProps, children)}
-                />
+            const newProps = overrideProps<HTMLCheckboxObject>(
+                checkboxProps,
+                ({ checked }) => {
+                    const output: Record<string, any> = { type: "checkbox" };
+                    if (checked) {
+                        output.checked = checked;
+                    }
+                    return output;
+                }
             );
+            return createElement("input", newProps, children, passThrough);
+            // return (
+            //     <input
+            //         type="checkbox"
+            //         checked={children.checked}
+            //         {...getProps(checkboxProps, children)}
+            //     />
+            // );
     }
 };
 
+type PassThroughProps = Omit<HTMLObjectRenderProps, "children">;
+
 interface SubComponentProps {
-    passThrough: Omit<HTMLObjectRenderProps, "children">;
+    passThrough: PassThroughProps;
     children?: HTMLObject | HTMLObject[];
 }
 

@@ -155,6 +155,21 @@ describe("HTMLObjectRender", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    test("override props", () => {
+        const result = render(
+            <HTMLObjectRender
+                paragraphProps={{ children: "Overridden text" }}
+            >
+                {{ type: "p", content: "Provided text" }}
+            </HTMLObjectRender>
+        );
+        const expected: TrimmedJSON = {
+            type: "p",
+            children: ["Overridden text"]
+        };
+        assert.deepStrictEqual(result, expected);
+    });
+
     test("object", () => {
         const result = render(
             <HTMLObjectRender
