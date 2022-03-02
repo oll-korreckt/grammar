@@ -143,7 +143,7 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
             type: "tr",
             cells: [
                 { type: "td", content: info.header },
-                { type: "td", content: "$" + type }
+                { type: "td", custom: type }
             ]
         }]
     };
