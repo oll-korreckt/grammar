@@ -13,6 +13,27 @@ function runFileScan(filename: string): TokenResult[] {
 }
 
 describe("MarkdownScanner", () => {
+    test("code", () => {
+        const result = runFileScan("code.md");
+        const expected: TokenResult[] = [{
+            type: "paragraph",
+            tokens: [{
+                type: "codespan",
+                text: "Here is a codespan"
+            }]
+        }];
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("codeblock", () => {
+        const result = runFileScan("codeblock.md");
+        const expected: TokenResult[] = [{
+            type: "code",
+            text: "Here is code"
+        }];
+        assert.deepStrictEqual(result, expected);
+    });
+
     test("comment", () => {
         const content = getTestFileContent("comments.md");
         const result = runScan(content);

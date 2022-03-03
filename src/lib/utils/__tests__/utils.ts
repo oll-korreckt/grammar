@@ -32,6 +32,8 @@ export function toResult(token: MarkdownToken): TokenResult {
     }
     switch (token.type) {
         case "text":
+        case "code":
+        case "codespan":
             output.text = token.text;
             break;
         case "image":
@@ -57,6 +59,7 @@ export function toResult(token: MarkdownToken): TokenResult {
             output.align = token.align;
             output.header = toTableCellResult(token.header);
             output.rows = token.rows.map((row) => toTableCellResult(row));
+            break;
     }
     return output;
 }
