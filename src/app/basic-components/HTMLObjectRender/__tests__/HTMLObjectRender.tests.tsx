@@ -34,8 +34,9 @@ type JSONElementType =
 interface TrimmedJSON {
     type: JSONElementType;
     props?: Record<string, any>;
-    children?: (string | TrimmedJSON)[];
+    children?: TrimmedJSONOutput[];
 }
+type TrimmedJSONOutput = string | TrimmedJSON;
 
 const allElements: { [Key in JSONElementType]: "" } = {
     blockquote: "",
@@ -74,7 +75,10 @@ function checkElementType(type: string): void {
     }
 }
 
-function trim(reactJson: ReactTestRendererJSON): TrimmedJSON {
+function trim(reactJson: ReactTestRendererJSON | string): TrimmedJSONOutput {
+    if (typeof reactJson === "string") {
+        return reactJson;
+    }
     const { type, props, children } = reactJson;
     checkElementType(type);
     const output: TrimmedJSON = {
@@ -95,7 +99,7 @@ function trim(reactJson: ReactTestRendererJSON): TrimmedJSON {
 
 type ArgType = Parameters<typeof TestRenderer.create>[0]
 
-function render(content: ArgType): TrimmedJSON | TrimmedJSON[] {
+function render(content: ArgType): TrimmedJSONOutput | TrimmedJSONOutput[] {
     const output = TestRenderer.create(content).toJSON();
     if (output === null) {
         throw "invalid output type";
@@ -107,6 +111,15 @@ function render(content: ArgType): TrimmedJSON | TrimmedJSON[] {
 
 
 describe("HTMLObjectRender", () => {
+    test("text", () => {
+        const result = render(
+            <HTMLObjectRender>
+                Here is some text
+            </HTMLObjectRender>
+        );
+        assert.deepStrictEqual(result, "Here is some text");
+    });
+
     test("plain elements", () => {
         const result = render(
             <HTMLObjectRender>
