@@ -1,18 +1,17 @@
 import { marked } from "marked";
-import Tokens = marked.Tokens;
 
 type RemoveTokens<Type> = Omit<Type, "tokens">;
 type OverrideTokens = { tokens: MarkdownToken[]; };
-export type MarkdownBlockquote = RemoveTokens<Tokens.Blockquote> & OverrideTokens;
-export type MarkdownBr = Tokens.Br;
-export type MarkdownCode = Tokens.Code;
-export type MarkdownCodespan = Tokens.Codespan;
-export type MarkdownDef = Tokens.Def;
-export type MarkdownDel = RemoveTokens<Tokens.Del> & OverrideTokens;
-export type MarkdownEm = RemoveTokens<Tokens.Em> & OverrideTokens;
-export type MarkdownEscape = Tokens.Escape;
-export type MarkdownHTML = Tokens.HTML;
-export type MarkdownHeading = Omit<RemoveTokens<Tokens.Heading> & OverrideTokens, "depth"> & { depth: MarkdownHeadingDepth; };
+export type MarkdownBlockquote = RemoveTokens<marked.Tokens.Blockquote> & OverrideTokens;
+export type MarkdownBr = marked.Tokens.Br;
+export type MarkdownCode = marked.Tokens.Code;
+export type MarkdownCodespan = marked.Tokens.Codespan;
+export type MarkdownDef = marked.Tokens.Def;
+export type MarkdownDel = RemoveTokens<marked.Tokens.Del> & OverrideTokens;
+export type MarkdownEm = RemoveTokens<marked.Tokens.Em> & OverrideTokens;
+export type MarkdownEscape = marked.Tokens.Escape;
+export type MarkdownHTML = marked.Tokens.HTML;
+export type MarkdownHeading = Omit<RemoveTokens<marked.Tokens.Heading> & OverrideTokens, "depth"> & { depth: MarkdownHeadingDepth; };
 export type MarkdownHeadingDepth =
     | 1
     | 2
@@ -20,29 +19,29 @@ export type MarkdownHeadingDepth =
     | 4
     | 5
     | 6
-export type MarkdownHr = Tokens.Hr;
-export type MarkdownImage = Tokens.Image;
-export type MarkdownLink = RemoveTokens<Tokens.Link> & OverrideTokens;
-export type MarkdownList = Omit<Tokens.List, "items"> & { items: MarkdownListItem[]; };
-export type MarkdownListItem = RemoveTokens<Tokens.ListItem> & OverrideTokens;
-export type MarkdownParagraph = RemoveTokens<Tokens.Paragraph> & OverrideTokens;
-export type MarkdownSpace = Tokens.Space;
-export type MarkdownStrong = RemoveTokens<Tokens.Strong> & OverrideTokens;
-export interface MarkdownTable extends Omit<Tokens.Table, "header" | "rows"> {
+export type MarkdownHr = marked.Tokens.Hr;
+export type MarkdownImage = marked.Tokens.Image;
+export type MarkdownLink = RemoveTokens<marked.Tokens.Link> & OverrideTokens;
+export type MarkdownList = Omit<marked.Tokens.List, "items"> & { items: MarkdownListItem[]; };
+export type MarkdownListItem = RemoveTokens<marked.Tokens.ListItem> & OverrideTokens;
+export type MarkdownParagraph = RemoveTokens<marked.Tokens.Paragraph> & OverrideTokens;
+export type MarkdownSpace = marked.Tokens.Space;
+export type MarkdownStrong = RemoveTokens<marked.Tokens.Strong> & OverrideTokens;
+export interface MarkdownTable extends Omit<marked.Tokens.Table, "header" | "rows"> {
     header: MarkdownTableCell[];
     rows: MarkdownTableCell[][];
 }
-export type MarkdownTableCell = RemoveTokens<Tokens.TableCell> & OverrideTokens;
-export type MarkdownText = RemoveTokens<Tokens.Text>;
-export interface MarkdownCommentId extends Omit<Tokens.HTML, "type"> {
+export type MarkdownTableCell = RemoveTokens<marked.Tokens.TableCell> & OverrideTokens;
+export type MarkdownText = RemoveTokens<marked.Tokens.Text>;
+export interface MarkdownCommentId extends Omit<marked.Tokens.HTML, "type"> {
     type: "comment.id";
     id: string;
 }
-export interface MarkdownCommentSnippet extends Omit<Tokens.HTML, "type"> {
+export interface MarkdownCommentSnippet extends Omit<marked.Tokens.HTML, "type"> {
     type: "comment.snippet";
     name: string;
 }
-export interface MarkdownCommentHTMLInjection extends Omit<Tokens.HTML, "type"> {
+export interface MarkdownCommentHTMLInjection extends Omit<marked.Tokens.HTML, "type"> {
     type: "comment.htmlInjection";
     id: string;
 }
