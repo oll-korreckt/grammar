@@ -45,3 +45,15 @@ export function useResize<TRef extends HTMLElement>(callback: (e: TRef) => void)
     });
     return ref;
 }
+
+export function useClientSide(): boolean {
+    const [render, setRender] = useState(false);
+    const inBrowser = typeof window !== "undefined";
+    useEffect(() => {
+        if (inBrowser && !render) {
+            setRender(true);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    return render;
+}
