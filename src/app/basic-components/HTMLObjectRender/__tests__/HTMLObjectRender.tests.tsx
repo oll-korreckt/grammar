@@ -22,6 +22,8 @@ type JSONElementType =
     | "ul"
     | "li"
     | "table"
+    | "thead"
+    | "tbody"
     | "tr"
     | "th"
     | "td"
@@ -54,6 +56,8 @@ const allElements: { [Key in JSONElementType]: "" } = {
     ul: "",
     li: "",
     table: "",
+    thead: "",
+    tbody: "",
     tr: "",
     th: "",
     td: "",
@@ -356,24 +360,32 @@ describe("HTMLObjectRender", () => {
             type: "table",
             children: [
                 {
-                    type: "tr",
-                    children: [
-                        { type: "th", props: { align: "left" }, children: ["Column 1"] },
-                        { type: "th", children: ["Column 2"] }
-                    ]
+                    type: "thead",
+                    children: [{
+                        type: "tr",
+                        children: [
+                            { type: "th", props: { align: "left" }, children: ["Column 1"] },
+                            { type: "th", children: ["Column 2"] }
+                        ]
+                    }]
                 },
                 {
-                    type: "tr",
+                    type: "tbody",
                     children: [
-                        { type: "td", children: ["11"] },
-                        { type: "td", children: ["12"] }
-                    ]
-                },
-                {
-                    type: "tr",
-                    children: [
-                        { type: "td", children: ["21"] },
-                        { type: "td", children: ["22"] }
+                        {
+                            type: "tr",
+                            children: [
+                                { type: "td", children: ["11"] },
+                                { type: "td", children: ["12"] }
+                            ]
+                        },
+                        {
+                            type: "tr",
+                            children: [
+                                { type: "td", children: ["21"] },
+                                { type: "td", children: ["22"] }
+                            ]
+                        }
                     ]
                 }
             ]
