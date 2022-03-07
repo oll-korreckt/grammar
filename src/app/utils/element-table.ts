@@ -42,21 +42,72 @@ function _getYesNo(value: boolean): "Yes" | "No" {
     return value ? "Yes" : "No";
 }
 
+export type PropertyHeaderType =
+    | "property"
+    | "required"
+    | "allowMultiple"
+    | "types"
+
+function _isPropertyHeader(value: string | undefined): value is PropertyHeaderType {
+    const headerTypes = new Set<PropertyHeaderType>([
+        "property",
+        "required",
+        "allowMultiple",
+        "types"
+    ]);
+    return headerTypes.has(value as any);
+}
+
+function getHeaderType(obj: HTMLTableHeaderObject): PropertyHeaderType {
+    const { custom } = obj;
+    if (!_isPropertyHeader(custom)) {
+        throw `${obj.type} object does not contain a valid PropertyHeaderType value for custom`;
+    }
+    return custom;
+}
+
 function _createHeaders(inclPropCol: boolean): HTMLTableRowObject<"header"> {
+    const PROPERTY: PropertyHeaderType = "property";
+    const REQUIRED: PropertyHeaderType = "required";
+    const ALLOW_MULTIPLE: PropertyHeaderType = "allowMultiple";
+    const TYPES: PropertyHeaderType = "types";
+
     const headerCells: HTMLTableHeaderObject[] = [];
     if (inclPropCol) {
-        headerCells.push({ type: "th", content: "Property" });
+        headerCells.push({
+            type: "th",
+            custom: PROPERTY,
+            content: "Property"
+        });
     }
     headerCells.push(
-        { type: "th", content: "Required?" },
-        { type: "th", content: "Allow Multiple?" },
-        { type: "th", content: "Types" }
+        {
+            type: "th",
+            custom: REQUIRED,
+            content: "Required?"
+        },
+        {
+            type: "th",
+            custom: ALLOW_MULTIPLE,
+            content: "Allow Multiple?"
+        },
+        {
+            type: "th",
+            custom: TYPES,
+            content: "Types"
+        }
     );
     return {
         type: "tr",
         header: true,
         cells: headerCells
     };
+}
+
+const TYPE_LINK = "type-link";
+
+function isTypeLink(obj: HTMLAnchorObject): boolean {
+    return obj.custom === TYPE_LINK;
 }
 
 function _createPropertyRow({ fullName, required, isArray, validTypes }: FullPropertyInfo, inclPropCol: boolean): HTMLTableRowObject<"data"> {
@@ -68,6 +119,7 @@ function _createPropertyRow({ fullName, required, isArray, validTypes }: FullPro
         const typeInfo = ElementDisplayInfo.getDisplayInfo(validType);
         const output: HTMLAnchorObject = {
             type: "a",
+            custom: TYPE_LINK,
             href: validType,
             content: {
                 type: "code",
@@ -143,7 +195,7 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
             type: "tr",
             cells: [
                 { type: "td", content: info.header },
-                { type: "td", custom: type }
+                { type: "td", custom: "color" }
             ]
         }]
     };
@@ -151,5 +203,7 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
 
 export const ElementTable = {
     createElementInfoTable: createElementInfoTable,
-    createPropertyTable: createPropertyTable
+    createPropertyTable: createPropertyTable,
+    getHeaderType: getHeaderType,
+    isTypeLink: isTypeLink
 };
