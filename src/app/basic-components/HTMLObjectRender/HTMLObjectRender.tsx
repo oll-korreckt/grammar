@@ -18,8 +18,8 @@ export interface HTMLObjectRenderProps {
     anchorProps?: ElementProps<HTMLAnchorObject, AnchorProps>;
     tableProps?: ElementProps<HTMLTableObject, TableProps>;
     tableHeaderProps?: ElementProps<HTMLTableHeaderObject, TableHeaderProps>;
-    tableHeaderRowProps?: ElementProps<HTMLTableHeaderObject, TableHeaderProps>;
-    tableRowProps?: ElementProps<HTMLTableRowObject, TableRowProps>;
+    tableHeaderRowProps?: ElementProps<HTMLTableRowObject<"header">, TableHeaderProps>;
+    tableRowProps?: ElementProps<HTMLTableRowObject<"data">, TableRowProps>;
     tableDataProps?: ElementProps<HTMLTableDataObject, TableDataProps>;
     orderedListProps?: ElementProps<HTMLOrderedListObject, OrderedListProps>;
     unorderedListProps?: ElementProps<HTMLUnorderedListObject, UnorderedListProps>;
@@ -34,7 +34,7 @@ export interface HTMLObjectRenderProps {
 type ElementProps<THTMLObject extends HTMLObject, Props extends PropertyType> =
     | Props
     | ElementPropsFunction<THTMLObject, Props>
-type ElementPropsFunction<THTMLObject extends HTMLObject, Props extends PropertyType> = (htmlObj: THTMLObject) => Props | undefined;
+type ElementPropsFunction<THTMLObject extends HTMLObject, Props extends PropertyType> = (htmlObj: THTMLObject) => void | Props | undefined;
 type ElementPropsAlias<T extends HTMLElement = HTMLElement> = DetailedHTMLProps<HTMLAttributes<T>, T>;
 
 type PropertyType =
