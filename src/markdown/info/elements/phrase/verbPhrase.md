@@ -1,35 +1,23 @@
 # Verb Phrases
-|Abreviation|Color|
-|---|---|
-|VP|`verbPhrase`|
+<!-- +elementInfo -->
 <!-- !verbPhrase -->
 In terms of function, Verb Phrases are quite simple as they serve only as the predicate of a Clause.
 <!-- !verbPhrase -->
 
 ## Properties
-|Name|Required?|Allow Multiple?|Types|
-|---|---|---|---|
-|Head|Yes|No|`Verb`|
-|Head Modifier|No|No|`Adverb`, `Adverb Phrase`, `Adverbial Clause`, `Noun`, `Noun Phrase`, `Preposition`, `Preposition Phrase`, `Infinitive`, `Infinitive Phrase`|
-|Head Compliment|No|No|`Adverb`, `Adverb Phrase`, `Adverbial Clause`, `Noun`, `Noun Phrase`, `Preposition`, `Preposition Phrase`, `Infinitive`, `Infinitive Phrase`|
-|Subject Compliment|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Adjective`, `Adjective Phrase`, `Preposition`, `Preposition Phrase`|
-|Direct Object|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Gerund`, `Gerund Phrase`, `Infinitive`, `Infinitive Phrase`|
-|Direct Object Compliment|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Adjective`, `Adjective Phrase`, `Preposition`, `Preposition Phrase`|
-|Indirect Object|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Gerund`, `Gerund Phrase`, `Infinitive`, `Infinitive Phrase`|
+<!-- +propertySummary -->
 
 Verb Phrases can assume many forms due to the number of possible properties they can have. Luckily, most Verb Phrases will only contain a few properties.
 
+<!-- #head -->
 ### Head
-|Required?|Allow Multiple?|Types|
-|---|---|---|
-|Yes|No|`Verb`|
+<!-- +head -->
 
 All verb phrases must be headed by a verb.
 
+<!-- #headModifier -->
 ### Head Modifier
-|Required?|Allow Multiple?|Types|
-|---|---|---|
-|No|No|`Adverb`, `Adverb Phrase`, `Adverbial Clause`, `Noun`, `Noun Phrase`, `Preposition`, `Preposition Phrase`, `Infinitive`, `Infinitive Phrase`|
+<!-- +headModifier -->
 
 Optionally, verb phrases can contain head modifiers which modify the head of the phrase. The head modifier should answer one of the following questions:
 - when?
@@ -59,14 +47,14 @@ One can use infinitives in order to modify the verb. However, it is worth noting
 
 > The dog ran *to catch the squirell*. (infinitive phrase)
 
+<!-- #headCompl -->
 ### Head Compliment
+<!-- +headCompl -->
 There exist certain verbs that are often referred to as *factitive verbs* which allow for the use of a head compliment. In terms of the number of viable grammatical elements, head compliments are incredibly flexible.
 
-<!-- #subjectCompliment -->
+<!-- #subjCompl -->
 ### Subject Compliment
-|Required?|Allow Multiple?|Types|
-|---|---|---|
-|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Adjective`, `Adjective Phrase`, `Preposition`, `Preposition Phrase`|
+<!-- +subjCompl -->
 
 Subject compliments are only used with certain verbs.
 
@@ -89,11 +77,9 @@ Subject compliments are only used with certain verbs.
 
 > Drinks are *on the house*.
 
+<!-- #dirObj -->
 ### Direct Object
-|Required?|Allow Multiple?|Types|
-|---|---|---|
-|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Gerund`, `Gerund Phrase`, `Infinitive`, `Infinitive Phrase`|
-|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Adjective`, `Adjective Phrase`, `Preposition`, `Preposition Phrase`|
+<!-- +dirObj -->
 
 Certain verbs allow for a direct object compliment. Such verbs are sometimes called *factitive verbs*. A direct object complement is similar to a subject compliment.
 
@@ -106,17 +92,15 @@ Certain verbs allow for a direct object compliment. Such verbs are sometimes cal
 #### Infinitive
 > He was nominated *to head the department*.
 
+<!-- #dirObjCompl -->
 ### Direct Object Complement
-|Required?|Allow Multiple?|Types|
-|---|---|---|
-|No|No|`Stuff`|
+<!-- +dirObjCompl -->
 
 *Factitive verbs* are capable of having a direct object complement. In terms of function and acceptable gramatic elements, direct object complements are quite similar to subject complements.
 
+<!-- #indObj -->
 ### Indirect Object
-|Required?|Allow Multiple?|Types|
-|---|---|---|
-|No|No|`Noun`, `Noun Phrase`, `Noun Clause`, `Gerund`, `Gerund Phrase`, `Infinitive`, `Infinitive Phrase`|
+<!-- +indObj -->
 
 Certain verbs, commonly refered to as *ditransitive verbs*, allow for the use of a 2nd object called an *indirect object*. The *indirect object* is the object of the verb which recieves the direct object. Perhaps the most intuitive example that can be offered is with the verb *to give*:
 > The man gave *the dog* **a bone**.
@@ -141,3 +125,4 @@ Pronouns are often used as indirect objects. However, keep in mind that they mus
 > The coach gave *listening to his players* a chance. (gerund phrase)
 
 #### Infinitives?
+Does this work?
