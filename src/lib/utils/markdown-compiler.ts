@@ -106,7 +106,8 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
             };
             return output;
         }
-        case "code": {
+        case "code":
+        case "codespan": {
             const output: HTMLCodeObject = {
                 type: "code"
             };
