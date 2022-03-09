@@ -15,8 +15,9 @@ export type HTMLObjectType =
     | "hr"
     | "img"
     | "a"
-    | "list"
     | "table"
+    | "thead"
+    | "tbody"
     | "tr"
     | "th"
     | "td"
@@ -45,6 +46,8 @@ export type HTMLObject =
     | HTMLAnchorObject
     | HTMLTableObject
     | HTMLTableHeaderObject
+    | HTMLTableHeadObject
+    | HTMLTableBodyObject
     | HTMLTableRowObject<"header">
     | HTMLTableRowObject<"data">
     | HTMLTableDataObject
@@ -55,6 +58,36 @@ export type HTMLObject =
     | HTMLParagraphObject
     | HTMLBoldObject
     | HTMLCheckboxObject
+export type HTMLObjectMap<Type extends HTMLObjectType> = _HTMLObjectMap[Type];
+type _HTMLObjectMap = {
+    blockquote: HTMLBlockquoteObject;
+    br: HTMLBrObject;
+    code: HTMLCodeObject;
+    del: HTMLDelObject;
+    i: HTMLItalicObject;
+    h1: HTMLH1Object;
+    h2: HTMLH2Object;
+    h3: HTMLH3Object;
+    h4: HTMLH4Object;
+    h5: HTMLH5Object;
+    h6: HTMLH6Object;
+    hr: HTMLHrObject;
+    img: HTMLImageObject;
+    a: HTMLAnchorObject;
+    table: HTMLTableObject;
+    thead: HTMLTableHeadObject;
+    tbody: HTMLTableBodyObject;
+    tr: HTMLTableRowObject;
+    th: HTMLTableHeaderObject;
+    td: HTMLTableDataObject;
+    ol: HTMLOrderedListObject;
+    ul: HTMLUnorderedListObject;
+    tasklist: HTMLTaskListObject;
+    li: HTMLListItemObject;
+    p: HTMLParagraphObject;
+    b: HTMLBoldObject;
+    checkbox: HTMLCheckboxObject;
+}
 export type HTMLContent = undefined | HTMLObject | HTMLObject[];
 interface HTMLObjectBase {
     type: HTMLObjectType;
@@ -136,8 +169,8 @@ export interface HTMLCheckboxObject extends HTMLObjectBase {
 }
 export interface HTMLTableObject extends HTMLObjectBase {
     type: "table";
-    headers: HTMLTableRowObject<"header">;
-    rows: HTMLTableRowObject<"data">[];
+    head: HTMLTableHeadObject;
+    body: HTMLTableBodyObject;
 }
 export type HTMLTableColumnAlign =
     | "left"
@@ -146,6 +179,14 @@ export type HTMLTableColumnAlign =
 export interface HTMLTableHeaderObject extends HTMLContentObject {
     type: "th";
     align?: HTMLTableColumnAlign;
+}
+export interface HTMLTableHeadObject extends HTMLObjectBase {
+    type: "thead";
+    content: HTMLTableRowObject<"header">;
+}
+export interface HTMLTableBodyObject extends HTMLObjectBase {
+    type: "tbody";
+    content: HTMLTableRowObject<"data">[];
 }
 export type HTMLTableRowObject<Type extends "data" | "header" = "data"> =
     Type extends "data" ? DataRow
