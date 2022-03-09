@@ -155,8 +155,14 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
         case "table": {
             const output: HTMLTableObject = {
                 type: "table",
-                headers: _getTableHeaders(token),
-                rows: _getTableRows(token.rows)
+                head: {
+                    type: "thead",
+                    content: _getTableHeaders(token)
+                },
+                body: {
+                    type: "tbody",
+                    content: _getTableRows(token.rows)
+                }
             };
             return output;
         }

@@ -178,66 +178,72 @@ describe("MarkdownCompiler", () => {
         const result = toCompilerResult("table.md");
         const expected: HTMLTableObject = {
             type: "table",
-            headers: {
-                type: "tr",
-                header: true,
-                cells: [
-                    {
-                        type: "th",
-                        content: [
-                            { type: "i", content: "No" },
-                            " ",
-                            { type: "b", content: "align" }
-                        ]
-                    },
-                    { type: "th", align: "left", content: "Align Left" },
-                    {
-                        type: "th",
-                        align: "right",
-                        content: { type: "b", content: "Align Right" }
-                    },
-                    {
-                        type: "th",
-                        align: "center",
-                        content: { type: "del", content: "Align Center" }
-                    }
-                ]
-            },
-            rows: [
-                {
+            head: {
+                type: "thead",
+                content: {
                     type: "tr",
+                    header: true,
                     cells: [
                         {
-                            type: "td",
-                            content: { type: "b", content: "bold" }
+                            type: "th",
+                            content: [
+                                { type: "i", content: "No" },
+                                " ",
+                                { type: "b", content: "align" }
+                            ]
                         },
-                        { type: "td", content: "12" },
-                        { type: "td", content: "13" },
-                        { type: "td", content: "14" }
-                    ]
-                },
-                {
-                    type: "tr",
-                    cells: [
-                        { type: "td", content: "21" },
+                        { type: "th", align: "left", content: "Align Left" },
                         {
-                            type: "td",
-                            content: { type: "i", content: "italic" }
+                            type: "th",
+                            align: "right",
+                            content: { type: "b", content: "Align Right" }
                         },
-                        { type: "td", content: "23" },
-                        { type: "td", content: "24" }
-                    ]
-                },
-                {
-                    type: "tr",
-                    cells: [
-                        { type: "td", content: "31" },
-                        { type: "td", content: "32" },
-                        { type: "td", content: "33" },
-                        { type: "td", content: "34" }
+                        {
+                            type: "th",
+                            align: "center",
+                            content: { type: "del", content: "Align Center" }
+                        }
                     ]
                 }
-            ]
+            },
+            body: {
+                type: "tbody",
+                content: [
+                    {
+                        type: "tr",
+                        cells: [
+                            {
+                                type: "td",
+                                content: { type: "b", content: "bold" }
+                            },
+                            { type: "td", content: "12" },
+                            { type: "td", content: "13" },
+                            { type: "td", content: "14" }
+                        ]
+                    },
+                    {
+                        type: "tr",
+                        cells: [
+                            { type: "td", content: "21" },
+                            {
+                                type: "td",
+                                content: { type: "i", content: "italic" }
+                            },
+                            { type: "td", content: "23" },
+                            { type: "td", content: "24" }
+                        ]
+                    },
+                    {
+                        type: "tr",
+                        cells: [
+                            { type: "td", content: "31" },
+                            { type: "td", content: "32" },
+                            { type: "td", content: "33" },
+                            { type: "td", content: "34" }
+                        ]
+                    }
+                ]
+            }
         };
         assert.deepStrictEqual(result, expected);
     });
