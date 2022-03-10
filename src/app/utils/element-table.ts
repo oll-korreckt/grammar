@@ -1,5 +1,5 @@
 import { ElementType, getElementDefinition } from "@domain/language";
-import { HTMLAnchorObject, HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
+import { HTMLAnchorObject, HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableHeadObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
 import { ElementDisplayInfo } from ".";
 
 type PropertyDisplayInfo = ElementDisplayInfo["properties"][keyof ElementDisplayInfo["properties"]];
@@ -66,7 +66,7 @@ function getHeaderType(obj: HTMLTableHeaderObject): PropertyHeaderType {
     return custom;
 }
 
-function _createHeaders(inclPropCol: boolean): HTMLTableRowObject<"header"> {
+function _createHeaders(inclPropCol: boolean): HTMLTableHeadObject {
     const PROPERTY: PropertyHeaderType = "property";
     const REQUIRED: PropertyHeaderType = "required";
     const ALLOW_MULTIPLE: PropertyHeaderType = "allowMultiple";
@@ -98,9 +98,12 @@ function _createHeaders(inclPropCol: boolean): HTMLTableRowObject<"header"> {
         }
     );
     return {
-        type: "tr",
-        header: true,
-        cells: headerCells
+        type: "thead",
+        content: {
+            type: "tr",
+            header: true,
+            cells: headerCells
+        }
     };
 }
 
@@ -157,18 +160,22 @@ function _createPropertyRow({ fullName, required, isArray, validTypes }: FullPro
 function _createFullPropertyTable(info: FullPropertyInfoObject): HTMLTableObject {
     return {
         type: "table",
-        headers: _createHeaders(true),
-        rows: _getSortedProps(info).map((propInfo) => _createPropertyRow(propInfo, true))
+        head: _createHeaders(true),
+        body: {
+            type: "tbody",
+            content: _getSortedProps(info).map((propInfo) => _createPropertyRow(propInfo, true))
+        }
     };
 }
 
 function _createPartialPropertyTable(info: FullPropertyInfoObject, property: string): HTMLTableObject {
     return {
         type: "table",
-        headers: _createHeaders(false),
-        rows: [
-            _createPropertyRow(info[property], false)
-        ]
+        head: _createHeaders(false),
+        body: {
+            type: "tbody",
+            content: [_createPropertyRow(info[property], false)]
+        }
     };
 }
 
@@ -183,21 +190,27 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
     const info = ElementDisplayInfo.getDisplayInfo(type);
     return {
         type: "table",
-        headers: {
-            type: "tr",
-            header: true,
-            cells: [
-                { type: "th", content: "Abbreviation" },
-                { type: "th", content: "Color" }
-            ]
+        head: {
+            type: "thead",
+            content: {
+                type: "tr",
+                header: true,
+                cells: [
+                    { type: "th", content: "Abbreviation" },
+                    { type: "th", content: "Color" }
+                ]
+            }
         },
-        rows: [{
-            type: "tr",
-            cells: [
-                { type: "td", content: info.header },
-                { type: "td", custom: "color" }
-            ]
-        }]
+        body: {
+            type: "tbody",
+            content: [{
+                type: "tr",
+                cells: [
+                    { type: "td", content: info.header },
+                    { type: "td", custom: "color" }
+                ]
+            }]
+        }
     };
 }
 
