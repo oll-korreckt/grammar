@@ -1,8 +1,8 @@
 import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word, PartOfSpeechList, CoordinatedPartOfSpeechList, PhraseList, CoordinatedPhraseList, ClauseList, CoordClauseList, ElementTypeList } from "./utils";
 import { PosMapper, CoordPosMapper, PosDefinitionMapper, CoordPosDefinitionMapper, CoordinatedDefinition } from "./part-of-speech";
 import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDefinitionMapper, VerbPhraseBaseDefinition, FunctionalAdverbPhrase, FunctionalNounPhrase, FunctionalPrepositionPhrase, FunctionalInfinitivePhrase, FunctionalAdjectivePhrase, FunctionalGerundPhrase, FunctionalParticiplePhrase, FunctionalVerbPhrase } from "./phrase";
-import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition, FunctionalIndependentClause } from "./clause";
-import { SimpleObject } from "@lib/utils";
+import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition } from "./clause";
+import { SimpleObject, Strings } from "@lib/utils";
 
 export type {
     ElementRecord,
@@ -378,8 +378,6 @@ export function getElementDefinition(type: Exclude<ElementType, "word">): { [key
     return getTypedElementDefinition(type) as any;
 }
 
-export type Sentence = FunctionalIndependentClause;
-
 const posList: PartOfSpeechList = [
     "noun",
     "pronoun",
@@ -470,6 +468,7 @@ const clauseSet = new Set([
     ...clauseList,
     ...coordClauseList
 ]) as Set<string>;
+const elementSet = new Set<string>(elementTypeList);
 export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
 
 function _wordFilter(category: ElementCategory): boolean {
@@ -521,7 +520,21 @@ function getElementCategory(type: ElementType): ElementCategory {
     throw `Unhandled type '${type}'`;
 }
 
+function isCoordinated(type: ElementType): boolean {
+    return type.startsWith("coordinated");
+}
+
+function isCoordinable(type: ElementType): boolean {
+    if (isCoordinated(type)) {
+        return true;
+    }
+    const coordType = `coordinated${Strings.capitalize(type)}`;
+    return elementSet.has(coordType);
+}
+
 export const ElementCategory = {
+    isCoordinated: isCoordinated,
+    isCoordinable: isCoordinable,
     getLayerFilter: getLayerFilter,
     getElementCategory: getElementCategory,
     getDefault(category?: ElementCategory): ElementCategory {
