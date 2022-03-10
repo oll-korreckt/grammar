@@ -175,14 +175,29 @@ describe("HTMLObjectRender", () => {
     test("override props", () => {
         const result = render(
             <HTMLObjectRender
-                paragraphProps={{ children: "Overridden text" }}
+                aProps={{ href: "Link2" }}
             >
-                {{ type: "p", content: "Provided text" }}
+                {{ type: "a", href: "Link1" }}
             </HTMLObjectRender>
         );
         const expected: TrimmedJSON = {
-            type: "p",
-            children: ["Overridden text"]
+            type: "a",
+            props: { href: "Link2" }
+        };
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("mandatory props", () => {
+        const result = render(
+            <HTMLObjectRender
+                checkboxProps={{ type: "not a checkbox" as any }}
+            >
+                {{ type: "checkbox" }}
+            </HTMLObjectRender>
+        );
+        const expected: TrimmedJSON = {
+            type: "input",
+            props: { type: "checkbox" }
         };
         assert.deepStrictEqual(result, expected);
     });
@@ -190,7 +205,7 @@ describe("HTMLObjectRender", () => {
     test("object", () => {
         const result = render(
             <HTMLObjectRender
-                boldProps={{ className: "bold-class" }}
+                bProps={{ className: "bold-class" }}
             >
                 {[
                     { type: "checkbox", checked: true },
@@ -221,7 +236,7 @@ describe("HTMLObjectRender", () => {
                 h1Props={() => {
                     return { className: "hi" };
                 }}
-                italicProps={() => {
+                iProps={() => {
                     return { className: "hi" };
                 }}
             >
@@ -323,49 +338,55 @@ describe("HTMLObjectRender", () => {
             <HTMLObjectRender>
                 {{
                     type: "table",
-                    headers: {
-                        type: "tr",
-                        header: true,
-                        cells: [
-                            {
-                                type: "th",
-                                align: "left",
-                                content: "Column 1"
-                            },
-                            {
-                                type: "th",
-                                content: "Column 2"
-                            }
-                        ]
-                    },
-                    rows: [
-                        {
+                    head: {
+                        type: "thead",
+                        content: {
                             type: "tr",
+                            header: true,
                             cells: [
                                 {
-                                    type: "td",
-                                    content: "11"
+                                    type: "th",
+                                    align: "left",
+                                    content: "Column 1"
                                 },
                                 {
-                                    type: "td",
-                                    content: "12"
-                                }
-                            ]
-                        },
-                        {
-                            type: "tr",
-                            cells: [
-                                {
-                                    type: "td",
-                                    content: "21"
-                                },
-                                {
-                                    type: "td",
-                                    content: "22"
+                                    type: "th",
+                                    content: "Column 2"
                                 }
                             ]
                         }
-                    ]
+                    },
+                    body: {
+                        type: "tbody",
+                        content: [
+                            {
+                                type: "tr",
+                                cells: [
+                                    {
+                                        type: "td",
+                                        content: "11"
+                                    },
+                                    {
+                                        type: "td",
+                                        content: "12"
+                                    }
+                                ]
+                            },
+                            {
+                                type: "tr",
+                                cells: [
+                                    {
+                                        type: "td",
+                                        content: "21"
+                                    },
+                                    {
+                                        type: "td",
+                                        content: "22"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }}
             </HTMLObjectRender>
         );
