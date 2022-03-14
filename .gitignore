@@ -29,3 +29,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# compiled element data
+/src/data
