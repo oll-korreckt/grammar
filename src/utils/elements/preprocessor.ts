@@ -1,7 +1,7 @@
-import { ElementTable } from "@app/utils/element-table";
-import { ElementType } from "@domain/language";
+import { ElementTable } from "./element-table";
 import { HTMLTableObject, ParseObject } from "@lib/utils";
 import { PreprocessState } from "./preprocess-state";
+import { ElementType } from "@domain/language/_types/utils";
 
 function run(type: Exclude<ElementType, "word">, data: ParseObject[]): ParseObject[] {
     let state = PreprocessState.init(type);
@@ -43,7 +43,7 @@ function run(type: Exclude<ElementType, "word">, data: ParseObject[]): ParseObje
         }
         return item;
     });
-    PreprocessState.checkState(state);
+    // PreprocessState.checkState(state);
     return output;
 }
 

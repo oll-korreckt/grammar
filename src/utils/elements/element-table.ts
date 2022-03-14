@@ -1,6 +1,7 @@
 import { ElementType, getElementDefinition } from "@domain/language";
 import { HTMLAnchorObject, HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableHeadObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
-import { ElementDisplayInfo } from ".";
+import { ElementDisplayInfo } from "../../app/utils";
+import { ElementPageType } from "./types";
 
 type PropertyDisplayInfo = ElementDisplayInfo["properties"][keyof ElementDisplayInfo["properties"]];
 type PropertyDefinition = ReturnType<typeof getElementDefinition>[keyof ReturnType<typeof getElementDefinition>];
@@ -120,10 +121,11 @@ function _createPropertyRow({ fullName, required, isArray, validTypes }: FullPro
             validTypesHtml.push(", ");
         }
         const typeInfo = ElementDisplayInfo.getDisplayInfo(validType);
+        const id = ElementPageType.pageTypeToId(validType as ElementPageType);
         const output: HTMLAnchorObject = {
             type: "a",
             custom: TYPE_LINK,
-            href: validType,
+            href: id,
             content: {
                 type: "code",
                 content: typeInfo.fullName

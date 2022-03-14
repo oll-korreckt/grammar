@@ -1,3 +1,5 @@
+@use "main";
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,4 +8,57 @@
 
 body {
     overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    padding: 5px 0;
+}
+ol li {
+    margin-left: 20px;
+}
+ul li {
+    margin-left: 40px;
+}
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow: auto;
+}
+thead {
+    color: white;
+    background-color: gray;
+    white-space: nowrap;
+}
+tbody {
+    border-radius: 5px;
+}
+th {
+    text-align: left;
+    padding: 5px 15px;
+    border: 1px solid gray;
+    height: 100%;
+}
+td {
+    vertical-align: middle;
+    padding: 5px;
+    border: 1px solid gray;
+    height: 100%;
+}
+tr {
+    height: 100%;
+    &:nth-child(even) {
+        background-color: #ddd;
+    }
+}
+blockquote {
+    background-color: #eee;
+    margin-left: 5px;
+    border-left: 5px solid gray;
+    &:not(last-child) {
+        margin-bottom: 5px;
+    }
+    p {
+        margin-left: 5px;
+    }
 }

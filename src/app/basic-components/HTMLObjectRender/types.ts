@@ -29,7 +29,7 @@ export type HTMLObjectRenderProps =
     & ElementRenderProps<"p">
     & ElementRenderProps<"b">
     & ElementRenderProps<"checkbox">
-    & { children: HTMLObject | HTMLObject[]; };
+    & { children?: HTMLObject | HTMLObject[]; };
 
 type ElementRenderProps<Type extends HTMLObjectType = HTMLObjectType> = {
     [Key in `${Type}Props`]?: GenericElementPropsGetter<Type>;
@@ -80,14 +80,19 @@ type _HTMLObjectTagMap = {
 
 type InputType = "checkbox";
 type InputRenderProps<TInputType extends InputType> =
-    Omit<JSX.IntrinsicElements["input"], "children" | "type">
+    Omit<JSX.IntrinsicElements["input"], "children" | "ref" | "type">
     & {
         type: TInputType;
+        ref?: ModernRef<TInputType>;
         children: HTMLObjectMap<TInputType>;
     };
+type ModernRef<Type extends HTMLObjectType> = Exclude<JSX.IntrinsicElements[HTMLObjectTagMap<Type>]["ref"], string>;
 type StandardRenderProps<Type extends HTMLObjectType> =
-    Omit<JSX.IntrinsicElements[HTMLObjectTagMap<Type>], "children">
-    & { children: HTMLObjectMap<Type>; };
+    Omit<JSX.IntrinsicElements[HTMLObjectTagMap<Type>], "children" | "ref">
+    & {
+        ref?: ModernRef<Type>;
+        children: HTMLObjectMap<Type>;
+    };
 
 export type HTMLObjectComponentProps<Type extends HTMLObjectType> = Type extends InputType
     ? InputRenderProps<Type>
