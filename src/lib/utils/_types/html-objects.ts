@@ -197,7 +197,6 @@ interface DataRow extends HTMLObjectBase {
 }
 interface HeaderRow extends HTMLObjectBase {
     type: "tr";
-    header: true;
     cells: HTMLTableHeaderObject[];
 }
 export interface HTMLTableDataObject extends HTMLContentObject {
