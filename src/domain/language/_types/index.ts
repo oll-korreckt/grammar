@@ -4,7 +4,7 @@ import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDef
 import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition } from "./clause";
 import { SimpleObject, Strings } from "@lib/utils";
 
-export { ElementType } from "./utils";
+export { ElementType, elementTypeLists } from "./utils";
 export type {
     ElementRecord,
     ElementId,
