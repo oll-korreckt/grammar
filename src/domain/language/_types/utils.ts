@@ -117,6 +117,94 @@ export type ElementType =
     | ClauseGuard<ClauseType>
     | CoordClauseType;
 
+const posList: PartOfSpeechList = [
+    "noun",
+    "pronoun",
+    "verb",
+    "infinitive",
+    "participle",
+    "gerund",
+    "adjective",
+    "adverb",
+    "preposition",
+    "determiner",
+    "coordinator",
+    "subordinator"
+];
+const coordPosList: CoordinatedPartOfSpeechList = [
+    "coordinatedNoun",
+    "coordinatedPronoun",
+    "coordinatedVerb",
+    "coordinatedInfinitive",
+    "coordinatedParticiple",
+    "coordinatedGerund",
+    "coordinatedAdjective",
+    "coordinatedAdverb",
+    "coordinatedPreposition",
+    "coordinatedDeterminer"
+];
+const phraseList: PhraseList = [
+    "nounPhrase",
+    "verbPhrase",
+    "adjectivePhrase",
+    "adverbPhrase",
+    "prepositionPhrase",
+    "gerundPhrase",
+    "infinitivePhrase",
+    "participlePhrase"
+];
+const coordPhraseList: CoordinatedPhraseList = [
+    "coordinatedNounPhrase",
+    "coordinatedVerbPhrase",
+    "coordinatedAdjectivePhrase",
+    "coordinatedAdverbPhrase",
+    "coordinatedPrepositionPhrase",
+    "coordinatedGerundPhrase",
+    "coordinatedInfinitivePhrase",
+    "coordinatedParticiplePhrase"
+];
+const clauseList: ClauseList = [
+    "independentClause",
+    "nounClause",
+    "relativeClause",
+    "adverbialClause"
+];
+const coordClauseList: CoordClauseList = [
+    "coordinatedIndependentClause",
+    "coordinatedNounClause",
+    "coordinatedRelativeClause",
+    "coordinatedAdverbialClause"
+];
+const elementTypeList: ElementTypeList = [
+    "word",
+    ...posList,
+    ...coordPosList,
+    ...phraseList,
+    ...coordPhraseList,
+    ...clauseList,
+    ...coordClauseList
+];
+
+export const elementTypeLists = {
+    partOfSpeech: posList,
+    coordPartOfSpeech: coordPosList,
+    phrase: phraseList,
+    coordPhrase: coordPhraseList,
+    clause: clauseList,
+    coordClause: coordClauseList,
+    element: elementTypeList
+};
+
+export const elementSet = new Set<string>(elementTypeList);
+
+function isElementType(value: string): value is ElementType {
+    return elementSet.has(value);
+}
+
+export const ElementType = {
+    isElementType: isElementType
+};
+
 export interface ElementReference<TElementType extends ElementType = ElementType> {
     id: ElementId;
     type: TElementType;

@@ -1,9 +1,10 @@
-import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word, PartOfSpeechList, CoordinatedPartOfSpeechList, PhraseList, CoordinatedPhraseList, ClauseList, CoordClauseList, ElementTypeList } from "./utils";
+import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word, elementTypeLists, elementSet } from "./utils";
 import { PosMapper, CoordPosMapper, PosDefinitionMapper, CoordPosDefinitionMapper, CoordinatedDefinition } from "./part-of-speech";
 import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDefinitionMapper, VerbPhraseBaseDefinition, FunctionalAdverbPhrase, FunctionalNounPhrase, FunctionalPrepositionPhrase, FunctionalInfinitivePhrase, FunctionalAdjectivePhrase, FunctionalGerundPhrase, FunctionalParticiplePhrase, FunctionalVerbPhrase } from "./phrase";
 import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition } from "./clause";
 import { SimpleObject, Strings } from "@lib/utils";
 
+export { ElementType } from "./utils";
 export type {
     ElementRecord,
     ElementId,
@@ -13,7 +14,6 @@ export type {
     PhraseGuard,
     ClauseType,
     ClauseGuard,
-    ElementType,
     ElementReference,
     Word
 } from "./utils";
@@ -378,97 +378,19 @@ export function getElementDefinition(type: Exclude<ElementType, "word">): { [key
     return getTypedElementDefinition(type) as any;
 }
 
-const posList: PartOfSpeechList = [
-    "noun",
-    "pronoun",
-    "verb",
-    "infinitive",
-    "participle",
-    "gerund",
-    "adjective",
-    "adverb",
-    "preposition",
-    "determiner",
-    "coordinator",
-    "subordinator"
-];
-const coordPosList: CoordinatedPartOfSpeechList = [
-    "coordinatedNoun",
-    "coordinatedPronoun",
-    "coordinatedVerb",
-    "coordinatedInfinitive",
-    "coordinatedParticiple",
-    "coordinatedGerund",
-    "coordinatedAdjective",
-    "coordinatedAdverb",
-    "coordinatedPreposition",
-    "coordinatedDeterminer"
-];
-const phraseList: PhraseList = [
-    "nounPhrase",
-    "verbPhrase",
-    "adjectivePhrase",
-    "adverbPhrase",
-    "prepositionPhrase",
-    "gerundPhrase",
-    "infinitivePhrase",
-    "participlePhrase"
-];
-const coordPhraseList: CoordinatedPhraseList = [
-    "coordinatedNounPhrase",
-    "coordinatedVerbPhrase",
-    "coordinatedAdjectivePhrase",
-    "coordinatedAdverbPhrase",
-    "coordinatedPrepositionPhrase",
-    "coordinatedGerundPhrase",
-    "coordinatedInfinitivePhrase",
-    "coordinatedParticiplePhrase"
-];
-const clauseList: ClauseList = [
-    "independentClause",
-    "nounClause",
-    "relativeClause",
-    "adverbialClause"
-];
-const coordClauseList: CoordClauseList = [
-    "coordinatedIndependentClause",
-    "coordinatedNounClause",
-    "coordinatedRelativeClause",
-    "coordinatedAdverbialClause"
-];
-const elementTypeList: ElementTypeList = [
-    "word",
-    ...posList,
-    ...coordPosList,
-    ...phraseList,
-    ...coordPhraseList,
-    ...clauseList,
-    ...coordClauseList
-];
-
-export const elementTypeLists = {
-    partOfSpeech: posList,
-    coordPartOfSpeech: coordPosList,
-    phrase: phraseList,
-    coordPhrase: coordPhraseList,
-    clause: clauseList,
-    coordClause: coordClauseList,
-    element: elementTypeList
-};
-
 const posSet = new Set([
-    ...posList,
-    ...coordPosList
+    ...elementTypeLists.partOfSpeech,
+    ...elementTypeLists.coordPartOfSpeech
 ]) as Set<string>;
 const phraseSet = new Set([
-    ...phraseList,
-    ...coordPhraseList
+    ...elementTypeLists.phrase,
+    ...elementTypeLists.coordPhrase
 ]) as Set<string>;
 const clauseSet = new Set([
-    ...clauseList,
-    ...coordClauseList
+    ...elementTypeLists.clause,
+    ...elementTypeLists.coordClause
 ]) as Set<string>;
-const elementSet = new Set<string>(elementTypeList);
+
 export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
 
 function _wordFilter(category: ElementCategory): boolean {
