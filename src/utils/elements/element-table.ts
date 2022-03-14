@@ -102,7 +102,6 @@ function _createHeaders(inclPropCol: boolean): HTMLTableHeadObject {
         type: "thead",
         content: {
             type: "tr",
-            header: true,
             cells: headerCells
         }
     };
@@ -196,7 +195,6 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
             type: "thead",
             content: {
                 type: "tr",
-                header: true,
                 cells: [
                     { type: "th", content: "Abbreviation" },
                     { type: "th", content: "Color" }
