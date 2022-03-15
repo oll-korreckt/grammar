@@ -454,9 +454,17 @@ function isCoordinable(type: ElementType): boolean {
     return elementSet.has(coordType);
 }
 
+function coordinate(type: ElementType): ElementType {
+    if (!isCoordinable(type)) {
+        throw `Type '${type}' cannot be coordinated`;
+    }
+    return `coordinated${Strings.capitalize(type)}` as ElementType;
+}
+
 export const ElementCategory = {
     isCoordinated: isCoordinated,
     isCoordinable: isCoordinable,
+    coordinate: coordinate,
     getLayerFilter: getLayerFilter,
     getElementCategory: getElementCategory,
     getDefault(category?: ElementCategory): ElementCategory {
