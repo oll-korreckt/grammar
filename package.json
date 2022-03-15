@@ -33,7 +33,7 @@
     },
     "scripts": {
         "dev": "npm run open-browser && next dev",
-        "markdown": "npm run open-browser && next-remote-watch src/markdown",
+        "markdown": "next-remote-watch src/markdown",
         "open-browser": "node open",
         "test": "jest",
         "start": "webpack serve --open"
