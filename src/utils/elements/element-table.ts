@@ -1,22 +1,26 @@
-import { ElementType, getElementDefinition } from "@domain/language";
+import { ElementCategory, ElementType, getElementDefinition } from "@domain/language";
 import { HTMLAnchorObject, HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableHeadObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
 import { ElementDisplayInfo } from "../../app/utils";
-import { ElementPageType } from "./types";
+import { ElementPage, ElementPageType_ElementType } from "./types";
 
 type PropertyDisplayInfo = ElementDisplayInfo["properties"][keyof ElementDisplayInfo["properties"]];
 type PropertyDefinition = ReturnType<typeof getElementDefinition>[keyof ReturnType<typeof getElementDefinition>];
 interface FullPropertyInfo extends PropertyDisplayInfo {
     keyName: string;
     isArray: boolean;
-    validTypes: ElementType[];
+    validTypes: ElementPageType_ElementType[];
 }
 type FullPropertyInfoObject = Record<string, FullPropertyInfo>;
 
-function _createFullPropertyInfo(type: Exclude<ElementType, "word">): FullPropertyInfoObject {
+function _filterTypes(types: ElementType[]): ElementPageType_ElementType[] {
+    return types.filter((type) => ElementPage.isPageType(type)) as ElementPageType_ElementType[];
+}
+
+function _createFullPropertyInfo(type: ElementPageType_ElementType): FullPropertyInfoObject {
     const displayInfo: Record<string, PropertyDisplayInfo> = ElementDisplayInfo.getDisplayInfo(type).properties;
     const elementDef: Record<string, PropertyDefinition> = getElementDefinition(type);
     if (!SimpleObject.sameKeys(displayInfo, elementDef)) {
-        throw "";
+        throw `Incongruency between element defintion and display info for type '${type}'`;
     }
     const output: FullPropertyInfoObject = {};
     const keys = Object.keys(displayInfo);
@@ -27,8 +31,8 @@ function _createFullPropertyInfo(type: Exclude<ElementType, "word">): FullProper
         const fullInfo: FullPropertyInfo = {
             ...diEntry,
             keyName: key,
-            isArray,
-            validTypes
+            validTypes: _filterTypes(validTypes),
+            isArray
         };
         output[key] = fullInfo;
     }
@@ -115,21 +119,11 @@ function isTypeLink(obj: HTMLAnchorObject): boolean {
 
 function _createPropertyRow({ fullName, required, isArray, validTypes }: FullPropertyInfo, inclPropCol: boolean): HTMLTableRowObject<"data"> {
     const validTypesHtml: HTMLObject[] = [];
-    validTypes.filter((validType) => !validType.startsWith("coordinated")).forEach((validType, index) => {
+    validTypes.forEach((validType, index) => {
         if (index > 0) {
             validTypesHtml.push(", ");
         }
-        const typeInfo = ElementDisplayInfo.getDisplayInfo(validType);
-        const id = ElementPageType.pageTypeToId(validType as ElementPageType);
-        const output: HTMLAnchorObject = {
-            type: "a",
-            custom: TYPE_LINK,
-            href: id,
-            content: {
-                type: "code",
-                content: typeInfo.fullName
-            }
-        };
+        const output = ElementPage.createTypeLink(validType);
         validTypesHtml.push(output);
     });
     const output: HTMLTableDataObject[] = [];
@@ -180,14 +174,14 @@ function _createPartialPropertyTable(info: FullPropertyInfoObject, property: str
     };
 }
 
-function createPropertyTable(type: Exclude<ElementType, "word">, property?: string): HTMLTableObject {
+function createPropertyTable(type: ElementPageType_ElementType, property?: string): HTMLTableObject {
     const info = _createFullPropertyInfo(type);
     return property === undefined
         ? _createFullPropertyTable(info)
         : _createPartialPropertyTable(info, property);
 }
 
-function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableObject {
+function createElementInfoTable(type: ElementPageType_ElementType): HTMLTableObject {
     const info = ElementDisplayInfo.getDisplayInfo(type);
     return {
         type: "table",
@@ -197,6 +191,7 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
                 type: "tr",
                 cells: [
                     { type: "th", content: "Abbreviation" },
+                    { type: "th", content: "Coordination" },
                     { type: "th", content: "Color" }
                 ]
             }
@@ -207,11 +202,34 @@ function createElementInfoTable(type: Exclude<ElementType, "word">): HTMLTableOb
                 type: "tr",
                 cells: [
                     { type: "td", content: info.header },
+                    _createCoordinationCell(type),
                     { type: "td", custom: "color" }
                 ]
             }]
         }
     };
+}
+
+function _createCoordinationCell(type: ElementPageType_ElementType): HTMLTableDataObject {
+    if (!ElementCategory.isCoordinable(type)) {
+        return { type: "td", content: "N/A" };
+    }
+    const coordinatedType = ElementCategory.coordinate(type) as Exclude<ElementType, "word">;
+    const typeDef = getElementDefinition(coordinatedType);
+    if (!("items" in typeDef)) {
+        throw `No type definition found for '${coordinatedType}' derived from '${type}'`;
+    }
+    const [, validTypes] = typeDef["items"];
+    const filteredValidTypes = _filterTypes(validTypes);
+    const content: HTMLObject[] = [];
+    filteredValidTypes.forEach((vType, index) => {
+        if (index > 0) {
+            content.push(", ");
+        }
+        const link = ElementPage.createTypeLink(vType);
+        content.push(link);
+    });
+    return { type: "td", content };
 }
 
 export const ElementTable = {

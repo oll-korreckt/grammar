@@ -1,53 +1,65 @@
+import { ElementDisplayInfo } from "@app/utils";
 import { ElementCategory } from "@domain/language";
-import { ClauseList, PartOfSpeechList, PhraseList } from "@domain/language/_types/utils";
+import { ClauseList, ElementType, PartOfSpeechList, PhraseList } from "@domain/language/_types/utils";
+import { HTMLAnchorObject } from "@lib/utils";
 
 export type ElementPageType =
     | "coordinated"
     | PartOfSpeechList[number]
     | PhraseList[number]
     | ClauseList[number]
-    | ElementCategory;
+    | ElementCategory
 
-export type ElementPageId = keyof _ElementPageData;
-type Item<Type extends ElementPageType> = Type;
-type _ElementPageData = {
-    coordinated: Item<"coordinated">;
-    word: Item<"word">;
-    category: Item<"partOfSpeech">;
-    phrase: Item<"phrase">;
-    clause: Item<"clause">;
-    noun: Item<"noun">;
-    verb: Item<"verb">;
-    infinitive: Item<"infinitive">;
-    participle: Item<"participle">;
-    gerund: Item<"gerund">;
-    adjective: Item<"adjective">;
-    adverb: Item<"adverb">;
-    preposition: Item<"preposition">;
-    determiner: Item<"determiner">;
-    coordinator: Item<"coordinator">;
-    subordinator: Item<"subordinator">;
-    "noun-phrase": Item<"nounPhrase">;
-    "verb-phrase": Item<"verbPhrase">;
-    "adjective-phrase": Item<"adjectivePhrase">;
-    "adverb-phrase": Item<"adverbPhrase">;
-    "preposition-phrase": Item<"prepositionPhrase">;
-    "gerund-phrase": Item<"gerundPhrase">;
-    "infinitive-phrase": Item<"infinitivePhrase">;
-    "participle-phrase": Item<"participlePhrase">;
-    "independent-clause": Item<"independentClause">;
-    "noun-clause": Item<"nounClause">;
-    "relative-clause": Item<"relativeClause">;
-    "adverbial-clause": Item<"adverbialClause">;
-}
+export type ElementPageType_ElementType =
+    | PartOfSpeechList[number]
+    | PhraseList[number]
+    | ClauseList[number]
 
-const dataObj: _ElementPageData = {
+export type ElementPageType_ElementCategory =
+    | "coordinated"
+    | ElementCategory
+
+export type ElementPageId =
+    | "coordinated"
+    | "word"
+    | "category"
+    | "phrase"
+    | "clause"
+    | "noun"
+    | "pronoun"
+    | "verb"
+    | "infinitive"
+    | "participle"
+    | "gerund"
+    | "adjective"
+    | "adverb"
+    | "preposition"
+    | "determiner"
+    | "coordinator"
+    | "subordinator"
+    | "noun-phrase"
+    | "verb-phrase"
+    | "adjective-phrase"
+    | "adverb-phrase"
+    | "preposition-phrase"
+    | "gerund-phrase"
+    | "infinitive-phrase"
+    | "participle-phrase"
+    | "independent-clause"
+    | "noun-clause"
+    | "relative-clause"
+    | "adverbial-clause"
+type PageIdToPageType = Record<ElementPageId, ElementPageType>;
+type PageTypeToPageId = Record<ElementPageType, ElementPageId>;
+
+const idToTypeMap: PageIdToPageType = {
     coordinated: "coordinated",
     word: "word",
     category: "partOfSpeech",
     phrase: "phrase",
     clause: "clause",
     noun: "noun",
+    pronoun: "pronoun",
     verb: "verb",
     infinitive: "infinitive",
     participle: "participle",
@@ -71,38 +83,68 @@ const dataObj: _ElementPageData = {
     "relative-clause": "relativeClause",
     "adverbial-clause": "adverbialClause"
 };
+const typeToIdMap: PageTypeToPageId = Object.fromEntries(
+    Object.entries(idToTypeMap).map(([key, value]) => [value, key])
+) as PageTypeToPageId;
 
-function pageTypeToId(type: ElementPageType): string {
-    let output = "";
-    for (let index = 0; index < type.length; index++) {
-        const char = type[index];
-        if (char === char.toUpperCase()) {
-            output += `-${char.toLowerCase()}`;
-        } else {
-            output += char;
-        }
+function isElementPageType(value: string): value is ElementPageType {
+    return value in typeToIdMap;
+}
+
+function isElementPageId(value: string): value is ElementPageId {
+    return value in idToTypeMap;
+}
+
+function typeToId(type: ElementPageType): ElementPageId {
+    const output = typeToIdMap[type];
+    if (output === undefined) {
+        throw `Value '${type}' is not a valid ElementPageType`;
     }
     return output;
 }
 
-function idToPageType(id: string): ElementPageType {
-    let output = "";
-    let index = 0;
-    while (index < id.length) {
-        const char = id[index];
-        if (char === "-") {
-            const nextChar = id[index + 1];
-            output += nextChar.toUpperCase();
-            index++;
-        } else {
-            output += char;
-        }
-        index++;
+function idToType(id: ElementPageId): ElementPageType {
+    const output = idToTypeMap[id];
+    if (output === undefined) {
+        throw `Value '${id}' is not a valid ElementPageId`;
     }
     return output as ElementPageType;
 }
 
-export const ElementPageType = {
-    pageTypeToId: pageTypeToId,
-    idToPageType: idToPageType
+function isElementType(value: string): value is ElementPageType_ElementType {
+    return isElementPageType(value) && ElementType.isElementType(value);
+}
+
+function isElementCategory(value: string): value is ElementPageType_ElementCategory {
+    return isElementPageType(value) && !ElementType.isElementType(value);
+}
+
+const TYPE_LINK = "type-link";
+
+function isTypeLink(value: HTMLAnchorObject): boolean {
+    return value.custom === TYPE_LINK;
+}
+
+function createTypeLink(type: ElementPageType_ElementType): HTMLAnchorObject {
+    const { fullName } = ElementDisplayInfo.getDisplayInfo(type);
+    return {
+        type: "a",
+        custom: TYPE_LINK,
+        href: typeToId(type),
+        content: {
+            type: "code",
+            content: fullName
+        }
+    };
+}
+
+export const ElementPage = {
+    typeToId: typeToId,
+    idToType: idToType,
+    isPageId: isElementPageId,
+    isPageType: isElementPageType,
+    isElementType: isElementType,
+    isElementCategory: isElementCategory,
+    createTypeLink: createTypeLink,
+    isTypeLink: isTypeLink
 };

@@ -1,9 +1,9 @@
 import { ElementTable } from "./element-table";
 import { HTMLTableObject, ParseObject } from "@lib/utils";
 import { PreprocessState } from "./preprocess-state";
-import { ElementType } from "@domain/language/_types/utils";
+import { ElementPageType_ElementCategory, ElementPageType_ElementType } from "./types";
 
-function run(type: Exclude<ElementType, "word">, data: ParseObject[]): ParseObject[] {
+function runElementType(type: ElementPageType_ElementType, data: ParseObject[]): ParseObject[] {
     let state = PreprocessState.init(type);
     const output: ParseObject[] = data.map((item) => {
         switch (item.type) {
@@ -47,6 +47,11 @@ function run(type: Exclude<ElementType, "word">, data: ParseObject[]): ParseObje
     return output;
 }
 
+function runElementCategory(type: ElementPageType_ElementCategory, data: ParseObject[]): ParseObject[] {
+    throw "not implemented";
+}
+
 export const Preprocessor = {
-    run: run
+    runElementType: runElementType,
+    runElementCategory: runElementCategory
 };
