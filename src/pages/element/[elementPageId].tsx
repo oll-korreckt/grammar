@@ -3,27 +3,23 @@ import { HTMLObject } from "@lib/utils";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { ParsedUrlQuery } from "querystring";
 import React from "react";
-import { promises as fs } from "fs";
-import { MarkdownScanner } from "@lib/utils/markdown-scanner";
-import { MarkdownParser } from "@lib/utils/markdown-parser";
-import { MarkdownCompiler } from "@lib/utils/markdown-compiler";
-import { Preprocessor } from "utils/elements";
 import styles from "./_styles.module.scss";
 import { accessClassName, ElementDisplayInfo } from "@app/utils";
-import { ElementType } from "@domain/language";
 import Link from "next/link";
-import { ElementPageType } from "utils/elements/types";
-import { MarkdownFinder } from "utils/elements/markdown-finder";
 import { ElementTable } from "utils/elements/element-table";
+import { ElementPage, ElementPageId, ElementPageType, ElementPageType_ElementType } from "utils/elements";
+import { ElementPageLoader } from "utils/elements/io";
 
 export interface ElementPageProps {
-    type: Exclude<ElementType, "word">;
+    type: ElementPageType;
     content: HTMLObject | HTMLObject[];
 }
 
 
-const ElementPage: NextPage<ElementPageProps> = ({ type, content }) => {
-    const CustomTd = createCustomTd(type);
+const ElementPageComponent: NextPage<ElementPageProps> = ({ type, content }) => {
+    const CustomTd = ElementPage.isElementType(type)
+        ? createElementPageTd(type)
+        : undefined;
     return (
         <div className={accessClassName(styles, "container")}>
             <div className={accessClassName(styles, "content")}>
@@ -43,18 +39,18 @@ const ElementPage: NextPage<ElementPageProps> = ({ type, content }) => {
     );
 };
 
-function createCustomTd(type: Exclude<ElementType, "word">): GenericHTMLObjectComponent<"td"> {
+function createElementPageTd(type: ElementPageType_ElementType): GenericHTMLObjectComponent<"td"> {
     const CustomTd: GenericHTMLObjectComponent<"td"> = (props) => {
         const { children, ...rest } = props;
         if (children.custom === "color") {
             const color = ElementDisplayInfo.getDisplayInfo(type).color;
             return (
                 <td {...rest}>
-                    <div className={accessClassName(styles, color)}/>
+                    <div className={accessClassName(styles, color)} />
                 </td>
             );
         }
-        return <TableData {...props}/>;
+        return <TableData {...props} />;
     };
     return CustomTd;
 }
@@ -63,6 +59,9 @@ function createCustomTd(type: Exclude<ElementType, "word">): GenericHTMLObjectCo
 const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest }) => {
     if (href === undefined) {
         throw "";
+    }
+    if (!ElementPage.isPageId(href)) {
+        throw `'${href}' is not a valid elementpage`;
     }
     return (
         <Link href={href} passHref>
@@ -74,13 +73,13 @@ const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest
 };
 
 interface PathData extends ParsedUrlQuery {
-    elementId: string;
+    elementPageId: ElementPageId;
 }
 
 export const getStaticPaths: GetStaticPaths<PathData> = async () => {
     return {
         paths: [
-            { params: { elementId: "verb-phrase" } }
+            { params: { elementPageId: "verb-phrase" } }
         ],
         fallback: false
     };
@@ -90,24 +89,15 @@ export const getStaticProps: GetStaticProps<ElementPageProps, PathData> = async 
     if (params === undefined) {
         throw "params does not exist";
     }
-    const { elementId } = params;
-    const type = ElementPageType.idToPageType(elementId);
-    const filepath = MarkdownFinder.findFile(type);
-    const fileBuffer = await fs.readFile(filepath);
-    const fileContent = await fileBuffer.toString();
-    const tokens = MarkdownScanner.scan(fileContent);
-    const parseOutput = MarkdownParser.parse(tokens);
-    if (!ElementType.isElementType(type) || type === "word") {
-        throw "";
-    }
-    const parsedParseOutput = Preprocessor.run(type, parseOutput);
-    const htmlObjs = MarkdownCompiler.compile(parsedParseOutput);
+    const { elementPageId } = params;
+    const elementPageType = ElementPage.idToType(elementPageId);
+    const content = await ElementPageLoader.loadPage(elementPageType);
     return {
         props: {
-            type: type,
-            content: htmlObjs
+            type: elementPageType,
+            content
         }
     };
 };
 
-export default ElementPage;
+export default ElementPageComponent;
