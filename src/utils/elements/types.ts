@@ -1,7 +1,7 @@
 import { ElementDisplayInfo } from "@app/utils";
 import { ElementCategory } from "@domain/language";
 import { ClauseList, ElementType, PartOfSpeechList, PhraseList } from "@domain/language/_types/utils";
-import { HTMLAnchorObject } from "@lib/utils";
+import { HTMLAnchorObject, Strings } from "@lib/utils";
 
 export type ElementPageType =
     | "coordinated"
@@ -125,8 +125,8 @@ function isTypeLink(value: HTMLAnchorObject): boolean {
     return value.custom === TYPE_LINK;
 }
 
-function createTypeLink(type: ElementPageType_ElementType): HTMLAnchorObject {
-    const { fullName } = ElementDisplayInfo.getDisplayInfo(type);
+function createTypeLink(type: ElementPageType): HTMLAnchorObject {
+    const fullName = _getFullName(type);
     return {
         type: "a",
         custom: TYPE_LINK,
@@ -136,6 +136,24 @@ function createTypeLink(type: ElementPageType_ElementType): HTMLAnchorObject {
             content: fullName
         }
     };
+}
+
+function _getFullName(type: ElementPageType): string {
+    if (isElementType(type)) {
+        return ElementDisplayInfo.getDisplayInfo(type).fullName;
+    } else if (isElementCategory(type)) {
+        switch (type) {
+            case "word":
+            case "phrase":
+            case "clause":
+                return `${Strings.capitalize(type)}s`;
+            case "partOfSpeech":
+                return "Categories";
+            case "coordinated":
+                return Strings.capitalize(type);
+        }
+    }
+    throw `Cannot find full name for type '${type}'`;
 }
 
 export const ElementPage = {
