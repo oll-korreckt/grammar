@@ -79,6 +79,8 @@ interface PathData extends ParsedUrlQuery {
 export const getStaticPaths: GetStaticPaths<PathData> = async () => {
     return {
         paths: [
+            { params: { elementPageId: "adjective" } },
+            { params: { elementPageId: "adverb" } },
             { params: { elementPageId: "verb-phrase" } }
         ],
         fallback: false
