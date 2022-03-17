@@ -41,7 +41,9 @@ describe("MarkdownScanner", () => {
             { type: "html" },
             { type: "comment.id", id: "id" },
             { type: "comment.snippet", name: "section" },
-            { type: "comment.htmlInjection", id: "injection" }
+            { type: "comment.htmlInjection", id: "injection" },
+            { type: "comment.class", className: "nameOf1stClass" },
+            { type: "comment.class", className: "nameOf2ndClass" }
         ];
         assert.deepStrictEqual(result, expected);
     });

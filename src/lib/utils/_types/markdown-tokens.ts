@@ -46,6 +46,11 @@ export interface MarkdownCommentHTMLInjection extends Omit<marked.Tokens.HTML, "
     id: string;
 }
 
+export interface MarkdownCommentHTMLClass extends Omit<marked.Tokens.HTML, "type"> {
+    type: "comment.class";
+    className: string;
+}
+
 export type MarkdownToken =
     | MarkdownBlockquote
     | MarkdownBr
@@ -54,6 +59,7 @@ export type MarkdownToken =
     | MarkdownCommentId
     | MarkdownCommentSnippet
     | MarkdownCommentHTMLInjection
+    | MarkdownCommentHTMLClass
     | MarkdownDef
     | MarkdownDel
     | MarkdownEm
@@ -78,6 +84,7 @@ export type MarkdownTokenType =
     | "comment.id"
     | "comment.snippet"
     | "comment.htmlInjection"
+    | "comment.class"
     | "def"
     | "del"
     | "em"

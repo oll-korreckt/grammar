@@ -13,6 +13,7 @@ export interface TokenResult {
     id?: string;
     header?: TableCellResult[];
     rows?: TableCellResult[][];
+    className?: string;
     align?: MarkdownTable["align"];
 }
 
@@ -54,6 +55,9 @@ export function toResult(token: MarkdownToken): TokenResult {
             break;
         case "comment.htmlInjection":
             output.id = token.id;
+            break;
+        case "comment.class":
+            output.className = token.className;
             break;
         case "table":
             output.align = token.align;
