@@ -119,17 +119,11 @@ function isElementCategory(value: string): value is ElementPageType_ElementCateg
     return isElementPageType(value) && !ElementType.isElementType(value);
 }
 
-const TYPE_LINK = "type-link";
-
-function isTypeLink(value: HTMLAnchorObject): boolean {
-    return value.custom === TYPE_LINK;
-}
-
 function createTypeLink(type: ElementPageType): HTMLAnchorObject {
     const fullName = _getFullName(type);
     return {
         type: "a",
-        custom: TYPE_LINK,
+        className: "typeLink",
         href: typeToId(type),
         content: {
             type: "code",
@@ -163,6 +157,5 @@ export const ElementPage = {
     isPageType: isElementPageType,
     isElementType: isElementType,
     isElementCategory: isElementCategory,
-    createTypeLink: createTypeLink,
-    isTypeLink: isTypeLink
+    createTypeLink: createTypeLink
 };

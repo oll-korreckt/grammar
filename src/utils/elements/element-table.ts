@@ -1,5 +1,5 @@
 import { ElementCategory, ElementType, getElementDefinition } from "@domain/language";
-import { HTMLAnchorObject, HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableHeadObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
+import { HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableHeadObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
 import { ElementDisplayInfo } from "../../app/utils";
 import { ElementPage, ElementPageType_ElementType } from "./types";
 
@@ -72,33 +72,24 @@ function getHeaderType(obj: HTMLTableHeaderObject): PropertyHeaderType {
 }
 
 function _createHeaders(inclPropCol: boolean): HTMLTableHeadObject {
-    const PROPERTY: PropertyHeaderType = "property";
-    const REQUIRED: PropertyHeaderType = "required";
-    const ALLOW_MULTIPLE: PropertyHeaderType = "allowMultiple";
-    const TYPES: PropertyHeaderType = "types";
-
     const headerCells: HTMLTableHeaderObject[] = [];
     if (inclPropCol) {
         headerCells.push({
             type: "th",
-            custom: PROPERTY,
             content: "Property"
         });
     }
     headerCells.push(
         {
             type: "th",
-            custom: REQUIRED,
             content: "Required?"
         },
         {
             type: "th",
-            custom: ALLOW_MULTIPLE,
             content: "Allow Multiple?"
         },
         {
             type: "th",
-            custom: TYPES,
             content: "Types"
         }
     );
@@ -109,12 +100,6 @@ function _createHeaders(inclPropCol: boolean): HTMLTableHeadObject {
             cells: headerCells
         }
     };
-}
-
-const TYPE_LINK = "type-link";
-
-function isTypeLink(obj: HTMLAnchorObject): boolean {
-    return obj.custom === TYPE_LINK;
 }
 
 function _createPropertyRow({ fullName, required, isArray, validTypes }: FullPropertyInfo, inclPropCol: boolean): HTMLTableRowObject<"data"> {
@@ -235,6 +220,5 @@ function _createCoordinationCell(type: ElementPageType_ElementType): HTMLTableDa
 export const ElementTable = {
     createElementInfoTable: createElementInfoTable,
     createPropertyTable: createPropertyTable,
-    getHeaderType: getHeaderType,
-    isTypeLink: isTypeLink
+    getHeaderType: getHeaderType
 };
