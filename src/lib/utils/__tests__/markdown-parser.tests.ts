@@ -2,45 +2,60 @@ import { assert } from "chai";
 import { ParseObject, ParseObjectType } from "..";
 import { MarkdownParser } from "../markdown-parser";
 import { MarkdownScanner } from "../markdown-scanner";
+import { ParseContent } from "../_types";
 import { getTestFileContent, TokenResult } from "./utils";
 
-interface ContainerResultBase {
+interface ParseResultBase {
     type: ParseObjectType;
 }
 
-interface SectionHeaderResult extends ContainerResultBase {
-    type: "idHeading";
+interface ElementIdResult extends ParseResultBase {
+    type: "elementId";
     id: string;
-    heading: TokenResult;
+    content: TokenResult | ElementClassResult;
 }
 
-interface SnippetResult extends ContainerResultBase {
+interface SnippetResult extends ParseResultBase {
     type: "snippet";
-    name?: string;
+    name: string;
     content: TokenResult[];
 }
 
-interface HTMLInjectionResult extends ContainerResultBase {
+interface HTMLInjectionResult extends ParseResultBase {
     type: "htmlInjection";
     id: string;
 }
 
-type ContainerResult =
-    | SectionHeaderResult
-    | SnippetResult
-    | HTMLInjectionResult;
+interface ElementClassResult extends ParseResultBase {
+    type: "elementClass";
+    className: string | string[];
+    content: TokenResult;
+}
 
-function toContainerResult(result: ParseObject): ContainerResult {
+type ParseResult =
+    | TokenResult
+    | ElementIdResult
+    | SnippetResult
+    | HTMLInjectionResult
+    | ElementClassResult
+
+function toParseResult(result: ParseObject): ParseResult {
+    if (ParseContent.isParseContent(result)) {
+        return TokenResult.toResult(result);
+    }
     switch (result.type) {
-        case "idHeading":
+        case "elementId":
             return {
-                type: "idHeading",
+                type: "elementId",
                 id: result.id,
-                heading: TokenResult.toResult(result.heading)
+                content: ParseContent.isParseContent(result.content)
+                    ? TokenResult.toResult(result.content)
+                    : toParseResult(result.content) as ElementClassResult
             };
         case "snippet": {
             const output: SnippetResult = {
                 type: "snippet",
+                name: result.name,
                 content: result.content.map((token) => TokenResult.toResult(token))
             };
             if (result.name !== undefined) {
@@ -54,28 +69,39 @@ function toContainerResult(result: ParseObject): ContainerResult {
                 id: result.id
             };
         }
+        case "elementClass": {
+            return {
+                type: "elementClass",
+                className: result.className,
+                content: TokenResult.toResult(result.content)
+            };
+        }
     }
 }
 
-function runParse(filename: string): ContainerResult[] {
+function runParse(filename: string): ParseResult[] {
     const content = getTestFileContent(filename);
     const tokens = MarkdownScanner.scan(content);
     return MarkdownParser
         .parse(tokens)
-        .map((token) => toContainerResult(token));
+        .map((token) => toParseResult(token));
 }
 
 describe("MarkdownParser", () => {
     test("parse", () => {
         const result = runParse("parser.md");
-        const expected: ContainerResult[] = [
+        const expected: ParseResult[] = [
             {
-                type: "idHeading",
+                type: "elementId",
                 id: "link",
-                heading: {
-                    type: "heading",
-                    depth: 1,
-                    tokens: [{ type: "text", text: "Heading" }]
+                content: {
+                    type: "elementClass",
+                    className: ["firstClass", "secondClass"],
+                    content: {
+                        type: "heading",
+                        depth: 1,
+                        tokens: [{ type: "text", text: "Heading" }]
+                    }
                 }
             },
             {
@@ -90,14 +116,8 @@ describe("MarkdownParser", () => {
                 }]
             },
             {
-                type: "snippet",
-                content: [{
-                    type: "paragraph",
-                    tokens: [{
-                        type: "text",
-                        text: "Unnamed section"
-                    }]
-                }]
+                type: "paragraph",
+                tokens: [{ type: "text", text: "Unnamed section" }]
             },
             {
                 type: "htmlInjection",
@@ -108,13 +128,6 @@ describe("MarkdownParser", () => {
     });
 
     describe("error", () => {
-        test("heading links", () => {
-            assert.throws(
-                () => runParse("parser-heading-links.md"),
-                /must precede headings/i
-            );
-        });
-
         test("multiple heading ids", () => {
             assert.throws(
                 () => runParse("parser-multiple-ids.md"),
@@ -122,9 +135,23 @@ describe("MarkdownParser", () => {
             );
         });
 
-        test("no closing tag", () => {
+        test("snippet: invalid token", () => {
             assert.throws(
-                () => runParse("parser-no-closing-tag.md"),
+                () => runParse("parser-snippet-invalid-token.md"),
+                /contains invalid token/i
+            );
+        });
+
+        test("snippet: different closing tag", () => {
+            assert.throws(
+                () => runParse("parser-snippet-diff-closing-tag.md"),
+                /contains a different closing tag/i
+            );
+        });
+
+        test("snippet: no closing tag", () => {
+            assert.throws(
+                () => runParse("parser-snippet-no-closing-tag.md"),
                 /does not have a matching closing tag/i
             );
         });

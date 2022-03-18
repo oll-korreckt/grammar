@@ -1,30 +1,36 @@
 import { HTMLContent } from "./html-objects";
-import { MarkdownHeading, MarkdownToken } from "./markdown-tokens";
+import { MarkdownCommentHTMLClass, MarkdownCommentHTMLInjection, MarkdownCommentId, MarkdownCommentSnippet, MarkdownToken, MarkdownTokenType } from "./markdown-tokens";
 
 export type ParseObjectType =
-    | "idHeading"
+    | "elementId"
     | "snippet"
     | "htmlInjection"
+    | "elementClass"
 
 export type ParseObject =
-    | IdHeading
+    | ParseContent
+    | ElementId
     | Snippet
     | HTMLInjection
+    | ElementClass
+
+export type ParseContent = Exclude<MarkdownToken, MarkdownCommentId | MarkdownCommentSnippet | MarkdownCommentHTMLInjection | MarkdownCommentHTMLClass>;
+export type ParseContentType = Exclude<MarkdownTokenType, "comment.id" | "comment.snippet" | "comment.htmlInjection" | "comment.class">;
 
 interface ParseObjectBase {
     type: ParseObjectType;
 }
 
-export interface IdHeading extends ParseObjectBase {
-    type: "idHeading";
+export interface ElementId extends ParseObjectBase {
+    type: "elementId";
     id: string;
-    heading: MarkdownHeading;
+    content: ElementClass | ParseContent;
 }
 
 export interface Snippet extends ParseObjectBase {
     type: "snippet";
-    name?: string;
-    content: MarkdownToken[];
+    name: string;
+    content: ParseContent[];
 }
 
 export interface HTMLInjection extends ParseObjectBase {
@@ -32,3 +38,40 @@ export interface HTMLInjection extends ParseObjectBase {
     id: string;
     content?: HTMLContent;
 }
+
+export interface ElementClass extends ParseObjectBase {
+    type: "elementClass";
+    className: string | string[];
+    content: ParseContent;
+}
+
+const tokenTypes = new Set<ParseContentType>([
+    "blockquote",
+    "br",
+    "code",
+    "codespan",
+    "def",
+    "del",
+    "em",
+    "escape",
+    "html",
+    "heading",
+    "hr",
+    "image",
+    "link",
+    "list",
+    "list_item",
+    "paragraph",
+    "space",
+    "strong",
+    "table",
+    "text"
+]);
+
+function isParseContent(obj: Record<string, any>): obj is ParseContent {
+    return "type" in obj && tokenTypes.has(obj["type"]);
+}
+
+export const ParseContent = {
+    isParseContent: isParseContent
+};

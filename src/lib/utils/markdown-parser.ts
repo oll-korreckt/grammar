@@ -1,34 +1,10 @@
-import { MarkdownToken, MarkdownTokenType, ParseObject, Snippet } from "./_types";
+import { ElementClass, MarkdownToken, ParseContent, ParseObject, Snippet } from "./_types";
 
 interface ParseData {
     tokens: MarkdownToken[];
     current: number;
-    idHeadings: Set<string>;
+    ids: Set<string>;
     snippetNames: Set<string>;
-}
-
-function _idHeading(data: ParseData): ParseObject {
-    const currToken = _getCurrentToken(data);
-    if (currToken.type === "comment.id") {
-        const id = currToken.id;
-        const { idHeadings } = data;
-        if (idHeadings.has(id)) {
-            throw `File contains multiple id headings for '${id}'`;
-        }
-        idHeadings.add(id);
-        _advance(data);
-        const headingToken = _getCurrentToken(data);
-        if (headingToken.type !== "heading") {
-            throw "heading ids must precede headings";
-        }
-        _advance(data);
-        return {
-            type: "idHeading",
-            id: id,
-            heading: headingToken
-        };
-    }
-    return _injection(data);
 }
 
 function _injection(data: ParseData): ParseObject {
@@ -40,7 +16,69 @@ function _injection(data: ParseData): ParseObject {
             id: currToken.id
         };
     }
+    return _elementId(data);
+}
+
+function _elementId(data: ParseData): ParseObject {
+    const currToken = _getCurrentToken(data);
+    if (currToken.type === "comment.id") {
+        const id = currToken.id;
+        const { ids } = data;
+        if (ids.has(id)) {
+            throw `File contains multiple id headings for '${id}'`;
+        }
+        ids.add(id);
+        _advance(data);
+        const nextToken = _elementClass(data);
+        if (!ParseContent.isParseContent(nextToken)
+            && nextToken.type !== "elementClass") {
+            throw "content of an 'elementId' must be either a MarkdownToken or 'elementClass'";
+        }
+        _advance(data);
+        return {
+            type: "elementId",
+            id: id,
+            content: nextToken
+        };
+    }
+    return _elementClass(data);
+}
+
+function _elementClass(data: ParseData): ParseObject {
+    const currToken = _getCurrentToken(data);
+    if (currToken.type === "comment.class") {
+        const chain: MarkdownToken[] = [];
+        while (!_isAtEnd(data) && _getCurrentToken(data).type === "comment.class") {
+            chain.push(_getCurrentToken(data));
+            _advance(data);
+        }
+        chain.push(_getCurrentToken(data));
+        return _toElementClass(chain);
+    }
     return _snippet(data);
+}
+
+function _toElementClass(chain: MarkdownToken[]): ElementClass {
+    const classes: string[] = [];
+    for (let index = 1; index < chain.length; index++) {
+        const prev = chain[index - 1];
+        if (prev.type !== "comment.class") {
+            throw `Unexpected token of type '${prev.type}' found when trying to form ElementClass`;
+        }
+        classes.push(prev.className);
+    }
+    if (classes.length === 0) {
+        throw "ElementClass needs at least 1 class";
+    }
+    const last = chain[chain.length - 1];
+    if (!ParseContent.isParseContent(last)) {
+        throw "ElementClass must contain a content element";
+    }
+    return {
+        type: "elementClass",
+        className: classes.length === 1 ? classes[0] : classes,
+        content: last
+    };
 }
 
 function _snippet(data: ParseData): ParseObject {
@@ -48,26 +86,40 @@ function _snippet(data: ParseData): ParseObject {
     if (currToken.type === "comment.snippet") {
         _advance(data);
         return _finishNamedSnippet(data, currToken.name);
-    } else {
-        return _finishUnnamedSnippet(data);
     }
+    return _parseContent(data);
+}
+
+function _parseContent(data: ParseData): ParseObject {
+    const output = _getCurrentToken(data);
+    if (!ParseContent.isParseContent(output)) {
+        throw `Unexpected token of type '${output.type}'`;
+    }
+    _advance(data);
+    return output;
 }
 
 function _finishNamedSnippet(data: ParseData, name: string): Snippet {
-    const content: MarkdownToken[] = [];
-    let closeName: string | undefined = undefined;
-    while (!_isAtEnd(data) && !_check(data, "comment.id")) {
+    const content: ParseContent[] = [];
+    let hasClosingTag = false;
+    while (!_isAtEnd(data)) {
         const currToken = _getCurrentToken(data);
         if (currToken.type === "comment.snippet") {
-            closeName = currToken.name;
+            if (currToken.name !== name) {
+                throw `Named snippet '${name}' contains a different closing tag: '${currToken.name}'`;
+            }
             _advance(data);
+            hasClosingTag = true;
             break;
+        }
+        if (!ParseContent.isParseContent(currToken)) {
+            throw `Snippet '${name}' contains invalid token of type '${currToken.type}'`;
         }
         content.push(currToken);
         _advance(data);
     }
-    if (closeName !== name) {
-        throw `Named snippet '${name}' does not have a matching closing tag`;
+    if (!hasClosingTag) {
+        throw `Snippet '${name}' does not have a matching closing tag`;
     }
     const { snippetNames } = data;
     if (snippetNames.has(name)) {
@@ -81,36 +133,16 @@ function _finishNamedSnippet(data: ParseData, name: string): Snippet {
     };
 }
 
-function _finishUnnamedSnippet(data: ParseData): Snippet {
-    const content: MarkdownToken[] = [];
-    while (!_isAtEnd(data) && !_check(data, "comment.id", "comment.snippet", "comment.htmlInjection")) {
-        const currToken = _getCurrentToken(data);
-        content.push(currToken);
-        _advance(data);
-    }
-    return {
-        type: "snippet",
-        content
-    };
-}
-
 function _isAtEnd(data: ParseData): boolean {
     return data.current >= data.tokens.length;
 }
 
 function _getCurrentToken(data: ParseData): MarkdownToken {
+    if (_isAtEnd(data)) {
+        throw "at end";
+    }
     const token = data.tokens[data.current];
     return token;
-}
-
-function _check(data: ParseData, ...tokenTypes: MarkdownTokenType[]): boolean {
-    const currToken = _getCurrentToken(data);
-    for (const tokenType of tokenTypes) {
-        if (currToken.type === tokenType) {
-            return true;
-        }
-    }
-    return false;
 }
 
 function _advance(data: ParseData): void {
@@ -123,15 +155,15 @@ function parse(markdown: MarkdownToken[]): ParseObject[] {
     const data: ParseData = {
         current: 0,
         tokens: markdown,
-        idHeadings: new Set(),
+        ids: new Set(),
         snippetNames: new Set()
     };
-    const content: ParseObject[] = [];
+    const output: ParseObject[] = [];
     while (!_isAtEnd(data)) {
-        const container = _idHeading(data);
-        content.push(container);
+        const item = _injection(data);
+        output.push(item);
     }
-    return content;
+    return output;
 }
 
 export const MarkdownParser = {

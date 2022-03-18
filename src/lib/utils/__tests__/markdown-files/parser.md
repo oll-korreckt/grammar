@@ -1,4 +1,6 @@
 <!-- #link -->
+<!-- .firstClass -->
+<!-- .secondClass -->
 # Heading
 <!-- !section -->
 Here is a section
