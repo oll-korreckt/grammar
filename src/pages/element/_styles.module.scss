@@ -26,6 +26,12 @@
     width: min(800px, calc(100% - 10px));
 }
 
+.caption {
+    margin-left: 40px;
+    margin-right: 40px;
+    font-size: 14px;
+}
+
 .typeLink {
     color: orangered;
     text-decoration: none;
