@@ -6,7 +6,6 @@ import React from "react";
 import styles from "./_styles.module.scss";
 import { accessClassName, ElementDisplayInfo } from "@app/utils";
 import Link from "next/link";
-import { ElementTable } from "utils/elements/element-table";
 import { ElementPage, ElementPageId, ElementPageType, ElementPageType_ElementType } from "utils/elements";
 import { ElementPageLoader } from "utils/elements/io";
 
@@ -24,13 +23,14 @@ const ElementPageComponent: NextPage<ElementPageProps> = ({ type, content }) => 
         <div className={accessClassName(styles, "container")}>
             <div className={accessClassName(styles, "content")}>
                 <HTMLObjectRender
-                    aProps={(obj) => {
-                        if (ElementTable.isTypeLink(obj)) {
-                            return { className: accessClassName(styles, "typeLink") };
-                        }
-                    }}
                     aCmpt={CustomAnchor}
                     tdCmpt={CustomTd}
+                    classMap={(className) => {
+                        const classNameArr = Array.isArray(className)
+                            ? className
+                            : [className];
+                        return accessClassName(styles, ...classNameArr);
+                    }}
                 >
                     {content}
                 </HTMLObjectRender>
