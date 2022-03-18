@@ -182,7 +182,6 @@ describe("MarkdownCompiler", () => {
                 type: "thead",
                 content: {
                     type: "tr",
-                    header: true,
                     cells: [
                         {
                             type: "th",
@@ -245,6 +244,29 @@ describe("MarkdownCompiler", () => {
                 ]
             }
         };
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("ids and classes", () => {
+        const result = toCompilerResult("ids-classes.md");
+        const expected: HTMLObject[] = [
+            {
+                type: "h1",
+                id: "id1",
+                className: ["class1", "class2", "class3"],
+                content: "This is a header"
+            },
+            {
+                type: "p",
+                className: "class1",
+                content: "No id"
+            },
+            {
+                type: "h3",
+                id: "id2",
+                content: "No class(es)"
+            }
+        ];
         assert.deepStrictEqual(result, expected);
     });
 });

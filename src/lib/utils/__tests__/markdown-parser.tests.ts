@@ -127,6 +127,43 @@ describe("MarkdownParser", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    test("ids and classes", () => {
+        const result = runParse("ids-classes.md");
+        const expected: ParseResult[] = [
+            {
+                type: "elementId",
+                id: "id1",
+                content: {
+                    type: "elementClass",
+                    className: ["class1", "class2", "class3"],
+                    content: {
+                        type: "heading",
+                        depth: 1,
+                        tokens: [{ type: "text", text: "This is a header" }]
+                    }
+                }
+            },
+            {
+                type: "elementClass",
+                className: "class1",
+                content: {
+                    type: "paragraph",
+                    tokens: [{ type: "text", text: "No id" }]
+                }
+            },
+            {
+                type: "elementId",
+                id: "id2",
+                content: {
+                    type: "heading",
+                    depth: 3,
+                    tokens: [{ type: "text", text: "No class(es)" }]
+                }
+            }
+        ];
+        assert.deepStrictEqual(result, expected);
+    });
+
     describe("error", () => {
         test("multiple heading ids", () => {
             assert.throws(

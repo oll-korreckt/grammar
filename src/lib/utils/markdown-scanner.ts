@@ -21,7 +21,7 @@ function _toMarkdownHeadingDepth(value: number): MarkdownHeadingDepth {
     return value as MarkdownHeadingDepth;
 }
 
-function _toMarkdownToken(token: marked.Token): MarkdownToken {
+function _toMarkdownToken(token: marked.Token): MarkdownToken | undefined {
     if (_isTag(token)) {
         throw "cannot use tag tokens";
     }
@@ -33,8 +33,10 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken {
         case "def":
         case "escape":
         case "hr":
-        case "space":
             return token;
+        // ignored tokens
+        case "space":
+            return undefined;
         // tokens with a 'tokens' property
         case "blockquote":
         case "del":
@@ -146,7 +148,15 @@ function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentId | Ma
 }
 
 function _toMarkdownTokens(tokens: marked.Token[]): MarkdownToken[] {
-    return tokens.map((token) => _toMarkdownToken(token));
+    const output: MarkdownToken[] = [];
+    for (let index = 0; index < tokens.length; index++) {
+        const token = tokens[index];
+        const item = _toMarkdownToken(token);
+        if (item !== undefined) {
+            output.push(item);
+        }
+    }
+    return output;
 }
 
 function _convertTableCellTokens(tokens: Tokens.TableCell[], expectedLength: number): MarkdownTableCell[] {
@@ -182,6 +192,9 @@ function _convertListItemTokens(tokens: marked.Token[]): MarkdownToken[] {
             }
             const textTokenSubTokensOutput = _toMarkdownTokens(textToken.tokens);
             const listTokenOutput = _toMarkdownToken(listToken);
+            if (listTokenOutput === undefined) {
+                throw "Unable to process 2nd token of list_item";
+            }
             return [
                 ...textTokenSubTokensOutput,
                 listTokenOutput

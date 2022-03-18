@@ -30,7 +30,7 @@ function runElementType(type: ElementPageType_ElementType, data: ParseObject[]):
                     content
                 };
             }
-            case "idHeading": {
+            case "elementId": {
                 state = PreprocessState.addHeader(state, item.id);
                 break;
             }

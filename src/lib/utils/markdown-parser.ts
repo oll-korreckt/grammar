@@ -34,7 +34,6 @@ function _elementId(data: ParseData): ParseObject {
             && nextToken.type !== "elementClass") {
             throw "content of an 'elementId' must be either a MarkdownToken or 'elementClass'";
         }
-        _advance(data);
         return {
             type: "elementId",
             id: id,
@@ -53,6 +52,7 @@ function _elementClass(data: ParseData): ParseObject {
             _advance(data);
         }
         chain.push(_getCurrentToken(data));
+        _advance(data);
         return _toElementClass(chain);
     }
     return _snippet(data);
@@ -117,6 +117,9 @@ function _finishNamedSnippet(data: ParseData, name: string): Snippet {
         }
         content.push(currToken);
         _advance(data);
+    }
+    if (content.length === 0) {
+        throw `Snippet '${name}' does not contain any content`;
     }
     if (!hasClosingTag) {
         throw `Snippet '${name}' does not have a matching closing tag`;

@@ -92,6 +92,8 @@ export type HTMLContent = undefined | HTMLObject | HTMLObject[];
 interface HTMLObjectBase {
     type: HTMLObjectType;
     custom?: string;
+    className?: string | string[];
+    id?: string;
 }
 export interface HTMLContentObject extends HTMLObjectBase {
     content?: HTMLContent;

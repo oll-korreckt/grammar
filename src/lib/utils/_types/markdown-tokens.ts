@@ -25,7 +25,6 @@ export type MarkdownLink = RemoveTokens<marked.Tokens.Link> & OverrideTokens;
 export type MarkdownList = Omit<marked.Tokens.List, "items"> & { items: MarkdownListItem[]; };
 export type MarkdownListItem = RemoveTokens<marked.Tokens.ListItem> & OverrideTokens;
 export type MarkdownParagraph = RemoveTokens<marked.Tokens.Paragraph> & OverrideTokens;
-export type MarkdownSpace = marked.Tokens.Space;
 export type MarkdownStrong = RemoveTokens<marked.Tokens.Strong> & OverrideTokens;
 export interface MarkdownTable extends Omit<marked.Tokens.Table, "header" | "rows"> {
     header: MarkdownTableCell[];
@@ -72,7 +71,6 @@ export type MarkdownToken =
     | MarkdownList
     | MarkdownListItem
     | MarkdownParagraph
-    | MarkdownSpace
     | MarkdownStrong
     | MarkdownTable
     | MarkdownText
@@ -97,7 +95,6 @@ export type MarkdownTokenType =
     | "list"
     | "list_item"
     | "paragraph"
-    | "space"
     | "strong"
     | "table"
     | "text"

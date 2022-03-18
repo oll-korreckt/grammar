@@ -51,39 +51,36 @@ describe("MarkdownScanner", () => {
     test("styling", () => {
         const content = getTestFileContent("styling.md");
         const result = runScan(content);
-        const expected: TokenResult[] = [
-            { type: "space" },
-            {
-                type: "paragraph",
-                tokens: [
-                    { type: "text", text: "plain " },
-                    {
+        const expected: TokenResult[] = [{
+            type: "paragraph",
+            tokens: [
+                { type: "text", text: "plain " },
+                {
+                    type: "strong",
+                    tokens: [{ type: "text", text: "bold" }]
+                },
+                { type: "text", text: " " },
+                {
+                    type: "em",
+                    tokens: [{ type: "text", text: "italic" }]
+                },
+                { type: "text", text: " " },
+                {
+                    type: "em",
+                    tokens: [{
                         type: "strong",
-                        tokens: [{ type: "text", text: "bold" }]
-                    },
-                    { type: "text", text: " " },
-                    {
-                        type: "em",
-                        tokens: [{ type: "text", text: "italic" }]
-                    },
-                    { type: "text", text: " " },
-                    {
-                        type: "em",
-                        tokens: [{
-                            type: "strong",
-                            tokens: [{ type: "text", text: "bold and italic" }]
-                        }]
-                    },
-                    { type: "text", text: " " },
-                    {
-                        type: "del",
-                        tokens: [{ type: "text", text: "strikethrough" }]
-                    },
-                    { type: "br" },
-                    { type: "text", text: "newline" }
-                ]
-            }
-        ];
+                        tokens: [{ type: "text", text: "bold and italic" }]
+                    }]
+                },
+                { type: "text", text: " " },
+                {
+                    type: "del",
+                    tokens: [{ type: "text", text: "strikethrough" }]
+                },
+                { type: "br" },
+                { type: "text", text: "newline" }
+            ]
+        }];
         assert.deepStrictEqual(result, expected);
     });
 

@@ -120,9 +120,6 @@ function _toHTMLObject(token: MarkdownToken): HTMLObject | undefined {
             return {
                 type: token.type
             };
-        // ignored types
-        case "space":
-            return undefined;
         // mapped types
         case "em": {
             const output: HTMLItalicObject = {
@@ -210,7 +207,6 @@ function _getTableHeaders({ header, align }: MarkdownTable): HTMLTableRowObject<
     }
     return {
         type: "tr",
-        header: true,
         cells: output
     };
 }
@@ -231,40 +227,54 @@ function _getTableRows(rowTokens: MarkdownTableCell[][]): HTMLTableRowObject[] {
     });
 }
 
-function _compileContainer(parseObj: ParseObject): HTMLObject[] {
+function isHTMLElement(value: HTMLContent): value is Exclude<HTMLObject, string> {
+    return value !== undefined
+        && !Array.isArray(value)
+        && typeof value !== "string";
+}
+
+function _compileObject(parseObj: ParseObject): HTMLContent {
     switch (parseObj.type) {
-        case "idHeading": {
-            const output = _toHTMLObject(parseObj.heading);
-            switch (typeof output) {
-                case "string":
-                case "undefined":
-                    throw "";
+        case "elementId": {
+            const output = _compileObject(parseObj.content);
+            if (!isHTMLElement(output)) {
+                throw `id '${parseObj.id}' is not associated with an element`;
             }
-            output.custom = parseObj.id;
-            return [output];
+            output.id = parseObj.id;
+            return output;
+        }
+        case "elementClass": {
+            const output = _compileObject(parseObj.content);
+            if (!isHTMLElement(output)) {
+                const { className } = parseObj;
+                throw `class '${className}' is not associated with an element`;
+            }
+            output.className = parseObj.className;
+            return output;
         }
         case "snippet": {
             const output = _toHTMLContent(parseObj.content);
             if (output === undefined) {
-                throw "";
+                throw `Snippet '${parseObj.name}' does not contain any content`;
             }
-            return Array.isArray(output) ? output : [output];
+            return output;
         }
         case "htmlInjection": {
-            const { content } = parseObj;
-            if (content === undefined) {
-                return [];
-            }
-            return Array.isArray(content) ? content : [content];
+            return parseObj.content;
         }
+        default:
+            return _toHTMLContent([parseObj]);
     }
 }
 
 function compile(content: ParseObject[]): HTMLObject | HTMLObject[] {
     const output: HTMLObject[] = [];
     content.forEach((container) => {
-        const objs = _compileContainer(container);
-        output.push(...objs);
+        const obj = _compileObject(container);
+        if (obj !== undefined) {
+            const items = Array.isArray(obj) ? obj : [obj];
+            output.push(...items);
+        }
     });
     return output.length === 1
         ? output[0]
