@@ -187,6 +187,86 @@ describe("HTMLObjectRender", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    describe("className", () => {
+        test("default", () => {
+            const result = render(
+                <HTMLObjectRender>
+                    {[
+                        {
+                            type: "p",
+                            className: "class1",
+                            content: "String Class"
+                        },
+                        {
+                            type: "p",
+                            className: ["class1", "class2", "class3"],
+                            content: "Array Class"
+                        },
+                        {
+                            type: "p",
+                            content: "No Class"
+                        }
+                    ]}
+                </HTMLObjectRender>
+            );
+            const expected: TrimmedJSON[] = [
+                {
+                    type: "p",
+                    props: { className: "class1" },
+                    children: ["String Class"]
+                },
+                {
+                    type: "p",
+                    props: { className: "class1 class2 class3" },
+                    children: ["Array Class"]
+                },
+                {
+                    type: "p",
+                    children: ["No Class"]
+                }
+            ];
+            assert.deepStrictEqual(result, expected);
+        });
+
+        test("override", () => {
+            const result = render(
+                <HTMLObjectRender
+                    classMap={() => "override"}
+                >
+                    {{
+                        type: "p",
+                        className: "class1",
+                        content: "Override"
+                    }}
+                </HTMLObjectRender>
+            );
+            const expected: TrimmedJSON = {
+                type: "p",
+                props: { className: "override" },
+                children: ["Override"]
+            };
+            assert.deepStrictEqual(result, expected);
+        });
+    });
+
+    test("id", () => {
+        const result = render(
+            <HTMLObjectRender>
+                {{
+                    type: "blockquote",
+                    id: "id1",
+                    content: "This has an id"
+                }}
+            </HTMLObjectRender>
+        );
+        const expected: TrimmedJSON = {
+            type: "blockquote",
+            props: { id: "id1" },
+            children: ["This has an id"]
+        };
+        assert.deepStrictEqual(result, expected);
+    });
+
     test("mandatory props", () => {
         const result = render(
             <HTMLObjectRender
@@ -342,7 +422,6 @@ describe("HTMLObjectRender", () => {
                         type: "thead",
                         content: {
                             type: "tr",
-                            header: true,
                             cells: [
                                 {
                                     type: "th",

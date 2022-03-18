@@ -1,7 +1,7 @@
 import { makeRefComponent } from "@app/utils/hoc";
 import { HTMLObject, HTMLObjectMap, HTMLObjectType } from "@lib/utils";
 import React, { useContext } from "react";
-import { HTMLObjectRenderContext, GenericHTMLObjectComponent, HTMLObjectComponentProps, ElementPropsGetter, HTMLObjectComponent } from "./types";
+import { HTMLObjectRenderContext, GenericHTMLObjectComponent, HTMLObjectComponentProps, ElementPropsGetter, HTMLObjectComponent, ClassMap } from "./types";
 
 export const Blockquote = makeRefComponent<HTMLQuoteElement, HTMLObjectComponentProps<"blockquote">>("Blockquote", ({ children, ...props }, ref) => (
     <blockquote
@@ -485,6 +485,18 @@ function runPropsGetter(obj: HTMLObject, propsGetter: ElementPropsGetter | undef
     return output !== undefined ? output : {};
 }
 
+const defaultClassMap: ClassMap = (className) => {
+    const classNames = Array.isArray(className) ? className : [className];
+    let output = "";
+    classNames.forEach((cn, index) => {
+        if (index > 0) {
+            output += " ";
+        }
+        output += cn;
+    });
+    return output;
+};
+
 const RenderFragmentItem: React.VFC<{ children: HTMLObject; }> = ({ children }) => {
     const ctx = useContext(HTMLObjectRenderContext);
 
@@ -505,6 +517,17 @@ const RenderFragmentItem: React.VFC<{ children: HTMLObject; }> = ({ children }) 
                 }
             }
         });
+    }
+    if (children.className !== undefined
+        && !("className" in props)) {
+        const classMap: ClassMap = ctx.classMap !== undefined
+            ? ctx.classMap
+            : defaultClassMap;
+        props.className = classMap(children.className);
+    }
+    if (children.id !== undefined
+        && !("id" in props)) {
+        props.id = children.id;
     }
     if ("mandatoryProps" in utils) {
         Object.entries(utils.mandatoryProps).forEach(([key, value]) => {

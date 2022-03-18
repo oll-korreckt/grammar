@@ -1,6 +1,8 @@
 import { HTMLObject, HTMLObjectMap, HTMLObjectType } from "@lib/utils";
 import React, { createContext } from "react";
 
+export type ClassMap = (className: string | string[]) => string | undefined | void;
+
 export type HTMLObjectRenderProps =
     & ElementRenderProps<"blockquote">
     & ElementRenderProps<"br">
@@ -29,7 +31,10 @@ export type HTMLObjectRenderProps =
     & ElementRenderProps<"p">
     & ElementRenderProps<"b">
     & ElementRenderProps<"checkbox">
-    & { children?: HTMLObject | HTMLObject[]; };
+    & {
+        classMap?: ClassMap;
+        children?: HTMLObject | HTMLObject[];
+    };
 
 type ElementRenderProps<Type extends HTMLObjectType = HTMLObjectType> = {
     [Key in `${Type}Props`]?: GenericElementPropsGetter<Type>;
