@@ -9,7 +9,8 @@ function toCompilerResult(filename: string): HTMLObject | HTMLObject[] {
     const content = getTestFileContent(filename);
     const tokens = MarkdownScanner.scan(content);
     const containers = MarkdownParser.parse(tokens);
-    return MarkdownCompiler.compile(containers);
+    const output = MarkdownCompiler.compile(containers);
+    return output;
 }
 
 describe("MarkdownCompiler", () => {
