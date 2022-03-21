@@ -1,7 +1,7 @@
 # Adjectives
 <!-- +elementInfo -->
 <!-- !adjective -->
-Adjectives are used to describe noun-like elements within a sentence.
+Ad'jectives are used to describe noun-like elements within a sentence.
 <!-- !adjective -->
 
 ## Properties
@@ -33,13 +33,15 @@ When searching for adjectives, the first places one ought to look are the locati
 Another location within sentences where adjectives are likely to reside is within the predicate as either a subject complement or a direct object complement.
 
 > We are *lazy*.
-
+<!-- .caption -->
 Here, *lazy* is an adjective being used as a subject complement as it describes the subject **we**.
 
 > I find him *insuferable*.
-
+<!-- .caption -->
 *Insuferable* is being used in this circumstance to describe the direct object **him**.
 
 The English language contains numerous terms derived from French which thusly utilize the French rule for adjective placement with the adjective immediately following the noun-like element that it modifies.
 
-> He was the youngest person ever to serve as attorney *general*. 
+> He was the youngest person ever to serve as attorney *general*.
+<!-- .caption -->
+The adjective *general* modifies the noun **attorney** despite coming after it.

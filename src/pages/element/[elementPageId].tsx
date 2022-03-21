@@ -81,6 +81,7 @@ export const getStaticPaths: GetStaticPaths<PathData> = async () => {
         paths: [
             { params: { elementPageId: "adjective" } },
             { params: { elementPageId: "adverb" } },
+            { params: { elementPageId: "coordinator" } },
             { params: { elementPageId: "verb-phrase" } }
         ],
         fallback: false

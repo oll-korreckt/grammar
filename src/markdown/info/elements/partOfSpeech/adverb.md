@@ -36,6 +36,8 @@ Yet another example:
 It is important to remember, however, that not all adverbs can be re-positioned within a sentence:
 
 > He looked *around*.
+<!-- .caption -->
+There is only one possible position for *around* to occupy in this sentence.
 
 ### Time
 > She is *still* the best.
@@ -55,3 +57,5 @@ It is important to remember, however, that not all adverbs can be re-positioned 
 
 ### Degree
 > Her hair is *not* short.
+
+> Her hair is *quite* short.
