@@ -96,4 +96,82 @@ describe("Strings", () => {
             assert.throws(() => Strings.isNumericChar("00"));
         });
     });
+
+    describe("replaceAll", () => {
+        test("replacement longer than input", () => {
+            const result = Strings.replaceAll(
+                "hello",
+                { "hello": "goodbye" }
+            );
+            assert.strictEqual(result, "goodbye");
+        });
+
+        test("no matches", () => {
+            const result = Strings.replaceAll(
+                "hello",
+                { "bye": "bye" }
+            );
+            assert.strictEqual(result, "hello");
+        });
+
+        test("substrings longer than input", () => {
+            const result = Strings.replaceAll(
+                "dog",
+                {
+                    "onomatopoeia": "woof",
+                    "deoxyribonucleic acid": "dna"
+                }
+            );
+            assert.deepStrictEqual(result, "dog");
+        });
+
+        test("deletion", () => {
+            const result = Strings.replaceAll(
+                "can you delete the word delete?",
+                { " delete": "" }
+            );
+            assert.strictEqual(result, "can you the word?");
+        });
+
+        test("multiple matches", () => {
+            const result = Strings.replaceAll(
+                "thesaurus",
+                {
+                    "the": "tyrano",
+                    "thesaurus": "hi"
+                }
+            );
+            assert.strictEqual(result, "tyranosaurus");
+        });
+
+        test("double spaces", () => {
+            const result = Strings.replaceAll(
+                "does it work?",
+                { " ": "  " }
+            );
+            assert.strictEqual(result, "does  it  work?");
+        });
+
+        test("replace with same value", () => {
+            const result = Strings.replaceAll(
+                "does it work?",
+                { " ": " " }
+            );
+            assert.strictEqual(result, "does it work?");
+        });
+
+        test("error: empty string", () => {
+            assert.throws(
+                () => Strings.replaceAll("empty string", { "": "empty" }),
+                /empty string/i
+            );
+        });
+
+        test("error: empty map", () => {
+            assert.throws(
+                () => Strings.replaceAll("empty map", {}),
+                /empty map/i
+            );
+        });
+    });
 });

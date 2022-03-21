@@ -26,6 +26,59 @@ function _createCharFunction<TOutput>(fn: (char: number) => TOutput): (char: str
     };
 }
 
+function _getReplacementLengths(map: Record<string, string>): number[] {
+    const output = new Set<number>();
+    Object.keys(map).forEach((key) => {
+        if (key.length === 0) {
+            throw "cannot replace an empty string";
+        }
+        output.add(key.length);
+    });
+    if (output.size === 0) {
+        throw "received empty map";
+    }
+    return Array.from(output).sort();
+}
+
+function _createReplacer(input: string, map: Record<string, string>): (index: number) => [chunk: string, incr: number] {
+    const subStrLenArr = _getReplacementLengths(map);
+    return (index) => {
+        const maxSubStrLen = input.length - index;
+        const minMatchLen = subStrLenArr[0];
+        if (minMatchLen > maxSubStrLen) {
+            // if the smallest substring is longer than the remainder then just
+            // return the remainder in order to exit early
+            const subStr = input.substring(index);
+            return [subStr, subStr.length];
+        }
+        for (let i = 0; i < subStrLenArr.length; i++) {
+            const subStrLen = subStrLenArr[i];
+            if (subStrLen > maxSubStrLen) {
+                break;
+            }
+            const subStr = input.substring(index, index + subStrLen);
+            const replStr: string | undefined = map[subStr];
+            if (replStr !== undefined) {
+                return [replStr, subStrLen];
+            }
+        }
+        const subStr = input.substring(index, index + 1);
+        return [subStr, subStr.length];
+    };
+}
+
+function replaceAll(input: string, map: Record<string, string>): string {
+    const replacer = _createReplacer(input, map);
+    let output = "";
+    let index = 0;
+    while (index < input.length) {
+        const [subStr, incr] = replacer(index);
+        output += subStr;
+        index += incr;
+    }
+    return output;
+}
+
 const isEnglishLetterChar = _createCharFunction((char) => {
     const a = "a".charCodeAt(0);
     const z = "z".charCodeAt(0);
@@ -47,5 +100,6 @@ export const Strings = {
     printArray: printArray,
     capitalize: capitalize,
     isEnglishLetterChar: isEnglishLetterChar,
-    isNumericChar: isNumericChar
+    isNumericChar: isNumericChar,
+    replaceAll: replaceAll
 };
