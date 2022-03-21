@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import { Strings } from "./strings";
 import { MarkdownCommentHTMLClass, MarkdownCommentHTMLInjection, MarkdownCommentId, MarkdownCommentSnippet, MarkdownHeadingDepth, MarkdownHTML, MarkdownTableCell, MarkdownToken } from "./_types";
 import Tokens = marked.Tokens;
 
@@ -105,7 +106,17 @@ function _toMarkdownToken(token: marked.Token): MarkdownToken | undefined {
             if (token.tokens !== undefined) {
                 throw "'text' tokens should not contain children";
             }
-            return token;
+            const newText = Strings.replaceAll(
+                token.text,
+                {
+                    "&#39;": "'",
+                    "&quot;": "\""
+                }
+            );
+            return {
+                ...token,
+                text: newText
+            };
     }
 }
 

@@ -48,6 +48,18 @@ describe("MarkdownScanner", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    test("special characters", () => {
+        const result = runFileScan("special-characters.md");
+        const expected: TokenResult[] = [{
+            type: "paragraph",
+            tokens: [{
+                type: "text",
+                text: "how do these characters work: ' \""
+            }]
+        }];
+        assert.deepStrictEqual(result, expected);
+    });
+
     test("styling", () => {
         const content = getTestFileContent("styling.md");
         const result = runScan(content);
