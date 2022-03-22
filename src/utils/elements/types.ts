@@ -150,7 +150,12 @@ function _getFullName(type: ElementPageType): string {
     throw `Cannot find full name for type '${type}'`;
 }
 
+function getAllPageIds(): ElementPageId[] {
+    return Object.keys(idToTypeMap) as ElementPageId[];
+}
+
 export const ElementPage = {
+    getAllPageIds: getAllPageIds,
     typeToId: typeToId,
     idToType: idToType,
     isPageId: isElementPageId,

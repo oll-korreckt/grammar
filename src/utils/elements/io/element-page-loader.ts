@@ -9,6 +9,9 @@ import { MarkdownFinder } from "./markdown-finder";
 
 async function loadPage(pageType: ElementPageType): Promise<HTMLObject | HTMLObject[]> {
     const tokens = await getTokens(pageType);
+    if (tokens.length === 0) {
+        return [];
+    }
     let parseOutput = MarkdownParser.parse(tokens);
     if (ElementPage.isElementType(pageType)) {
         parseOutput = Preprocessor.runElementType(pageType, parseOutput);
