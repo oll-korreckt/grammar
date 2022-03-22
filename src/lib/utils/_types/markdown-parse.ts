@@ -30,7 +30,7 @@ export interface ElementId extends ParseObjectBase {
 export interface Snippet extends ParseObjectBase {
     type: "snippet";
     name: string;
-    content: ParseContent[];
+    content: Exclude<ParseObject, Snippet>[];
 }
 
 export interface HTMLInjection extends ParseObjectBase {
@@ -62,7 +62,6 @@ const tokenTypes = new Set<ParseContentType>([
     "list",
     "list_item",
     "paragraph",
-    "space",
     "strong",
     "table",
     "text"
