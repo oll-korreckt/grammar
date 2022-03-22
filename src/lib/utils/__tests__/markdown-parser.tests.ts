@@ -18,7 +18,7 @@ interface ElementIdResult extends ParseResultBase {
 interface SnippetResult extends ParseResultBase {
     type: "snippet";
     name: string;
-    content: TokenResult[];
+    content: ParseResult[];
 }
 
 interface HTMLInjectionResult extends ParseResultBase {
@@ -56,7 +56,7 @@ function toParseResult(result: ParseObject): ParseResult {
             const output: SnippetResult = {
                 type: "snippet",
                 name: result.name,
-                content: result.content.map((token) => TokenResult.toResult(token))
+                content: result.content.map((token) => toParseResult(token))
             };
             if (result.name !== undefined) {
                 output.name = result.name;
@@ -108,11 +108,19 @@ describe("MarkdownParser", () => {
                 type: "snippet",
                 name: "section",
                 content: [{
-                    type: "paragraph",
-                    tokens: [{
-                        type: "text",
-                        text: "Here is a section"
-                    }]
+                    type: "elementId",
+                    id: "withAnId",
+                    content: {
+                        type: "elementClass",
+                        className: "withAClass",
+                        content: {
+                            type: "paragraph",
+                            tokens: [{
+                                type: "text",
+                                text: "Here is a section"
+                            }]
+                        }
+                    }
                 }]
             },
             {
@@ -169,13 +177,6 @@ describe("MarkdownParser", () => {
             assert.throws(
                 () => runParse("parser-multiple-ids.md"),
                 /multiple id headings/i
-            );
-        });
-
-        test("snippet: invalid token", () => {
-            assert.throws(
-                () => runParse("parser-snippet-invalid-token.md"),
-                /contains invalid token/i
             );
         });
 

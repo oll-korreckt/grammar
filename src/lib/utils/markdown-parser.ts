@@ -100,7 +100,7 @@ function _parseContent(data: ParseData): ParseObject {
 }
 
 function _finishNamedSnippet(data: ParseData, name: string): Snippet {
-    const content: ParseContent[] = [];
+    const content: Exclude<ParseObject, Snippet>[] = [];
     let hasClosingTag = false;
     while (!_isAtEnd(data)) {
         const currToken = _getCurrentToken(data);
@@ -113,10 +113,15 @@ function _finishNamedSnippet(data: ParseData, name: string): Snippet {
             break;
         }
         if (!ParseContent.isParseContent(currToken)) {
-            throw `Snippet '${name}' contains invalid token of type '${currToken.type}'`;
+            const parsedToken = _injection(data);
+            if (parsedToken.type === "snippet") {
+                throw `Snippet '${name}' contains invalid token of type '${parsedToken.type}'`;
+            }
+            content.push(parsedToken);
+        } else {
+            content.push(currToken);
+            _advance(data);
         }
-        content.push(currToken);
-        _advance(data);
     }
     if (content.length === 0) {
         throw `Snippet '${name}' does not contain any content`;
