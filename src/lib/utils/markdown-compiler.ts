@@ -1,4 +1,4 @@
-import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLContentObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLObject, HTMLOrderedListObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, HTMLTaskListObject, HTMLUnorderedListObject, MarkdownHeading, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken, ParseObject } from "./_types";
+import { HTMLAnchorObject, HTMLBlockquoteObject, HTMLBoldObject, HTMLCheckboxObject, HTMLCodeObject, HTMLContent, HTMLContentObject, HTMLDelObject, HTMLH1Object, HTMLH2Object, HTMLH3Object, HTMLH4Object, HTMLH5Object, HTMLH6Object, HTMLImageObject, HTMLItalicObject, HTMLListItemObject, HTMLObject, HTMLOrderedListObject, HTMLParagraphObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableObject, HTMLTableRowObject, HTMLTaskListObject, HTMLUnorderedListObject, MarkdownHeading, MarkdownList, MarkdownListItem, MarkdownTable, MarkdownTableCell, MarkdownToken, ParseObject, Snippet } from "./_types";
 
 function _setContent(obj: HTMLContentObject, content: HTMLContent): void {
     if (content === undefined
@@ -253,7 +253,7 @@ function _compileObject(parseObj: ParseObject): HTMLContent {
             return output;
         }
         case "snippet": {
-            const output = _toHTMLContent(parseObj.content);
+            const output = _compileSnippetContent(parseObj.content);
             if (output === undefined) {
                 throw `Snippet '${parseObj.name}' does not contain any content`;
             }
@@ -265,6 +265,25 @@ function _compileObject(parseObj: ParseObject): HTMLContent {
         default:
             return _toHTMLContent([parseObj]);
     }
+}
+
+function _compileSnippetContent(content: Exclude<ParseObject, Snippet>[]): HTMLContent {
+    const output: HTMLObject[] = [];
+    for (let index = 0; index < content.length; index++) {
+        const obj = content[index];
+        const rawItem = _compileObject(obj);
+        const fmtItem = rawItem !== undefined
+            ? Array.isArray(rawItem)
+                ? rawItem
+                : [rawItem]
+            : [];
+        output.push(...fmtItem);
+    }
+    return output.length === 0
+        ? undefined
+        : output.length === 1
+            ? output[0]
+            : output;
 }
 
 function compile(content: ParseObject[]): HTMLObject | HTMLObject[] {
