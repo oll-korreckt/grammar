@@ -83,6 +83,8 @@ export const getStaticPaths: GetStaticPaths<PathData> = async () => {
             { params: { elementPageId: "adverb" } },
             { params: { elementPageId: "coordinator" } },
             { params: { elementPageId: "determiner" } },
+            { params: { elementPageId: "gerund" } },
+            { params: { elementPageId: "infinitive" } },
             { params: { elementPageId: "verb-phrase" } }
         ],
         fallback: false
