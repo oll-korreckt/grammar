@@ -15,10 +15,10 @@ async function loadPage(pageType: MarkdownPageType): Promise<HTMLObject | HTMLOb
     let parseOutput = MarkdownParser.parse(tokens);
     if (pageType === "index") {
         parseOutput = Preprocessor.runMainPage(parseOutput);
-    } else if (ElementPage.isElementType(pageType)) {
-        parseOutput = Preprocessor.runElementType(pageType, parseOutput);
     } else if (ElementPage.isElementCategory(pageType)) {
         parseOutput = Preprocessor.runElementCategory(pageType, parseOutput);
+    } else if (ElementPage.isElementType(pageType)) {
+        parseOutput = Preprocessor.runElementType(pageType, parseOutput);
     } else {
         throw `Unrecognized page type '${pageType}'`;
     }

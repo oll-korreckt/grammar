@@ -117,8 +117,16 @@ function isElementType(value: string): value is ElementPageType_ElementType {
     return isElementPageType(value) && ElementType.isElementType(value);
 }
 
+const elementCategorySet = new Set<ElementPageType_ElementCategory>([
+    "word",
+    "partOfSpeech",
+    "phrase",
+    "clause",
+    "coordinated"
+]);
+
 function isElementCategory(value: string): value is ElementPageType_ElementCategory {
-    return isElementPageType(value) && !ElementType.isElementType(value);
+    return elementCategorySet.has(value as any);
 }
 
 function createTypeLink(type: ElementPageType): HTMLAnchorObject {
