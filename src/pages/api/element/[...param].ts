@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { ElementPage, ElementPageType } from "utils/elements/types";
+import { ElementPage, ElementPageType } from "utils/element/types";
 import { HTMLObject } from "@lib/utils";
-import { ElementPageLoader } from "utils/elements/io";
+import { ElementPageLoader } from "utils/element/io";
 
 export type ElementRouteType =
     | "info"

@@ -1,7 +1,7 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import { ParsedUrlQuery } from "querystring";
-import { ElementPage, ElementPageId, MarkdownPageType, ElementPageComponent, ElementPageComponentProps } from "utils/elements";
-import { ElementPageLoader } from "utils/elements/io";
+import { ElementPage, ElementPageId, MarkdownPageType, ElementPageComponent, ElementPageComponentProps } from "utils/element";
+import { ElementPageLoader } from "utils/element/io";
 
 interface PathData extends ParsedUrlQuery {
     elementPageId: ElementPageId;
