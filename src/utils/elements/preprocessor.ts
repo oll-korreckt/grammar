@@ -48,7 +48,20 @@ function runElementType(type: ElementPageType_ElementType, data: ParseObject[]):
 }
 
 function runElementCategory(type: ElementPageType_ElementCategory, data: ParseObject[]): ParseObject[] {
-    throw "not implemented";
+    switch (type) {
+        case "coordinated":
+            return data.map((item) => {
+                if (item.type === "htmlInjection"
+                    && item.id === "coordTable") {
+                    return {
+                        ...item,
+                        content: ElementTable.createCordinationTable()
+                    };
+                }
+                return item;
+            });
+    }
+    return data;
 }
 
 export const Preprocessor = {

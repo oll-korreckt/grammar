@@ -1,4 +1,4 @@
-import { ElementCategory, ElementType, getElementDefinition } from "@domain/language";
+import { ElementCategory, ElementType, elementTypeLists, getElementDefinition } from "@domain/language";
 import { HTMLObject, HTMLTableDataObject, HTMLTableHeaderObject, HTMLTableHeadObject, HTMLTableObject, HTMLTableRowObject, SimpleObject } from "@lib/utils";
 import { ElementDisplayInfo } from "../../app/utils";
 import { ElementPage, ElementPageType_ElementType } from "./types";
@@ -217,8 +217,47 @@ function _createCoordinationCell(type: ElementPageType_ElementType): HTMLTableDa
     return { type: "td", content };
 }
 
+function _createCoordinationTableRow(type: ElementPageType_ElementType): HTMLTableRowObject<"data"> {
+    const nameCell: HTMLTableDataObject = {
+        type: "td",
+        content: ElementPage.createTypeLink(type)
+    };
+    const coordCell = _createCoordinationCell(type);
+    return {
+        type: "tr",
+        cells: [nameCell, coordCell]
+    };
+}
+
+function createCordinationTable(): HTMLTableObject {
+    const rows: HTMLTableRowObject<"data">[] = [];
+    for (let index = 0; index < elementTypeLists.element.length; index++) {
+        const type = elementTypeLists.element[index];
+        if (!ElementPage.isElementType(type)) {
+            continue;
+        }
+        const row = _createCoordinationTableRow(type);
+        rows.push(row);
+    }
+    return {
+        type: "table",
+        head: {
+            type: "thead",
+            content: {
+                type: "tr",
+                cells: [
+                    { type: "th", content: "Type" },
+                    { type: "th", content: "Compatible Types" }
+                ]
+            }
+        },
+        body: { type: "tbody", content: rows }
+    };
+}
+
 export const ElementTable = {
     createElementInfoTable: createElementInfoTable,
     createPropertyTable: createPropertyTable,
-    getHeaderType: getHeaderType
+    getHeaderType: getHeaderType,
+    createCordinationTable: createCordinationTable
 };
