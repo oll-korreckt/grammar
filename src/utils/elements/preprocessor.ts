@@ -2,6 +2,7 @@ import { ElementTable } from "./element-table";
 import { HTMLTableObject, ParseObject } from "@lib/utils";
 import { PreprocessState } from "./preprocess-state";
 import { ElementPageType_ElementCategory, ElementPageType_ElementType } from "./types";
+import { CategoryList } from "./category-list";
 
 function runElementType(type: ElementPageType_ElementType, data: ParseObject[]): ParseObject[] {
     let state = PreprocessState.init(type);
@@ -60,11 +61,59 @@ function runElementCategory(type: ElementPageType_ElementCategory, data: ParseOb
                 }
                 return item;
             });
+        case "partOfSpeech":
+            return data.map((item) => {
+                if (item.type === "htmlInjection"
+                    && item.id === "partOfSpeechList") {
+                    return {
+                        ...item,
+                        content: CategoryList.getCategoryList("partOfSpeech")
+                    };
+                }
+                return item;
+            });
+        case "phrase":
+            return data.map((item) => {
+                if (item.type === "htmlInjection"
+                    && item.id === "phraseList") {
+                    return {
+                        ...item,
+                        content: CategoryList.getCategoryList("phrase")
+                    };
+                }
+                return item;
+            });
+        case "clause":
+            return data.map((item) => {
+                if (item.type === "htmlInjection"
+                    && item.id === "clauseList") {
+                    return {
+                        ...item,
+                        content: CategoryList.getCategoryList("clause")
+                    };
+                }
+                return item;
+            });
+        case "word":
+            return data;
     }
-    return data;
+}
+
+function runMainPage(data: ParseObject[]): ParseObject[] {
+    return data.map((item) => {
+        if (item.type === "htmlInjection"
+            && item.id === "mainList") {
+            return {
+                ...item,
+                content: CategoryList.getCategoryList()
+            };
+        }
+        return item;
+    });
 }
 
 export const Preprocessor = {
     runElementType: runElementType,
-    runElementCategory: runElementCategory
+    runElementCategory: runElementCategory,
+    runMainPage: runMainPage
 };

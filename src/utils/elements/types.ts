@@ -10,6 +10,8 @@ export type ElementPageType =
     | ClauseList[number]
     | ElementCategory
 
+export type MarkdownPageType = ElementPageType | "index";
+
 export type ElementPageType_ElementType =
     | PartOfSpeechList[number]
     | PhraseList[number]

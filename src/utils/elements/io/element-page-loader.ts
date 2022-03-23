@@ -3,17 +3,19 @@ import { MarkdownCompiler } from "@lib/utils/markdown-compiler";
 import { MarkdownParser } from "@lib/utils/markdown-parser";
 import { MarkdownScanner } from "@lib/utils/markdown-scanner";
 import { promises as fs } from "fs";
-import { ElementPage, ElementPageType, Preprocessor } from "..";
+import { ElementPage, ElementPageType, MarkdownPageType, Preprocessor } from "..";
 import { MarkdownFinder } from "./markdown-finder";
 
 
-async function loadPage(pageType: ElementPageType): Promise<HTMLObject | HTMLObject[]> {
+async function loadPage(pageType: MarkdownPageType): Promise<HTMLObject | HTMLObject[]> {
     const tokens = await getTokens(pageType);
     if (tokens.length === 0) {
         return [];
     }
     let parseOutput = MarkdownParser.parse(tokens);
-    if (ElementPage.isElementType(pageType)) {
+    if (pageType === "index") {
+        parseOutput = Preprocessor.runMainPage(parseOutput);
+    } else if (ElementPage.isElementType(pageType)) {
         parseOutput = Preprocessor.runElementType(pageType, parseOutput);
     } else if (ElementPage.isElementCategory(pageType)) {
         parseOutput = Preprocessor.runElementCategory(pageType, parseOutput);
@@ -42,7 +44,7 @@ async function loadInfo(pageType: ElementPageType): Promise<HTMLObject | HTMLObj
     return htmlObjs;
 }
 
-async function getTokens(pageType: ElementPageType): Promise<MarkdownToken[]> {
+async function getTokens(pageType: MarkdownPageType): Promise<MarkdownToken[]> {
     const filepath = MarkdownFinder.findFile(pageType);
     const fileBuffer = await fs.readFile(filepath);
     const tokens = MarkdownScanner.scan(fileBuffer.toString());

@@ -1,12 +1,15 @@
-import React from "react";
-import Link from "next/link";
+import { GetStaticProps } from "next";
+import { ElementPageComponent, ElementPageComponentProps } from "utils/elements";
+import { ElementPageLoader } from "utils/elements/io";
 
-const Hello = () => {
-    return (
-        <div>Does this actually work?
-            <Link href="element/verb-phrase">Hmmmm</Link>
-        </div>
-    );
+export const getStaticProps: GetStaticProps<ElementPageComponentProps> = async () => {
+    const content = await ElementPageLoader.loadPage("index");
+    return {
+        props: {
+            type: "index",
+            content
+        }
+    };
 };
 
-export default Hello;
+export default ElementPageComponent;

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ElementPageType } from "..";
+import { MarkdownPageType } from "..";
 
 const filePathObject: Record<string, string> = {};
 
@@ -28,7 +28,7 @@ function _fillFilePathObject(dirPath: string): void {
     }
 }
 
-function findFile(type: ElementPageType): string {
+function findFile(type: MarkdownPageType): string {
     if (Object.keys(filePathObject).length === 0) {
         const basePath = path.resolve("src", "markdown", "info", "elements");
         _fillFilePathObject(basePath);
