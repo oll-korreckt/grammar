@@ -1,18 +1,18 @@
 # Adjectives
 <!-- +elementInfo -->
 <!-- !adjective -->
-Ad'jectives are used to describe noun-like elements within a sentence.
+Adjectives are used to describe noun-like elements within a sentence.
 <!-- !adjective -->
 
 ## Properties
 <!-- +propertySummary -->
 
 ## Identification
-Though typically composed of a single word, multi-word nouns are possible.
+Though typically composed of a single word, multi-word adjectives are possible.
 
 ### Single Word
 > He is a *good* dog.
-
+<!-- .gap -->
 > The *ugly* duckling.
 
 ### Multi Word
@@ -24,6 +24,8 @@ Multi-word adjectives are often derived from words which typically function as n
 Sometimes, words that are traditionally considered to be nouns can be used as adjectives as long as they are used to describe a noun-like element. For example:
 
 > Dr. Smith is a cardiologist. In other words, he is a *heart* doctor.
+<!-- .caption -->
+It is worth noting, however, that **heart doctor** could just be treated as compound noun and there would be no change in semantic meaning.
 
 ### Location
 When searching for adjectives, the first places one ought to look are the locations within a sentence directly preceding noun-like elements.

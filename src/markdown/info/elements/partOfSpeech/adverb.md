@@ -24,13 +24,13 @@ In order for a word to be an adverb, it must answer one of the following questio
 When it comes to placement within a sentence, adverbs tend to be quite flexible and it is often the case that an adverb could be moved elsewhere in a sentence. In other words, if you can move word around in a sentence, there is a good chance that word is an adverb. For example:
 
 > Bamboo grows *quickly*.
-
+<!-- .gap -->
 > Bamboo *quickly* grows.
 
 Yet another example:
 
 > *Tomorrow*, we are eating spaghetti for dinner.
-
+<!-- .gap -->
 > We are eating spaghetti for dinner *tomorrow*.
 
 It is important to remember, however, that not all adverbs can be re-positioned within a sentence:
@@ -41,12 +41,12 @@ There is only one possible position for *around* to occupy in this sentence.
 
 ### Time
 > She is *still* the best.
-
+<!-- .gap -->
 > I *just* ate.
 
 ### Location
 > One can find bamboo *everywhere*.
-
+<!-- .gap -->
 > He jumped *vertically*.
 
 ### Purpose
@@ -57,5 +57,5 @@ There is only one possible position for *around* to occupy in this sentence.
 
 ### Degree
 > Her hair is *not* short.
-
+<!-- .gap -->
 > Her hair is *quite* short.
