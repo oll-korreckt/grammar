@@ -24,6 +24,7 @@
 .content {
     @include center;
     width: min(800px, calc(100% - 10px));
+    margin-bottom: 100px;
 }
 
 .caption {
@@ -35,4 +36,8 @@
 .typeLink {
     color: orangered;
     text-decoration: none;
+}
+
+.gap {
+    margin-top: 10px;
 }

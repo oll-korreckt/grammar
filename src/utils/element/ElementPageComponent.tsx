@@ -13,7 +13,6 @@ export interface ElementPageComponentProps {
 }
 
 export const ElementPageComponent: NextPage<ElementPageComponentProps> = ({ type, content }) => {
-    const CustomAnchor = createCustomAnchor(type);
     const CustomTd = ElementPage.isElementType(type)
         ? createElementPageTd(type)
         : undefined;
@@ -53,26 +52,20 @@ function createElementPageTd(type: ElementPageType_ElementType): GenericHTMLObje
     return CustomTd;
 }
 
-function createCustomAnchor(type: MarkdownPageType): GenericHTMLObjectComponent<"a"> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest }) => {
-        if (href === undefined) {
-            throw "";
-        }
-        if (!ElementPage.isPageId(href)) {
-            throw `'${href}' is not a valid elementpage`;
-        }
-        let modifiedHref: string = href;
-        if (type === "index") {
-            modifiedHref = `element/${modifiedHref}`;
-        }
-        return (
-            <Link href={modifiedHref} passHref>
-                <Anchor {...rest}>
-                    {children}
-                </Anchor>
-            </Link>
-        );
-    };
-    return CustomAnchor;
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest }) => {
+    if (href === undefined) {
+        throw "";
+    }
+    if (!ElementPage.isPageId(href)) {
+        throw `'${href}' is not a valid elementpage`;
+    }
+    const modifiedHref = `/element/${href}`;
+    return (
+        <Link href={modifiedHref} passHref>
+            <Anchor {...rest}>
+                {children}
+            </Anchor>
+        </Link>
+    );
+};
