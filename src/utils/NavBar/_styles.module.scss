@@ -1,3 +1,5 @@
+@use "main";
+
 .navBar {
     height: 50px;
     background-color: black;
@@ -15,4 +17,35 @@
     justify-content: center;
     align-items: center;
     list-style: none;
+}
+
+.navBarItem {
+    position: relative;
+    display: inline-flex;
+    @include main.smScreen {
+        flex-direction: column;
+    }
+    @include main.mdLgScreen {
+        flex-direction: row;
+    }
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+}
+
+.navBarIcon {
+    display: inline-block;
+    font-size: 24px;
+}
+
+.navBarChildren {
+    display: inline-block;
+    @include main.smScreen {
+        font-size: 12px;
+    }
+    @include main.mdLgScreen {
+        font-size: 24px;
+        margin-left: 5px;
+    }
 }
