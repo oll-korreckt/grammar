@@ -202,7 +202,10 @@ export interface PrepositionPhrase extends Phrase, ReferencingElement<Prepositio
     phraseType: "preposition";
 }
 // Coordinated: both on my own and with others
-export type FunctionalPrepositionPhrase = PhraseFunctionalTypeGuard<"preposition">;
+export type FunctionalPrepositionPhrase = [
+    PhraseGuard<"preposition">,
+    CoordPhraseGuard<"coordinatedPrepositionPhrase">
+];
 
 // same composition as VerbPhrase
 export interface GerundPhraseDefinition extends VerbPhraseBaseDefinition {

@@ -108,8 +108,6 @@ const fnNounPhrase: FunctionalNounPhrase = [
     "coordinatedNounPhrase"
 ];
 const fnPrepositionPhrase: FunctionalPrepositionPhrase = [
-    "preposition",
-    "coordinatedPreposition",
     "prepositionPhrase",
     "coordinatedPrepositionPhrase"
 ];
