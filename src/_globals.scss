@@ -24,7 +24,10 @@ table {
     table-layout: fixed;
     border-collapse: collapse;
     border-spacing: 0;
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: block;
+    max-width: fit-content;
 }
 thead {
     color: white;
@@ -36,9 +39,10 @@ tbody {
 }
 th {
     text-align: left;
-    padding: 5px 15px;
+    padding: 5px 10px;
     border: 1px solid gray;
     height: 100%;
+    text-align: center;
 }
 td {
     vertical-align: middle;

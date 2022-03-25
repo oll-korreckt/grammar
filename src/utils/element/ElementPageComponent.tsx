@@ -22,6 +22,17 @@ export const ElementPageComponent: NextPage<ElementPageComponentProps> = ({ type
                 <HTMLObjectRender
                     aCmpt={CustomAnchor}
                     tdCmpt={CustomTd}
+                    thProps={({ custom }) => {
+                        if (custom) {
+                            return {
+                                title: custom,
+                                style: {
+                                    cursor: "help",
+                                    textDecoration: "underline dotted"
+                                }
+                            };
+                        }
+                    }}
                     classMap={(className) => {
                         const classNameArr = Array.isArray(className)
                             ? className

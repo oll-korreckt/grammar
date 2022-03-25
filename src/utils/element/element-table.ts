@@ -48,14 +48,14 @@ function _getYesNo(value: boolean): "Yes" | "No" {
 }
 
 export type PropertyHeaderType =
-    | "property"
+    | "name"
     | "required"
     | "allowMultiple"
     | "types"
 
 function _isPropertyHeader(value: string | undefined): value is PropertyHeaderType {
     const headerTypes = new Set<PropertyHeaderType>([
-        "property",
+        "name",
         "required",
         "allowMultiple",
         "types"
@@ -76,7 +76,7 @@ function _createHeaders(inclPropCol: boolean): HTMLTableHeadObject {
     if (inclPropCol) {
         headerCells.push({
             type: "th",
-            content: "Property"
+            content: "Name"
         });
     }
     headerCells.push(
@@ -86,11 +86,11 @@ function _createHeaders(inclPropCol: boolean): HTMLTableHeadObject {
         },
         {
             type: "th",
-            content: "Allow Multiple?"
+            content: "Multi?"
         },
         {
             type: "th",
-            content: "Types"
+            content: "Type(s)"
         }
     );
     return {
