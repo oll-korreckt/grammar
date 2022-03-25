@@ -208,8 +208,7 @@ function createVerbPhraseBaseDefinition<T extends ElementType[]>(head: T): Omit<
                 ...fnNounPhrase,
                 "nounClause",
                 "coordinatedNounClause",
-                ...fnGerundPhrase,
-                ...fnInfinitivePhrase
+                ...fnGerundPhrase
             ]
         ]
     };

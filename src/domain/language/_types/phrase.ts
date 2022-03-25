@@ -113,10 +113,13 @@ type SubjectComplement = [
     ...FunctionalAdjectivePhrase,
     ...FunctionalPrepositionPhrase
 ];
-type VerbObject = [
+type ObjectBase = [
     ...FunctionalNounPhrase,
     ...FunctionalNounClause,
-    ...FunctionalGerundPhrase,
+    ...FunctionalGerundPhrase
+];
+type VerbObject = [
+    ...ObjectBase,
     ...FunctionalInfinitivePhrase
 ];
 type VerbDirectObjectComplement = [
@@ -155,7 +158,7 @@ export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"
         Ex: They made him COMMISSIONER OF THE POLICE DEPARTMENT.
     */
     dirObjCompl: [false, VerbDirectObjectComplement];
-    indObj: [false, VerbObject];
+    indObj: [false, ObjectBase];
 }
 export interface VerbPhraseDefinition extends VerbPhraseBaseDefinition {
     head: [false, FunctionalVerb];
