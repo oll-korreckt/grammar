@@ -26,26 +26,34 @@ Optionally, verb phrases can contain head modifiers which modify the head of the
 - for what purpose?
 
 #### Adverbs
-> The dog ran *quickly*. (adverb)
+> The dog ran *quickly*.
+<!-- .caption -->
+Adverb
 
-> The dog ran *very quickly*. (adverb phrase)
+> The dog ran *very quickly*.
+<!-- .caption -->
+Adverb Phrase
 
-> The dog ran *when he saw a squirell*. (adverbial clause)
+> The dog ran *when he saw a squirell*.
+<!-- .caption -->
+Adverbial Clause
 
 #### Nouns
 > The dog ran *five miles*.
 
-#### Prepositions
-> Look *up*! (preposition)
+#### Preposition Phrases
+> The dog ran *across the field*.
 
-> The dog ran *across the field*. (preposition phrase)
-
-#### Infintives
+#### Infinitives
 One can use infinitives in order to modify the verb. However, it is worth noting that infinitives can also be used as a direct object. Thus, it is important to take great care determine whether an infinitive is being used to modify the main verb or as object of the main verb.
 
-> You should play *to win* and *to learn*. (coordinated infinitive)
+> You should play *to win* and *to learn*.
+<!-- .caption -->
+Coordinated Indirect
 
-> The dog ran *to catch the squirell*. (infinitive phrase)
+> The dog ran *to catch the squirell*.
+<!-- .caption -->
+Infinitive Phrase
 
 <!-- #headCompl -->
 ### Head Compliment
@@ -59,22 +67,31 @@ There exist certain verbs that are often referred to as *factitive verbs* which 
 Subject compliments are only used with certain verbs.
 
 #### Nouns
-> She is *president*. (noun)
+> She is *president*.
+<!-- .caption -->
+Noun
 
-> She is *a skilled heart surgeon*. (noun phrase)
+> She is *a skilled heart surgeon*.
+<!-- .caption -->
+Noun Phrase
 
-> She is *whom you should be speaking with*. (noun clause)
+> She is *whom you should be speaking with*.
+<!-- .caption -->
+Noun Clause
+
+#### Pronouns
+> It's *them*.
 
 #### Adjectives
 > The cat is *old*.
+<!-- .caption -->
+Adjective
 
 > The cat is *very old*.
+<!-- .caption -->
+Adjective Phrase
 
-#### Prepositions
-> What is *up*?
-
-> They are *outside*.
-
+#### Preposition Phrases
 > Drinks are *on the house*.
 
 <!-- #dirObj -->
@@ -104,25 +121,34 @@ Certain verbs allow for a direct object compliment. Such verbs are sometimes cal
 
 Certain verbs, commonly refered to as *ditransitive verbs*, allow for the use of a 2nd object called an *indirect object*. The *indirect object* is the object of the verb which recieves the direct object. Perhaps the most intuitive example that can be offered is with the verb *to give*:
 > The man gave *the dog* **a bone**.
-
-*the dog* and **a bone** are both objects of the verb "gave." *the dog* serves as the indirect object whereas **a bone** is the direct object meaning that **a bone** is being acted upon by the verb and *the dog* is the recipient of the indirect object.
+<!-- .caption -->
+*The dog* and **a bone** are both objects of the verb "gave." *the dog* serves as the indirect object whereas **a bone** is the direct object meaning that **a bone** is being acted upon by the verb and *the dog* is the recipient of the indirect object.
 
 #### Nouns
-> I made *Bob* a sandwich. (noun)
+> I made *Bob* a sandwich.
+<!-- .caption -->
+Noun
 
-> We found *the cat* a home. (noun phrase)
+> We found *the cat* a home.
+<!-- .caption -->
+Noun Phrase
 
-> The teacher assigned *whoever failed the test* extra homework. (noun clause)
+> The teacher assigned *whoever failed the test* extra homework.
+<!-- .caption -->
+Noun Clause
 
 #### Pronouns
 Pronouns are often used as indirect objects. However, keep in mind that they must take the objective case where possible.
 
-> The artist will paint *him and me* a portrait. (coordinated pronoun)
+> The artist will paint *him and me* a portrait.
+<!-- .caption -->
+Coordinated Pronoun
 
 #### Gerunds
-> I will give *running* a try. (gerund)
+> I will give *running* a try.
+<!-- .caption -->
+Gerund
 
-> The coach gave *listening to his players* a chance. (gerund phrase)
-
-#### Infinitives?
-Does this work?
+> The coach gave *listening to his players* a chance.
+<!-- .caption -->
+Gerund Phrase
