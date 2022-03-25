@@ -12,7 +12,7 @@ Though typically composed of a single word, multi-word adjectives are possible.
 
 ### Single Word
 > He is a *good* dog.
-<!-- .gap -->
+
 > The *ugly* duckling.
 
 ### Multi Word
