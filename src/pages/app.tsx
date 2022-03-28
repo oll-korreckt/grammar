@@ -1,6 +1,6 @@
 import { EditForm } from "@app/tricky-components/EditForm";
 import { useClientSide } from "@app/utils";
-import { NextPage } from "next";
+import { NextPage, GetStaticProps } from "next";
 import React from "react";
 
 const AppPage: NextPage = () => {
@@ -8,6 +8,10 @@ const AppPage: NextPage = () => {
     return client
         ? <EditForm/>
         : <div>One moment please</div>;
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+    return { props: {} };
 };
 
 export default AppPage;
