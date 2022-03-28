@@ -39,6 +39,7 @@ export type ElementPageId =
     | "determiner"
     | "coordinator"
     | "subordinator"
+    | "interjection"
     | "noun-phrase"
     | "verb-phrase"
     | "adjective-phrase"
@@ -51,6 +52,7 @@ export type ElementPageId =
     | "noun-clause"
     | "relative-clause"
     | "adverbial-clause"
+    | "sentence"
 type PageIdToPageType = Record<ElementPageId, ElementPageType>;
 type PageTypeToPageId = Record<ElementPageType, ElementPageId>;
 
@@ -72,6 +74,7 @@ const idToTypeMap: PageIdToPageType = {
     determiner: "determiner",
     coordinator: "coordinator",
     subordinator: "subordinator",
+    interjection: "interjection",
     "noun-phrase": "nounPhrase",
     "verb-phrase": "verbPhrase",
     "adjective-phrase": "adjectivePhrase",
@@ -83,7 +86,8 @@ const idToTypeMap: PageIdToPageType = {
     "independent-clause": "independentClause",
     "noun-clause": "nounClause",
     "relative-clause": "relativeClause",
-    "adverbial-clause": "adverbialClause"
+    "adverbial-clause": "adverbialClause",
+    sentence: "sentence"
 };
 const typeToIdMap: PageTypeToPageId = Object.fromEntries(
     Object.entries(idToTypeMap).map(([key, value]) => [value, key])
@@ -150,6 +154,7 @@ function _getFullName(type: ElementPageType): string {
             case "word":
             case "phrase":
             case "clause":
+            case "sentence":
                 return `${Strings.capitalize(type)}s`;
             case "partOfSpeech":
                 return "Categories";

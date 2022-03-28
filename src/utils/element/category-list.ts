@@ -95,6 +95,7 @@ function _getFullCategoryList(): HTMLUnorderedListObject {
                     _toList(_getPageTypeElements("clause"))
                 ]
             },
+            { type: "li", content: ElementPage.createTypeLink("sentence") },
             { type: "li", content: ElementPage.createTypeLink("coordinated") }
         ]
     };
