@@ -387,6 +387,19 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         color: "color8",
         properties: depClauseProps
     };
+    const sentence: TypedElementDisplayInfo<"sentence"> = {
+        fullName: "Sentence",
+        abrName: "Sent.",
+        header: "S",
+        color: "color10",
+        properties: {
+            items: {
+                fullName: "Items",
+                displayOrder: 0,
+                required: true
+            }
+        }
+    };
     const output: OutputType = {
         noun: noun,
         pronoun: pronoun,
@@ -434,7 +447,8 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         coordinatedIndependentClause: createCoordinated(independentClause),
         coordinatedNounClause: createCoordinated(nounClause),
         coordinatedRelativeClause: createCoordinated(relativeClause),
-        coordinatedAdverbialClause: createCoordinated(adverbialClause)
+        coordinatedAdverbialClause: createCoordinated(adverbialClause),
+        sentence: sentence
     };
     return output[type];
 }

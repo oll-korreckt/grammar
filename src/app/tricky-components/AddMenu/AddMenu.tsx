@@ -12,9 +12,20 @@ export interface AddMenuProps {
     onElementSelect?: (element: Exclude<ElementType, "word">) => void;
 }
 
-type AddMenuCategory = "category" | "phrase" | "clause" | "coordinated";
+type AddMenuCategory =
+    | "category"
+    | "phrase"
+    | "clause"
+    | "coordinated"
+    | "sentence";
 
-const categoryOrder: AddMenuCategory[] = ["category", "phrase", "clause", "coordinated"];
+const categoryOrder: AddMenuCategory[] = [
+    "category",
+    "phrase",
+    "clause",
+    "coordinated",
+    "sentence"
+];
 const categorySorter = createCategorySorter();
 const elementSorter = createElementSorter();
 
@@ -70,6 +81,7 @@ function getAddMenuCategory(element: Exclude<ElementType, "word">): AddMenuCateg
             return "category";
         case "phrase":
         case "clause":
+        case "sentence":
             return category;
     }
 }
@@ -133,6 +145,13 @@ export const AddMenu = makeRefComponent<HTMLDivElement, AddMenuProps>("AddMenu",
                     onClick={() => setActiveCategory("coordinated")}
                 >
                     Coord.
+                </Category>
+                <Category
+                    icon={FaLayerGroup}
+                    active={activeCategory === "sentence"}
+                    enabled={availableCategories.includes("sentence")}
+                >
+                    Sentence
                 </Category>
             </div>
             <div className={accessClassName(styles, "items")}>

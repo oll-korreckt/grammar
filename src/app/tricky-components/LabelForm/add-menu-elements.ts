@@ -20,7 +20,7 @@ function extractDerivationTreeElements(tree: DerivationTree | undefined): Exclud
     if (tree === undefined) {
         return [];
     }
-    const { partOfSpeech, phrase, clause } = tree;
+    const { partOfSpeech, phrase, clause, sentence } = tree;
     const output = new Set<Exclude<ElementType, "word">>();
     if (partOfSpeech !== undefined) {
         partOfSpeech.forEach((item) => extractElementTypes(item).forEach((element) => output.add(element)));
@@ -30,6 +30,9 @@ function extractDerivationTreeElements(tree: DerivationTree | undefined): Exclud
     }
     if (clause !== undefined) {
         clause.forEach((item) => extractElementTypes(item).forEach((element) => output.add(element)));
+    }
+    if (sentence !== undefined) {
+        sentence.forEach((item) => extractElementTypes(item).forEach((element) => output.add(element)));
     }
     return Array.from(output);
 }

@@ -71,6 +71,13 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                     >
                         Clause
                     </Item>
+                    <Item
+                        icon={FaLayerGroup}
+                        selected={defaultCategory === "sentence"}
+                        onClick={() => invokeCategoryChange("sentence")}
+                    >
+                        Sentence
+                    </Item>
                 </AnimateSharedLayout>
             </div>
         </div>

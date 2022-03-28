@@ -16,6 +16,7 @@ export type DerivationTree = {
     partOfSpeech?: DerivationTreeItem[];
     phrase?: DerivationTreeItem[];
     clause?: DerivationTreeItem[];
+    sentence?: DerivationTreeItem[];
 }
 
 export type DerivationTreeItem = {
@@ -43,7 +44,8 @@ const mainOrder: PartOfSpeechType[] = [
     "participle",
     "infinitive",
     "coordinator",
-    "subordinator"
+    "subordinator",
+    "interjection"
 ];
 const clauseOrder: ClauseType[] = [
     "independent",
@@ -150,6 +152,9 @@ function transformPrecursor(precursor: AllDerivationTreePrecursors): AllDerivati
         }
         if (element.clause !== undefined) {
             outputElement.clause = Object.values(element.clause).sort(clauseSorter);
+        }
+        if (element.sentence !== undefined) {
+            outputElement.sentence = Object.values(element.sentence);
         }
         output[eType as keyof AllDerivationTreePrecursors] = outputElement;
     });

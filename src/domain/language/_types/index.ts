@@ -1,4 +1,4 @@
-import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word, elementTypeLists, elementSet } from "./utils";
+import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word, elementTypeLists, elementSet, Sentence, SentenceDefinition } from "./utils";
 import { PosMapper, CoordPosMapper, PosDefinitionMapper, CoordPosDefinitionMapper, CoordinatedDefinition } from "./part-of-speech";
 import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDefinitionMapper, VerbPhraseBaseDefinition, FunctionalAdverbPhrase, FunctionalNounPhrase, FunctionalPrepositionPhrase, FunctionalInfinitivePhrase, FunctionalAdjectivePhrase, FunctionalGerundPhrase, FunctionalParticiplePhrase, FunctionalVerbPhrase } from "./phrase";
 import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition } from "./clause";
@@ -70,6 +70,7 @@ export type ElementMapper<Type extends ElementType> =
     : Type extends CoordinatedPhraseType ? CoordPhraseMapper<Type>
     : Type extends ClauseGuard<ClauseType> ? ClauseMapper<Type>
     : Type extends CoordClauseType ? CoordClauseMapper<Type>
+    : Type extends ElementGuard<"sentence"> ? Sentence
     : never;
 export type Element = ElementMapper<ElementType>;
 
@@ -80,6 +81,7 @@ export type ElementDefinitionMapper<Type extends Exclude<ElementType, "word">> =
     : Type extends CoordinatedPhraseType ? CoordPhraseDefinitionMapper<Type>
     : Type extends ClauseGuard<ClauseType> ? ClauseDefinitionMapper<Type>
     : Type extends CoordClauseType ? CoordClauseDefinitionMapper<Type>
+    : Type extends ElementGuard<"sentence"> ? SentenceDefinition
     : never;
 
 type DefinitionObject = {
@@ -367,7 +369,10 @@ const definitionObject: DefinitionObject = {
     },
     coordinatedIndependentClause: createCoordinatedDefinition(["independentClause"]),
     relativeClause: createDependentClauseDefinition(["adverb", "pronoun"]),
-    coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"])
+    coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"]),
+    sentence: {
+        items: [true, ["interjection", "independentClause", "coordinatedIndependentClause"]]
+    }
 };
 
 export function getTypedElementDefinition<T extends Exclude<ElementType, "word">>(type: T): ElementDefinitionMapper<T> {
@@ -391,7 +396,12 @@ const clauseSet = new Set([
     ...elementTypeLists.coordClause
 ]) as Set<string>;
 
-export type ElementCategory = "word" | "partOfSpeech" | "phrase" | "clause";
+export type ElementCategory =
+    | "word"
+    | "partOfSpeech"
+    | "phrase"
+    | "clause"
+    | "sentence";
 
 function _wordFilter(category: ElementCategory): boolean {
     return category === "word";
@@ -408,10 +418,21 @@ function _partOfSpeechFilter(category: ElementCategory): boolean {
 }
 
 function _phraseFilter(category: ElementCategory): boolean {
-    return category !== "clause";
+    switch (category) {
+        case "word":
+        case "partOfSpeech":
+        case "phrase":
+            return true;
+        default:
+            return false;
+    }
 }
 
-function _clauseFilter(): boolean {
+function _clauseFilter(category: ElementCategory): boolean {
+    return category !== "sentence";
+}
+
+function _sentenceFilter(): boolean {
     return true;
 }
 
@@ -425,6 +446,8 @@ function getLayerFilter(category: ElementCategory): (category: ElementCategory) 
             return _phraseFilter;
         case "clause":
             return _clauseFilter;
+        case "sentence":
+            return _sentenceFilter;
         default:
             throw `unsupported category ${category}`;
     }
@@ -438,6 +461,8 @@ function getElementCategory(type: ElementType): ElementCategory {
         return "phrase";
     } else if (clauseSet.has(type)) {
         return "clause";
+    } else if (type === "sentence") {
+        return "sentence";
     }
     throw `Unhandled type '${type}'`;
 }
@@ -468,6 +493,6 @@ export const ElementCategory = {
     getLayerFilter: getLayerFilter,
     getElementCategory: getElementCategory,
     getDefault(category?: ElementCategory): ElementCategory {
-        return category !== undefined ? category : "clause";
+        return category !== undefined ? category : "sentence";
     }
 };

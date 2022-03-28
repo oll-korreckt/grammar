@@ -108,7 +108,8 @@ export type ElementTypeList = [
     ...PhraseList,
     ...CoordinatedPhraseList,
     ...ClauseList,
-    ...CoordClauseList
+    ...CoordClauseList,
+    "sentence"
 ];
 export type ElementType =
     | "word"
@@ -117,7 +118,8 @@ export type ElementType =
     | PhraseGuard<PhraseType>
     | CoordinatedPhraseType
     | ClauseGuard<ClauseType>
-    | CoordClauseType;
+    | CoordClauseType
+    | "sentence";
 
 const posList: PartOfSpeechList = [
     "noun",
@@ -185,7 +187,8 @@ const elementTypeList: ElementTypeList = [
     ...phraseList,
     ...coordPhraseList,
     ...clauseList,
-    ...coordClauseList
+    ...coordClauseList,
+    "sentence"
 ];
 
 export const elementTypeLists = {
@@ -221,4 +224,10 @@ export type DefinitionMapper<Type> = undefined | (Type extends [boolean, Element
 
 export interface Word extends Identifiable {
     lexeme: string;
+}
+export interface SentenceDefinition extends ReferencingElementDefinition<"items"> {
+    items: [true, ["interjection", "independentClause", "coordinatedIndependentClause"]];
+}
+export interface Sentence extends Identifiable, ReferencingElement<SentenceDefinition> {
+    elementType: "sentence";
 }

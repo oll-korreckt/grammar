@@ -150,7 +150,9 @@ const valueInit: ElementInit = {
     relativeClause: makeClauseInit("relative"),
     coordinatedRelativeClause: makeCoordClauseInit("relative"),
     adverbialClause: makeClauseInit("adverbial"),
-    coordinatedAdverbialClause: makeCoordClauseInit("adverbial")
+    coordinatedAdverbialClause: makeCoordClauseInit("adverbial"),
+    // sentence
+    sentence: (id) => { return { elementType: "sentence", id }; }
 };
 
 export function initElement<T extends Exclude<ElementType, "word">>(type: T, id: ElementId): ElementMapper<T> {
