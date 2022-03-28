@@ -349,6 +349,9 @@ const definitionObject: DefinitionObject = {
     subordinator: {
         words: [true, ["word"]]
     },
+    interjection: {
+        words: [true, ["word"]]
+    },
     independentClause: {
         subject: [
             false,

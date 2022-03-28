@@ -18,7 +18,8 @@ export type PartOfSpeechList = [
     "preposition",
     "determiner",
     "coordinator",
-    "subordinator"
+    "subordinator",
+    "interjection"
 ];
 export type PartOfSpeechType =
     | "noun"
@@ -32,7 +33,8 @@ export type PartOfSpeechType =
     | "preposition"
     | "determiner"
     | "coordinator"
-    | "subordinator";
+    | "subordinator"
+    | "interjection";
 export type CoordinatedPartOfSpeechList = [
     CoordinatedType<"noun">,
     CoordinatedType<"pronoun">,
@@ -45,7 +47,7 @@ export type CoordinatedPartOfSpeechList = [
     CoordinatedType<"preposition">,
     CoordinatedType<"determiner">
 ];
-export type CoordinatedPartOfSpeechType = CoordinatedType<Exclude<PartOfSpeechType, "coordinator" | "subordinator">>;
+export type CoordinatedPartOfSpeechType = CoordinatedType<Exclude<PartOfSpeechType, "coordinator" | "subordinator" | "interjection">>;
 
 export type PhraseList = [
     PhraseGuard<"noun">,
@@ -129,7 +131,8 @@ const posList: PartOfSpeechList = [
     "preposition",
     "determiner",
     "coordinator",
-    "subordinator"
+    "subordinator",
+    "interjection"
 ];
 const coordPosList: CoordinatedPartOfSpeechList = [
     "coordinatedNoun",

@@ -236,6 +236,13 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         color: "color12",
         properties: words
     };
+    const interjection: TypedElementDisplayInfo<"interjection"> = {
+        fullName: "Interjection",
+        abrName: "Int.",
+        header: "I",
+        color: "color13",
+        properties: words
+    };
     const head = {
         fullName: "Head",
         displayOrder: 0,
@@ -393,6 +400,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         determiner: determiner,
         coordinator: coordinator,
         subordinator: subordinator,
+        interjection: interjection,
         coordinatedNoun: createCoordinated(noun),
         coordinatedPronoun: createCoordinated(pronoun),
         coordinatedVerb: createCoordinated(verb),

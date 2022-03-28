@@ -15,6 +15,7 @@ export type PosMapper<Type extends ElementType> =
     : Type extends PosGuard<"determiner"> ? Determiner
     : Type extends PosGuard<"coordinator"> ? Coordinator
     : Type extends PosGuard<"subordinator"> ? Subordinator
+    : Type extends PosGuard<"interjection"> ? Interjection
     : never;
 export type PosDefinitionMapper<Type extends PartOfSpeechType> =
     Type extends PosGuard<"noun"> ? NounDefinition
@@ -29,6 +30,7 @@ export type PosDefinitionMapper<Type extends PartOfSpeechType> =
     : Type extends PosGuard<"determiner"> ? DeterminerDefinition
     : Type extends PosGuard<"coordinator"> ? CoordinatorDefinition
     : Type extends PosGuard<"subordinator"> ? SubordinatorDefinition
+    : Type extends PosGuard<"interjection"> ? InterjectionDefinition
     : never;
 
 export type CoordPosMapper<Type extends CoordinatedPartOfSpeechType> =
@@ -71,7 +73,7 @@ export interface CoordinatedPartOfSpeech<TPartOfSpeechType extends PartOfSpeechT
 }
 
 export type FunctionalTypeGuard<T extends ElementType[]> = T;
-export type PosFunctionalTypeGuard<T extends Exclude<PartOfSpeechType, "coordinator" | "subordinator">> = FunctionalTypeGuard<[T, `coordinated${Capitalize<T>}`]>
+export type PosFunctionalTypeGuard<T extends Exclude<PartOfSpeechType, "coordinator" | "subordinator" | "interjection">> = FunctionalTypeGuard<[T, `coordinated${Capitalize<T>}`]>
 
 export interface PartOfSpeech extends Identifiable {
     posType?: PartOfSpeechType;
@@ -200,3 +202,9 @@ export interface Participle extends PartOfSpeech, ReferencingElement<ParticipleD
 }
 // Coordinated: broken and shattered
 export type FunctionalParticiple = PosFunctionalTypeGuard<"participle">;
+export interface InterjectionDefinition extends ReferencingElementDefinition<"words"> {
+    words: [true, ["word"]];
+}
+export interface Interjection extends PartOfSpeech, ReferencingElement<InterjectionDefinition> {
+    posType: "interjection";
+}

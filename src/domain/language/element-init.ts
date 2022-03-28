@@ -140,6 +140,8 @@ const valueInit: ElementInit = {
     coordinator: makePosInit("coordinator"),
     // subordinator
     subordinator: makePosInit("subordinator"),
+    // interjection
+    interjection: makePosInit("interjection"),
     // clauses
     independentClause: makeClauseInit("independent"),
     coordinatedIndependentClause: makeCoordClauseInit("independent"),
