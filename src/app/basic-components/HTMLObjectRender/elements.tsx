@@ -3,7 +3,7 @@ import { HTMLObject, HTMLObjectMap, HTMLObjectType } from "@lib/utils";
 import React, { useContext } from "react";
 import { HTMLObjectRenderContext, GenericHTMLObjectComponent, HTMLObjectComponentProps, ElementPropsGetter, HTMLObjectComponent, ClassMap } from "./types";
 
-export const Blockquote = makeRefComponent<HTMLQuoteElement, HTMLObjectComponentProps<"blockquote">>("Blockquote", ({ children, ...props }, ref) => (
+export const Blockquote = makeRefComponent<HTMLElement, HTMLObjectComponentProps<"blockquote">>("Blockquote", ({ children, ...props }, ref) => (
     <blockquote
         ref={ref}
         {...props}
