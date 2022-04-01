@@ -33,7 +33,7 @@ function stripDirOutput(data: DirectoryItem): TestDirectoryItem {
     return output;
 }
 
-describe("title", () => {
+describe("FileSystem", () => {
     const testFiles = nodepath.resolve(__dirname, "test-files");
 
     test("readdir", async () => {
