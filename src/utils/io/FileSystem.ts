@@ -51,6 +51,21 @@ async function createDirectoryItem(path: string): Promise<DirectoryItem> {
     return output;
 }
 
+function walkdir({ children }: DirectoryItem): (FileItem | DirectoryItem)[] {
+    const output: (FileItem | DirectoryItem)[] = [];
+    if (children !== undefined) {
+        Object.values(children).forEach((child) => {
+            output.push(child);
+            if (child.type === "dir") {
+                const newChildren = walkdir(child);
+                output.push(...newChildren);
+            }
+        });
+    }
+    return output;
+}
+
 export const FileSystem = {
-    readdir: createDirectoryItem
+    readdir: createDirectoryItem,
+    walkdir: walkdir
 };

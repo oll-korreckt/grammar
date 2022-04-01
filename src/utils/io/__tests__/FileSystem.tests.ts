@@ -34,9 +34,10 @@ function stripDirOutput(data: DirectoryItem): TestDirectoryItem {
 }
 
 describe("title", () => {
-    test("title", async () => {
-        const target = nodepath.resolve(__dirname, "test-files");
-        const result = stripDirOutput(await FileSystem.readdir(target));
+    const testFiles = nodepath.resolve(__dirname, "test-files");
+
+    test("readdir", async () => {
+        const result = stripDirOutput(await FileSystem.readdir(testFiles));
         const expected: TestDirectoryItem = {
             type: "dir",
             name: "test-files",
@@ -89,6 +90,23 @@ describe("title", () => {
                 }
             }
         };
+        assert.deepStrictEqual(result, expected);
+    });
+
+    test("walkdir", async () => {
+        const data = await FileSystem.readdir(testFiles);
+        const result = FileSystem.walkdir(data).map(({ name }) => name).sort();
+        const expected: string[] = [
+            "dir1",
+            "subdir",
+            "file1.css",
+            "file2.model.json",
+            "what.txt",
+            "dir2",
+            "file1.txt",
+            "file2.module.scss",
+            "file3.json"
+        ].sort();
         assert.deepStrictEqual(result, expected);
     });
 });
