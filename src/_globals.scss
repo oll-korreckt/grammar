@@ -11,15 +11,24 @@ body {
     overflow: hidden;
 }
 
-h1, h2, h3, h4, h5, h6, p {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
     padding: 5px 0;
 }
+
 ol li {
     margin-left: 40px;
 }
+
 ul li {
     margin-left: 40px;
 }
+
 table {
     table-layout: fixed;
     border-collapse: collapse;
@@ -29,14 +38,17 @@ table {
     display: block;
     max-width: fit-content;
 }
+
 thead {
     color: white;
     background-color: gray;
     white-space: nowrap;
 }
+
 tbody {
     border-radius: 5px;
 }
+
 th {
     text-align: left;
     padding: 5px 10px;
@@ -44,27 +56,42 @@ th {
     height: 100%;
     text-align: center;
 }
+
 td {
     vertical-align: middle;
     padding: 5px;
     border: 1px solid gray;
     height: 100%;
 }
+
 tr {
     height: 100%;
+
     &:nth-child(even) {
         background-color: #ddd;
     }
 }
+
 blockquote {
     background-color: #eee;
     margin-left: 5px;
-    border-left: 5px solid gray;
+    position: relative;
+
+    &::before {
+        content: '';
+        top: 0;
+        left: 0;
+        position: absolute;
+        width: 5px;
+        height: 100%;
+        background-color: gray;
+    }
+
     p {
-        margin-left: 5px;
+        margin-left: 10px;
     }
 }
 
-blockquote + blockquote {
+blockquote+blockquote {
     margin-top: 10px;
 }
