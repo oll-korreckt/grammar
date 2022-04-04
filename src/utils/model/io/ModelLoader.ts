@@ -3,7 +3,7 @@ import { Model } from "../types";
 import { promises as fs } from "fs";
 import { FileSystem } from "@utils/io";
 
-const FILE_IDENTIFIER = ".model.json";
+const FILE_IDENTIFIER = ".json";
 
 export type ModelLoader = (page: ElementPageId, model: string) => Promise<Model | "no model" | "invalid model">;
 
@@ -27,6 +27,19 @@ function _getKeyFromFilename(filename: string): string {
 async function _createCache(root: string): Promise<Cache> {
     const output: Cache = {};
     const dirItems = FileSystem.walkdir(await FileSystem.readdir(root));
+    for (let index = 0; index < dirItems.length; index++) {
+        const item = dirItems[index];
+        if (item.type === "file" && item.name.endsWith(FILE_IDENTIFIER)) {
+            const key = _getKeyFromFilename(item.name);
+            output[key] = item.fullPath;
+        }
+    }
+    return output;
+}
+
+function _createCacheSync(root: string): Cache {
+    const output: Cache = {};
+    const dirItems = FileSystem.walkdir(FileSystem.readdirSync(root));
     for (let index = 0; index < dirItems.length; index++) {
         const item = dirItems[index];
         if (item.type === "file" && item.name.endsWith(FILE_IDENTIFIER)) {
@@ -81,6 +94,28 @@ async function createLoader(root: string): Promise<ModelLoader> {
     };
 }
 
+function createLoaderSync(root: string): ModelLoader {
+    const cache = _createCacheSync(root);
+    return async (page, model) => {
+        const key = `${page}.${model}`;
+        const filepath = cache[key];
+        if (filepath === undefined) {
+            return "no model";
+        }
+        const buffer = await fs.readFile(filepath);
+        const content = buffer.toString();
+        if (content.length === 0) {
+            return "invalid model";
+        }
+        const output = JSON.parse(content);
+        if (!isModel(output)) {
+            return "invalid model";
+        }
+        return output;
+    };
+}
+
 export const ModelLoader = {
-    createLoader: createLoader
+    createLoader: createLoader,
+    createLoaderSync: createLoaderSync
 };
