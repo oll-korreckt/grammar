@@ -26,7 +26,7 @@ function createFileItem(path: string): FileItem {
     };
 }
 
-async function createDirectoryItem(path: string): Promise<DirectoryItem> {
+async function readdir(path: string): Promise<DirectoryItem> {
     const output: DirectoryItem = {
         type: "dir",
         name: nodepath.basename(path),
@@ -40,7 +40,32 @@ async function createDirectoryItem(path: string): Promise<DirectoryItem> {
         if (child.isFile()) {
             childrenOutput[child.name] = createFileItem(childPath);
         } else if (child.isDirectory()) {
-            childrenOutput[child.name] = await createDirectoryItem(childPath);
+            childrenOutput[child.name] = await readdir(childPath);
+        } else {
+            throw `Unexpected item in directory: '${childPath}'`;
+        }
+    }
+    if (children.length > 0) {
+        output.children = childrenOutput;
+    }
+    return output;
+}
+
+function readdirSync(path: string): DirectoryItem {
+    const output: DirectoryItem = {
+        type: "dir",
+        name: nodepath.basename(path),
+        fullPath: path
+    };
+    const children = fs.readdirSync(path, { withFileTypes: true });
+    const childrenOutput: Required<DirectoryItem>["children"] = {};
+    for (let index = 0; index < children.length; index++) {
+        const child = children[index];
+        const childPath = nodepath.resolve(path, child.name);
+        if (child.isFile()) {
+            childrenOutput[child.name] = createFileItem(childPath);
+        } else if (child.isDirectory()) {
+            childrenOutput[child.name] = readdirSync(childPath);
         } else {
             throw `Unexpected item in directory: '${childPath}'`;
         }
@@ -66,6 +91,7 @@ function walkdir({ children }: DirectoryItem): (FileItem | DirectoryItem)[] {
 }
 
 export const FileSystem = {
-    readdir: createDirectoryItem,
+    readdir: readdir,
+    readdirSync: readdirSync,
     walkdir: walkdir
 };
