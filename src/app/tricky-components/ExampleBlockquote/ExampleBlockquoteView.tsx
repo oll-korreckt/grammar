@@ -87,7 +87,7 @@ export const ExampleBlockquoteView: React.VFC<ExampleBlockquoteViewProps> = ({ d
                 {state.type === "error" &&
                     <div className={accessClassName(styles, "errorMsg")}>
                         <p>Error loading model.</p>
-                        <p>
+                        <div>
                             <ErrorButton
                                 icon={FaRedo}
                                 onClick={() => invokeDispatch({ type: "error: retry" })}
@@ -100,7 +100,7 @@ export const ExampleBlockquoteView: React.VFC<ExampleBlockquoteViewProps> = ({ d
                             >
                                 Cancel
                             </ErrorButton>
-                        </p>
+                        </div>
                     </div>
                 }
             </blockquote>

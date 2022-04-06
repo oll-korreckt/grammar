@@ -23,6 +23,9 @@ async function queryFn({ custom }: HTMLBlockquoteObject): Promise<Model> {
     const elementPageId = ElementPage.typeToId(pageType);
     const queryStr = `${SERVER}/api/model/${elementPageId}/${model}`;
     const response = await fetch(queryStr);
+    if (!response.ok) {
+        throw "error occurred while loading data";
+    }
     const output = await response.json();
     return output;
 }
@@ -82,6 +85,7 @@ export const ExampleBlockquote: React.VFC<ExampleBlockquoteProps> = ({ blockquot
         "ExampleBlockquote",
         async () => queryFn(blockquote),
         {
+            retry: false,
             enabled: false,
             onError: () => dispatch({ type: "loading: fetch error" }),
             onSuccess: (data) => dispatch({ type: "loading: data fetched", data })

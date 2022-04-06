@@ -61,22 +61,6 @@ function getLabelSettings(diagram: DiagramState, lexemes: Lexeme[]): Record<Elem
     return output;
 }
 
-// function enterOpenState(state: MasterState): MasterState {
-//     const output = resetOpenView({
-//         ...state,
-//         type: "open"
-//     });
-//     const { model, category, selectedElement } = output;
-//     if (model === undefined) {
-//         throw "cannot enter open state without a model";
-//     }
-//     const displaySettings = getDisplayData(model.diagram, category, selectedElement);
-//     return {
-//         ...output,
-//         ...displaySettings
-//     };
-// }
-
 function initializer(blockquote: HTMLBlockquoteObject): MasterState {
     return {
         type: "closed",
