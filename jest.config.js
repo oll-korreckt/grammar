@@ -12,7 +12,10 @@ const config = {
     },
     transform: {
         "\\.[jt]sx?$": ["babel-jest", { configFile: "./babel.testing.config.json" }]
-    }
+    },
+    setupFiles: [
+        "<rootDir>/__mocks__/localStorageMock.js"
+    ]
 };
 
 module.exports = config;
