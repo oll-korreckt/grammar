@@ -9,6 +9,12 @@ interface ParseResultBase {
     type: ParseObjectType;
 }
 
+interface ElementCustomResult extends ParseResultBase {
+    type: "custom";
+    customValue: string;
+    content: ElementIdResult | ElementClassResult | TokenResult;
+}
+
 interface ElementIdResult extends ParseResultBase {
     type: "elementId";
     id: string;
@@ -38,6 +44,7 @@ type ParseResult =
     | SnippetResult
     | HTMLInjectionResult
     | ElementClassResult
+    | ElementCustomResult
 
 function toParseResult(result: ParseObject): ParseResult {
     if (ParseContent.isParseContent(result)) {
@@ -74,6 +81,15 @@ function toParseResult(result: ParseObject): ParseResult {
                 type: "elementClass",
                 className: result.className,
                 content: TokenResult.toResult(result.content)
+            };
+        }
+        case "custom": {
+            return {
+                type: "custom",
+                customValue: result.customValue,
+                content: ParseContent.isParseContent(result.content)
+                    ? TokenResult.toResult(result.content)
+                    : toParseResult(result.content) as ElementIdResult | ElementClassResult
             };
         }
     }
@@ -136,18 +152,22 @@ describe("MarkdownParser", () => {
     });
 
     test("ids and classes", () => {
-        const result = runParse("ids-classes.md");
+        const result = runParse("custom-ids-classes.md");
         const expected: ParseResult[] = [
             {
-                type: "elementId",
-                id: "id1",
+                type: "custom",
+                customValue: "thisIsCustom",
                 content: {
-                    type: "elementClass",
-                    className: ["class1", "class2", "class3"],
+                    type: "elementId",
+                    id: "id1",
                     content: {
-                        type: "heading",
-                        depth: 1,
-                        tokens: [{ type: "text", text: "This is a header" }]
+                        type: "elementClass",
+                        className: ["class1", "class2", "class3"],
+                        content: {
+                            type: "heading",
+                            depth: 1,
+                            tokens: [{ type: "text", text: "This is a header" }]
+                        }
                     }
                 }
             },
@@ -160,12 +180,31 @@ describe("MarkdownParser", () => {
                 }
             },
             {
-                type: "elementId",
-                id: "id2",
+                type: "custom",
+                customValue: "customVal",
                 content: {
-                    type: "heading",
-                    depth: 3,
-                    tokens: [{ type: "text", text: "No class(es)" }]
+                    type: "elementId",
+                    id: "id2",
+                    content: {
+                        type: "heading",
+                        depth: 3,
+                        tokens: [{ type: "text", text: "No class(es)" }]
+                    }
+                }
+            },
+            {
+                type: "custom",
+                customValue: "customVal",
+                content: {
+                    type: "elementClass",
+                    className: "class1",
+                    content: {
+                        type: "blockquote",
+                        tokens: [{
+                            type: "paragraph",
+                            tokens: [{ type: "text", text: "Class and custom" }]
+                        }]
+                    }
                 }
             }
         ];

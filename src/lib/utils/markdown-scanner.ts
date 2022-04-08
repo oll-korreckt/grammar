@@ -1,6 +1,6 @@
 import { marked } from "marked";
 import { Strings } from "./strings";
-import { MarkdownCommentHTMLClass, MarkdownCommentHTMLInjection, MarkdownCommentId, MarkdownCommentSnippet, MarkdownHeadingDepth, MarkdownHTML, MarkdownTableCell, MarkdownToken } from "./_types";
+import { MarkdownCommentCustom, MarkdownCommentHTMLClass, MarkdownCommentHTMLInjection, MarkdownCommentId, MarkdownCommentSnippet, MarkdownHeadingDepth, MarkdownHTML, MarkdownTableCell, MarkdownToken } from "./_types";
 import Tokens = marked.Tokens;
 
 type ListItemTextToken = Omit<Tokens.Text, "tokens"> & Required<Pick<Tokens.Text, "tokens">>;
@@ -127,7 +127,7 @@ function _extractCommentText(comment: string): string {
     return trimmedComment.slice(startIndex, endIndex).trim();
 }
 
-function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentId | MarkdownCommentSnippet | MarkdownCommentHTMLInjection | MarkdownCommentHTMLClass {
+function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentId | MarkdownCommentSnippet | MarkdownCommentHTMLInjection | MarkdownCommentHTMLClass | MarkdownCommentCustom {
     const commentText = _extractCommentText(token.text);
     if (commentText.startsWith("#")) {
         return {
@@ -152,6 +152,12 @@ function _toHTMLToken(token: Tokens.HTML): MarkdownHTML | MarkdownCommentId | Ma
             ...token,
             type: "comment.class",
             className: commentText.slice(1)
+        };
+    } else if (commentText.startsWith("*")) {
+        return {
+            ...token,
+            type: "comment.custom",
+            customValue: commentText.slice(1)
         };
     } else {
         return token;

@@ -18,6 +18,7 @@ describe("MarkdownCompiler", () => {
         const result = toCompilerResult("styling.md");
         const expected: HTMLObject = {
             type: "p",
+            custom: "customVal",
             content: [
                 "plain ",
                 { type: "b", content: "bold" },
@@ -249,10 +250,11 @@ describe("MarkdownCompiler", () => {
     });
 
     test("ids and classes", () => {
-        const result = toCompilerResult("ids-classes.md");
+        const result = toCompilerResult("custom-ids-classes.md");
         const expected: HTMLObject[] = [
             {
                 type: "h1",
+                custom: "thisIsCustom",
                 id: "id1",
                 className: ["class1", "class2", "class3"],
                 content: "This is a header"
@@ -264,8 +266,15 @@ describe("MarkdownCompiler", () => {
             },
             {
                 type: "h3",
+                custom: "customVal",
                 id: "id2",
                 content: "No class(es)"
+            },
+            {
+                type: "blockquote",
+                custom: "customVal",
+                className: "class1",
+                content: { type: "p", content: "Class and custom" }
             }
         ];
         assert.deepStrictEqual(result, expected);

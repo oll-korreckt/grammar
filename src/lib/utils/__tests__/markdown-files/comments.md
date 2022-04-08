@@ -1,4 +1,5 @@
 <!-- html -->
+<!-- *thisIsCustom -->
 <!-- #id -->
 <!-- !section -->
 <!-- +injection -->

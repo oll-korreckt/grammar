@@ -1,11 +1,12 @@
 import { HTMLContent } from "./html-objects";
-import { MarkdownCommentHTMLClass, MarkdownCommentHTMLInjection, MarkdownCommentId, MarkdownCommentSnippet, MarkdownToken, MarkdownTokenType } from "./markdown-tokens";
+import { MarkdownCommentCustom, MarkdownCommentHTMLClass, MarkdownCommentHTMLInjection, MarkdownCommentId, MarkdownCommentSnippet, MarkdownToken, MarkdownTokenType } from "./markdown-tokens";
 
 export type ParseObjectType =
     | "elementId"
     | "snippet"
     | "htmlInjection"
     | "elementClass"
+    | "custom"
 
 export type ParseObject =
     | ParseContent
@@ -13,12 +14,31 @@ export type ParseObject =
     | Snippet
     | HTMLInjection
     | ElementClass
+    | ElementCustom
 
-export type ParseContent = Exclude<MarkdownToken, MarkdownCommentId | MarkdownCommentSnippet | MarkdownCommentHTMLInjection | MarkdownCommentHTMLClass>;
-export type ParseContentType = Exclude<MarkdownTokenType, "comment.id" | "comment.snippet" | "comment.htmlInjection" | "comment.class">;
+type CommentTokens =
+    | MarkdownCommentId
+    | MarkdownCommentSnippet
+    | MarkdownCommentHTMLInjection
+    | MarkdownCommentHTMLClass
+    | MarkdownCommentCustom
+export type ParseContent = Exclude<MarkdownToken, CommentTokens>;
+type CommentTokenTypes =
+    | "comment.id"
+    | "comment.snippet"
+    | "comment.htmlInjection"
+    | "comment.class"
+    | "comment.custom"
+export type ParseContentType = Exclude<MarkdownTokenType, CommentTokenTypes>;
 
 interface ParseObjectBase {
     type: ParseObjectType;
+}
+
+export interface ElementCustom extends ParseObjectBase {
+    type: "custom";
+    customValue: string;
+    content: ElementId | ElementClass | ParseContent;
 }
 
 export interface ElementId extends ParseObjectBase {

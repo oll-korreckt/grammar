@@ -16,6 +16,26 @@ function _injection(data: ParseData): ParseObject {
             id: currToken.id
         };
     }
+    return _custom(data);
+}
+
+function _custom(data: ParseData): ParseObject {
+    const currToken = _getCurrentToken(data);
+    if (currToken.type === "comment.custom") {
+        const { customValue } = currToken;
+        _advance(data);
+        const nextToken = _elementId(data);
+        if (!ParseContent.isParseContent(nextToken)
+            && nextToken.type !== "elementId"
+            && nextToken.type !== "elementClass") {
+            throw "content of a 'custom' must be ElementId, ElementClass, or ParseContent";
+        }
+        return {
+            type: "custom",
+            customValue: customValue,
+            content: nextToken
+        };
+    }
     return _elementId(data);
 }
 

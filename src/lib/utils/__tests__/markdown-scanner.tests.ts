@@ -39,6 +39,7 @@ describe("MarkdownScanner", () => {
         const result = runScan(content);
         const expected: TokenResult[] = [
             { type: "html" },
+            { type: "comment.custom", customValue: "thisIsCustom" },
             { type: "comment.id", id: "id" },
             { type: "comment.snippet", name: "section" },
             { type: "comment.htmlInjection", id: "injection" },

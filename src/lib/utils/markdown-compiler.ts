@@ -262,6 +262,15 @@ function _compileObject(parseObj: ParseObject): HTMLContent {
         case "htmlInjection": {
             return parseObj.content;
         }
+        case "custom": {
+            const output = _compileObject(parseObj.content);
+            if (!isHTMLElement(output)) {
+                const { customValue } = parseObj;
+                throw `custom value '${customValue}' is not associated with an element`;
+            }
+            output.custom = parseObj.customValue;
+            return output;
+        }
         default:
             return _toHTMLContent([parseObj]);
     }
