@@ -1,4 +1,5 @@
-import { Anchor, GenericHTMLObjectComponent, HTMLObjectRender, TableData } from "@app/basic-components/HTMLObjectRender";
+import { Anchor, Blockquote, GenericHTMLObjectComponent, HTMLObjectRender, TableData } from "@app/basic-components/HTMLObjectRender";
+import { ExampleBlockquote } from "@app/tricky-components/ExampleBlockquote";
 import { accessClassName, ElementDisplayInfo } from "@app/utils";
 import { HTMLObject } from "@lib/utils";
 import { NextPage } from "next";
@@ -22,6 +23,7 @@ export const ElementPageComponent: NextPage<ElementPageComponentProps> = ({ type
                 <HTMLObjectRender
                     aCmpt={CustomAnchor}
                     tdCmpt={CustomTd}
+                    blockquoteCmpt={CustomBlockquote}
                     thProps={({ custom }) => {
                         if (custom) {
                             return {
@@ -66,7 +68,7 @@ function createElementPageTd(type: ElementPageType_ElementType): GenericHTMLObje
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest }) => {
     if (href === undefined) {
-        throw "";
+        throw "anchor does not have an 'href' attribute";
     }
     if (!ElementPage.isPageId(href)) {
         throw `'${href}' is not a valid elementpage`;
@@ -79,4 +81,10 @@ const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest
             </Anchor>
         </Link>
     );
+};
+
+const CustomBlockquote: GenericHTMLObjectComponent<"blockquote"> = ({ children, ...rest }) => {
+    return children.custom
+        ? <ExampleBlockquote blockquote={children}/>
+        : <Blockquote {...rest}>{children}</Blockquote>;
 };
