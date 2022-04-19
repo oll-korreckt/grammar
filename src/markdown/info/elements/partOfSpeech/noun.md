@@ -1,7 +1,11 @@
-# Nouns
-When one asks: "what is a noun?" the answer typically recieved is "a person, place, or thing." In practice, most nouns are composed of a single word but it is possible to have nouns that are composed of two or more words.
+# Noun
+<!-- +elementInfo -->
+<!-- !noun -->
+When one asks: "what is a noun?" the answer typically received is "a person, place, or thing." In practice, most nouns are composed of a single word but it is possible to have nouns that are composed of two or more words.
+<!-- !noun -->
 
 ## Properties
+<!-- +propertySummary -->
 As mentioned before, a noun can be composed of one or more words.
 > a delicious *Taco*
 
@@ -16,4 +20,4 @@ As mentioned before, a noun can be composed of one or more words.
 - Is it being modified by a [determiner](determiner) or could you modify it with an article?
 - Is it being described by an [adjective](adjective)?
 - Is it plural or could you pluralize it?
-- Is it the object of a [verb pharse](verb-phrase) or [preposition phrase](preposition-phrase)?
+- Is it the object of a [verb phrase](verb-phrase) or [preposition phrase](preposition-phrase)?
