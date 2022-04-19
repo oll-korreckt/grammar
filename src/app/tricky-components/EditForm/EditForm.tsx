@@ -1,9 +1,10 @@
 import { MessageBoxModal } from "@app/basic-components/MessageBoxModal";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { EditFormView } from "../EditFormView";
 import { InputFormProps } from "../InputForm";
 import { LabelFormProps } from "../LabelForm/types";
-import { Action, EditFormProps, InputStuff, LabelStuff, useEditForm } from "./reducer";
+import { InputKeyContext } from "./context";
+import { Action, InputStuff, LabelStuff, useEditForm, useLocalStorage } from "./reducer";
 
 function convertToInputProps(stuff: InputStuff, dispatch: React.Dispatch<Action>): InputFormProps {
     return {
@@ -28,19 +29,34 @@ function convertToLabelProps(stuff: LabelStuff, dispatch: React.Dispatch<Action>
     };
 }
 
-export const EditForm: React.VFC<EditFormProps> = (props) => {
-    const [state, dispatch] = useEditForm(props);
+export const EditForm: React.VFC = () => {
+    const storage = useLocalStorage();
+    const [state, dispatch] = useEditForm(storage.value);
+    const updateRef = useRef(false);
+    const extendedDispatch: typeof dispatch = (action) => {
+        updateRef.current = true;
+        dispatch(action);
+    };
     const { stage, inputStuff, labelStuff } = state;
-    const inputProps = convertToInputProps(inputStuff, dispatch);
-    const labelProps = convertToLabelProps(labelStuff, dispatch);
+    const inputProps = convertToInputProps(inputStuff, extendedDispatch);
+    const labelProps = convertToLabelProps(labelStuff, extendedDispatch);
+
+    useEffect(() => {
+        if (updateRef.current) {
+            storage.update(state);
+        }
+        updateRef.current = false;
+    }, [state, storage]);
+
+    const { inputKey } = inputStuff;
 
     return (
-        <>
+        <InputKeyContext.Provider value={{ inputKey }}>
             <EditFormView
                 mode={stage}
                 onModeClick={(mode) => {
                     if (mode !== state.stage) {
-                        dispatch({ type: "stage switch" });
+                        extendedDispatch({ type: "stage switch" });
                     }
                 }}
                 inputFormProps={inputProps}
@@ -56,15 +72,18 @@ export const EditForm: React.VFC<EditFormProps> = (props) => {
                     ]}
                     onResponse={(response) => {
                         if (response.type === "off screen click") {
-                            dispatch({ type: "input: reject replace" });
+                            extendedDispatch({ type: "input: reject replace" });
                             return;
                         }
                         switch (response.text) {
+                            case "Discard Changes":
+                                extendedDispatch({ type: "input: discard changes" });
+                                break;
                             case "Yes":
-                                dispatch({ type: "input: accept replace" });
+                                extendedDispatch({ type: "input: accept replace" });
                                 break;
                             case "No":
-                                dispatch({ type: "input: reject replace" });
+                                extendedDispatch({ type: "input: reject replace" });
                                 break;
                         }
                     }}
@@ -72,6 +91,6 @@ export const EditForm: React.VFC<EditFormProps> = (props) => {
                     Proceeding will result in a new model with all labels from the old model being deleted. Proceed?
                 </MessageBoxModal>
             }
-        </>
+        </InputKeyContext.Provider>
     );
 };

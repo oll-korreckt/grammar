@@ -1,5 +1,5 @@
 import { InputFormErrorState } from "@app/tricky-components/InputForm";
-import { DiagramState, Stage } from "@app/utils";
+import { createLocalStorageHook, DiagramState, LocalStorageSerializer, Stage } from "@app/utils";
 import { useReducer } from "react";
 
 export interface EditFormProps {
@@ -36,6 +36,7 @@ export interface State {
 }
 
 export interface InputStuff {
+    inputKey?: string;
     initialValue: string;
     currentValue: string;
     enableLabelSwitch?: boolean;
@@ -107,6 +108,19 @@ export function initializer({ initialStage, initialValue }: EditFormProps): Stat
         }
     };
 }
+
+const KEY_STATE_0 = "0";
+const KEY_STATE_1 = "1";
+
+const defaultState: State = {
+    stage: "input",
+    inputStuff: {
+        initialValue: "",
+        currentValue: "",
+        inputKey: KEY_STATE_0
+    },
+    labelStuff: {}
+};
 
 export function reducer(state: State, action: Action): State {
     switch (action.type) {
@@ -214,7 +228,8 @@ export function reducer(state: State, action: Action): State {
                 inputStuff: {
                     ...inputStuff,
                     currentValue: inputStuff.initialValue,
-                    askReplace: false
+                    askReplace: false,
+                    inputKey: flipKey(inputStuff.inputKey)
                 }
             };
         }
@@ -231,6 +246,35 @@ export function reducer(state: State, action: Action): State {
     }
 }
 
-export function useEditForm(props: EditFormProps): [State, React.Dispatch<Action>] {
-    return useReducer(reducer, props, initializer);
+function flipKey(key: string | undefined): typeof KEY_STATE_0 | typeof KEY_STATE_1 {
+    return (key === undefined || key === KEY_STATE_1)
+        ? KEY_STATE_0 : KEY_STATE_1;
+}
+
+function serializeState(state: State): string {
+    const inputStuff = { ...state.inputStuff };
+    delete inputStuff.inputKey;
+    const serializeData = {
+        ...state,
+        inputStuff
+    };
+    return JSON.stringify(serializeData);
+}
+
+function deserializeState(data: string): State {
+    const state: State = JSON.parse(data);
+    const { inputStuff } = state;
+    inputStuff.inputKey = flipKey(inputStuff.inputKey);
+    return state;
+}
+
+const serializer: LocalStorageSerializer<State> = {
+    serialize: serializeState,
+    deserialize: deserializeState
+};
+
+export const useLocalStorage = createLocalStorageHook<State>("app", serializer, defaultState);
+
+export function useEditForm(initialValue: State): [State, React.Dispatch<Action>] {
+    return useReducer(reducer, initialValue);
 }

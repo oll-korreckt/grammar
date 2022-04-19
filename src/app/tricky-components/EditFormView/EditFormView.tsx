@@ -1,8 +1,9 @@
 import { accessClassName } from "@app/utils";
 import { AnimatePresence, AnimateSharedLayout, motion, Transition } from "framer-motion";
-import React from "react";
+import React, { useContext } from "react";
 import { IconType } from "react-icons";
 import { FaEdit, FaTag } from "react-icons/fa";
+import { InputKeyContext } from "../EditForm/context";
 import { InputForm, InputFormProps } from "../InputForm";
 import { LabelForm } from "../LabelForm";
 import { LabelFormProps } from "../LabelForm/types";
@@ -20,6 +21,7 @@ export type EditFormViewMode = "input" | "label";
 
 const transition: Transition = { duration: 0.4 };
 export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, disableLabelMode, inputFormProps, labelFormProps }) => {
+    const { inputKey } = useContext(InputKeyContext);
     const defMode: EditFormViewMode = mode !== undefined ? mode : "input";
     const defInputFormProps: InputFormProps = inputFormProps !== undefined
         ? inputFormProps
@@ -64,7 +66,11 @@ export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, 
                             transition={transition}
                             className={accessClassName(styles, "contentPanel")}
                         >
-                            <InputForm {...defInputFormProps} />
+                            <InputForm
+                                key={inputKey}
+
+                                {...defInputFormProps}
+                            />
                         </motion.div>
                     }
                     {defMode === "label" &&
