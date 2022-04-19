@@ -7,7 +7,7 @@ const AppPage: NextPage = () => {
     const client = useClientSide();
     return client
         ? <EditForm/>
-        : <div>One moment please</div>;
+        : null;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
