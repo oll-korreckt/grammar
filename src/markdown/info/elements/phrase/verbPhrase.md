@@ -34,7 +34,7 @@ Adverb
 <!-- .caption -->
 Adverb Phrase
 
-> The dog ran *when he saw a squirell*.
+> The dog ran *when he saw a squirrel*.
 <!-- .caption -->
 Adverbial Clause
 
@@ -51,7 +51,7 @@ One can use infinitives in order to modify the verb. However, it is worth noting
 <!-- .caption -->
 Coordinated Indirect
 
-> The dog ran *to catch the squirell*.
+> The dog ran *to catch the squirrel*.
 <!-- .caption -->
 Infinitive Phrase
 
@@ -113,13 +113,13 @@ Certain verbs allow for a direct object compliment. Such verbs are sometimes cal
 ### Direct Object Complement
 <!-- +dirObjCompl -->
 
-*Factitive verbs* are capable of having a direct object complement. In terms of function and acceptable gramatic elements, direct object complements are quite similar to subject complements.
+*Factitive verbs* are capable of having a direct object complement. In terms of function and acceptable grammatical elements, direct object complements are quite similar to subject complements.
 
 <!-- #indObj -->
 ### Indirect Object
 <!-- +indObj -->
 
-Certain verbs, commonly refered to as *ditransitive verbs*, allow for the use of a 2nd object called an *indirect object*. The *indirect object* is the object of the verb which recieves the direct object. Perhaps the most intuitive example that can be offered is with the verb *to give*:
+Certain verbs, commonly referred to as *ditransitive verbs*, allow for the use of a 2nd object called an *indirect object*. The *indirect object* is the object of the verb which receives the direct object. Perhaps the most intuitive example that can be offered is with the verb *to give*:
 > The man gave *the dog* **a bone**.
 <!-- .caption -->
 *The dog* and **a bone** are both objects of the verb "gave." *the dog* serves as the indirect object whereas **a bone** is the direct object meaning that **a bone** is being acted upon by the verb and *the dog* is the recipient of the indirect object.
