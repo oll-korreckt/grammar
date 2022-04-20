@@ -14,9 +14,12 @@ While often derived verbs via a *-ed* or *-d* ending, it is worth noting that th
 <!-- +propertySummary -->
 
 ## Identification
-Present and past participles are primarily used as the main verb in *present* and *perfect* verb tenses. Thus, identification can be quite difficult. Since participles and participle phrases function both function as adjectives, participles can be identified by determining whether the participle or the participle phrase could be removed from the clause without destroying the clause or changing the semantic meaning.
+Present and past participles are primarily used as the main verb in *present* and *perfect* verb tenses. Past participles can also mimic [gerunds](gerund) in appearance. Thus, identification can be quite difficult.
 
-### Present Participle
+### Verb or Participle?
+Since participles and participle phrases function both function as adjectives, participles can be identified by determining whether the participle or the participle phrase could be removed from the clause without destroying the clause or changing the semantic meaning.
+
+#### Present Participle
 > He is *running*.
 <!-- .caption -->
 Verb. Here, *running* functions as the main verb of the present continuous tense: *is running*. Removing *running* from the sentence would not destroy the clause, but it would fundamentally alter its semantic meaning.
@@ -25,6 +28,27 @@ Verb. Here, *running* functions as the main verb of the present continuous tense
 <!-- .caption -->
 Participle. Here, *running* describes *dog*. You could remove *running* from the sentence and it would not destroy the clause nor the semantic meaning. On the other hand, removing *breathing* would break the sentence since it is the main verb.
 
-### Past Participle
+#### Past Participle
+> She had *defeated* her opponent.
+<!-- .caption -->
+Verb. Here, *defeated* is the main verb of the past perfect tense: *had defeated*. Removal of *defeated* would not break the clause, but the meaning of the sentence would be changed since it's predicate would be now using a different verb.
 
-### Passive Perfect
+> Her opponent, badly *defeated*, fled in shame.
+<!-- .caption -->
+Participle. *Defeated* describes the noun, *opponent*. The participle phrase that it forms, *badly defeated*, could likewise be removed from the sentence.
+
+#### Passive Perfect
+> Her opponent, having been badly beaten, fled in shame.
+<!-- .caption -->
+Participle.
+
+### Gerund or Past Participle?
+Gerunds and past participles function differently within sentences: gerunds and [gerund phrases](gerund-phrase) both function as nouns whereas past participles and the participle phrases they form will function only as adjectives.
+
+> *Running* for mayor is an arduous task.
+<!-- .caption -->
+Gerund. *Running* is the subject of the sentence and therefore a noun.
+
+> The *growing* discontent resulted in her election as mayor.
+<!-- .caption -->
+Past participle. *Growing* describes *discontent* and is therefore a participle.
