@@ -318,7 +318,8 @@ const definitionObject: DefinitionObject = {
     gerundPhrase: createVerbPhraseBaseDefinition(["gerund", "coordinatedGerund"]),
     coordinatedGerundPhrase: createCoordinatedDefinition(["gerund", "gerundPhrase"]),
     participle: {
-        word: [true, ["word"]]
+        mainVerb: [true, ["word"]],
+        auxiliaryVerbs: [true, ["word"]]
     },
     coordinatedParticiple: createCoordinatedDefinition(["participle"]),
     participlePhrase: createVerbPhraseBaseDefinition(["participle", "coordinatedParticiple"]),

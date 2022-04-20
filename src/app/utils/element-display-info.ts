@@ -134,6 +134,18 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
             required: true
         }
     };
+    const verbProps = {
+        mainVerb: {
+            fullName: "Main Verb",
+            displayOrder: 0,
+            required: true
+        },
+        auxiliaryVerbs: {
+            fullName: "Auxiliary Verbs",
+            abrName: "Aux. Verbs",
+            displayOrder: 1
+        }
+    };
     const noun: TypedElementDisplayInfo<"noun"> = {
         fullName: "Noun",
         header: "N",
@@ -150,18 +162,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         fullName: "Verb",
         header: "V",
         color: "color3",
-        properties: {
-            mainVerb: {
-                fullName: "Main Verb",
-                displayOrder: 0,
-                required: true
-            },
-            auxiliaryVerbs: {
-                fullName: "Auxiliary Verbs",
-                abrName: "Aux. Verbs",
-                displayOrder: 1
-            }
-        }
+        properties: verbProps
     };
     const infinitive: TypedElementDisplayInfo<"infinitive"> = {
         fullName: "Infinitive",
@@ -186,7 +187,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         abrName: "Part.",
         header: "P",
         color: "color5",
-        properties: word
+        properties: verbProps
     };
     const gerund: TypedElementDisplayInfo<"gerund"> = {
         fullName: "Gerund",

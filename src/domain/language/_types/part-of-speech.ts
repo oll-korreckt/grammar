@@ -194,8 +194,9 @@ export interface Gerund extends PartOfSpeech, ReferencingElement<GerundDefinitio
 // Coordinated: smoking and drinking
 export type FunctionalGerund = PosFunctionalTypeGuard<"gerund">;
 
-export interface ParticipleDefinition extends ReferencingElementDefinition<"word"> {
-    word: [true, ["word"]];
+export interface ParticipleDefinition extends ReferencingElementDefinition<"mainVerb" | "auxiliaryVerbs"> {
+    mainVerb: [true, ["word"]];
+    auxiliaryVerbs: [true, ["word"]];
 }
 export interface Participle extends PartOfSpeech, ReferencingElement<ParticipleDefinition> {
     posType: "participle";
