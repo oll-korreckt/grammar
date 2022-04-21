@@ -281,7 +281,8 @@ const definitionObject: DefinitionObject = {
             [
                 ...fnPrepositionPhrase,
                 ...fnInfinitivePhrase,
-                ...fnNounPhrase
+                "nounClause",
+                "coordinatedNounClause"
             ]
         ]
     },

@@ -172,7 +172,8 @@ export type FunctionalVerbPhrase = PhraseFunctionalTypeGuard<"verb">;
 type AdjectiveComplement = [
     ...FunctionalPrepositionPhrase,
     ...FunctionalInfinitivePhrase,
-    ...FunctionalNounPhrase
+    "nounClause",
+    "coordinatedNounClause"
 ];
 export interface AdjectivePhraseDefinition extends ReferencingElementDefinition<"determiner" | "head" | "modifiers" | "complement"> {
     determiner: [false, FunctionalDeterminer];
