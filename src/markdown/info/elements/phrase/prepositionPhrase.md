@@ -1,7 +1,7 @@
 # Preposition Phrases
 <!-- +elementInfo -->
 <!-- !prepositionPhrase -->
-Description
+Prepositions are combined with their objects in order to create preposition phrases.
 <!-- !prepositionPhrase -->
 
 ## Properties
