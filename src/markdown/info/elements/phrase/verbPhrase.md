@@ -11,19 +11,18 @@ Verb Phrases can assume many forms due to the number of possible properties they
 
 <!-- #head -->
 ### Head
-<!-- +head -->
-
 All verb phrases must be headed by a verb.
 
 <!-- #headModifier -->
 ### Head Modifier
-<!-- +headModifier -->
-
 Optionally, verb phrases can contain head modifiers which modify the head of the phrase. The head modifier should answer one of the following questions:
 - when?
 - where?
+- why?
 - in what manner?
-- for what purpose?
+- to what degree?
+
+Head modifiers are similar to head complements with the distinguishing feature being that head modifiers are not semantically essential whereas head complements are.
 
 #### Adverbs
 > The dog ran *quickly*.
@@ -56,14 +55,23 @@ Coordinated Indirect
 Infinitive Phrase
 
 <!-- #headCompl -->
-### Head Compliment
-<!-- +headCompl -->
-There exist certain verbs that are often referred to as *factitive verbs* which allow for the use of a head compliment. In terms of the number of viable grammatical elements, head compliments are incredibly flexible.
+### Head Complement
+Head complements semantically alter a verb. In order to determine whether an element is functioning as a head modifier or a head complement, you can try removing the element from the sentence in order to see if the meaning of the verb is altered. For example, there is a semantic difference between the following sentences:
+
+> Put the car *in the garage*.
+
+> Put the car.
+
+On the other hand,
+
+> *Quickly* put the car in the garage.
+
+> Put the car in the garage.
+
+do not have a difference in semantic meaning.
 
 <!-- #subjCompl -->
 ### Subject Compliment
-<!-- +subjCompl -->
-
 Subject compliments are only used with certain verbs.
 
 #### Nouns
@@ -96,8 +104,6 @@ Adjective Phrase
 
 <!-- #dirObj -->
 ### Direct Object
-<!-- +dirObj -->
-
 Certain verbs allow for a direct object compliment. Such verbs are sometimes called *factitive verbs*. A direct object complement is similar to a subject compliment.
 
 #### Nouns
@@ -111,14 +117,10 @@ Certain verbs allow for a direct object compliment. Such verbs are sometimes cal
 
 <!-- #dirObjCompl -->
 ### Direct Object Complement
-<!-- +dirObjCompl -->
-
 *Factitive verbs* are capable of having a direct object complement. In terms of function and acceptable grammatical elements, direct object complements are quite similar to subject complements.
 
 <!-- #indObj -->
 ### Indirect Object
-<!-- +indObj -->
-
 Certain verbs, commonly referred to as *ditransitive verbs*, allow for the use of a 2nd object called an *indirect object*. The *indirect object* is the object of the verb which receives the direct object. Perhaps the most intuitive example that can be offered is with the verb *to give*:
 > The man gave *the dog* **a bone**.
 <!-- .caption -->
