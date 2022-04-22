@@ -232,7 +232,7 @@ export interface InfinitivePhrase extends Phrase, ReferencingElement<InfinitiveP
 export type FunctionalInfinitivePhrase = PhraseFunctionalTypeGuard<"infinitive">;
 
 // same composition as VerbPhrase
-export interface ParticiplePhraseDefinition extends VerbPhraseBaseDefinition {
+export interface ParticiplePhraseDefinition extends Omit<VerbPhraseBaseDefinition, "dirObjCompl"> {
     head: [false, FunctionalParticiple];
 }
 export interface ParticiplePhrase extends Phrase, ReferencingElement<ParticiplePhraseDefinition> {

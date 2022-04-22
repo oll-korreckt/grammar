@@ -289,6 +289,14 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
             displayOrder: 6
         }
     };
+    const partPhraseProps: Omit<typeof verblikePhraseProps, "dirObjCompl"> = {
+        ...verblikePhraseProps,
+        indObj: {
+            ...verblikePhraseProps.indObj,
+            displayOrder: 5
+        }
+    };
+    delete (partPhraseProps as any).dirObjCompl;
     const verbPhrase = createPhrase(verb, verblikePhraseProps);
     const adjectivePhrase = createPhrase(
         adjective,
@@ -328,7 +336,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
     );
     const gerundPhrase = createPhrase(gerund, verblikePhraseProps);
     const infinitivePhrase = createPhrase(infinitive, verblikePhraseProps);
-    const participlePhrase = createPhrase(participle, verblikePhraseProps);
+    const participlePhrase = createPhrase(participle, partPhraseProps);
     const indClauseProps = {
         subject: {
             fullName: "Subject",

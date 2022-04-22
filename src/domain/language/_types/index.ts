@@ -1,6 +1,6 @@
 import { PartOfSpeechType, CoordinatedPartOfSpeechType, PhraseGuard, PhraseType, CoordinatedPhraseType, ClauseGuard, ClauseType, CoordClauseType, ElementType, Word, elementTypeLists, elementSet, Sentence, SentenceDefinition } from "./utils";
 import { PosMapper, CoordPosMapper, PosDefinitionMapper, CoordPosDefinitionMapper, CoordinatedDefinition } from "./part-of-speech";
-import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDefinitionMapper, VerbPhraseBaseDefinition, FunctionalAdverbPhrase, FunctionalNounPhrase, FunctionalPrepositionPhrase, FunctionalInfinitivePhrase, FunctionalAdjectivePhrase, FunctionalGerundPhrase, FunctionalParticiplePhrase, FunctionalVerbPhrase } from "./phrase";
+import { PhraseMapper, CoordPhraseMapper, PhraseDefinitionMapper, CoordPhraseDefinitionMapper, VerbPhraseBaseDefinition, FunctionalAdverbPhrase, FunctionalNounPhrase, FunctionalPrepositionPhrase, FunctionalInfinitivePhrase, FunctionalAdjectivePhrase, FunctionalGerundPhrase, FunctionalParticiplePhrase, FunctionalVerbPhrase, ParticiplePhraseDefinition } from "./phrase";
 import { ClauseMapper, ClauseDefinitionMapper, CoordClauseMapper, CoordClauseDefinitionMapper, DependentClauseDefinition } from "./clause";
 import { SimpleObject, Strings } from "@lib/utils";
 
@@ -323,7 +323,13 @@ const definitionObject: DefinitionObject = {
         auxiliaryVerbs: [true, ["word"]]
     },
     coordinatedParticiple: createCoordinatedDefinition(["participle"]),
-    participlePhrase: createVerbPhraseBaseDefinition(["participle", "coordinatedParticiple"]),
+    participlePhrase: (() => {
+        const output: ParticiplePhraseDefinition = createVerbPhraseBaseDefinition(["participle", "coordinatedParticiple"]);
+        if ("dirObjCompl" in output) {
+            delete (output as any).dirObjCompl;
+        }
+        return output;
+    })(),
     coordinatedParticiplePhrase: createCoordinatedDefinition(["participle", "participlePhrase"]),
     preposition: {
         words: [true, ["word"]]

@@ -47,6 +47,7 @@ describe("ElementDisplayInfo", () => {
                 determiner: true,
                 coordinator: true,
                 subordinator: true,
+                interjection: true,
                 coordinatedNoun: true,
                 coordinatedPronoun: true,
                 coordinatedVerb: true,
@@ -80,7 +81,8 @@ describe("ElementDisplayInfo", () => {
                 coordinatedIndependentClause: true,
                 coordinatedNounClause: true,
                 coordinatedRelativeClause: true,
-                coordinatedAdverbialClause: true
+                coordinatedAdverbialClause: true,
+                sentence: true
             };
         });
 

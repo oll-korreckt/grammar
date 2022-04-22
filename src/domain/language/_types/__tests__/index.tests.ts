@@ -16,8 +16,6 @@ describe("index", () => {
                     "coordinatedAdjective",
                     "adjectivePhrase",
                     "coordinatedAdjectivePhrase",
-                    "preposition",
-                    "coordinatedPreposition",
                     "prepositionPhrase",
                     "coordinatedPrepositionPhrase",
                     "relativeClause",

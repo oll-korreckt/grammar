@@ -103,7 +103,7 @@ function getSubmitClass(allowSubmit: boolean | undefined): string {
     return allowSubmit ? submitEnabled : submitDisabled;
 }
 
-export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuProps>("PropertyEditor", ({ state, elementType, dispatch, duration }, ref) => {
+export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuProps>("EditActiveMenu", ({ state, elementType, dispatch, duration }, ref) => {
     const invokeDispatch = (action: EditActiveMenuAction) => dispatch && dispatch(action);
     const prevState = useRef(state);
     const transportId = useRef<string>();
