@@ -348,7 +348,7 @@ const definitionObject: DefinitionObject = {
             ]
         ]
     },
-    coordinatedPrepositionPhrase: createCoordinatedDefinition(["preposition", "prepositionPhrase"]),
+    coordinatedPrepositionPhrase: createCoordinatedDefinition(["prepositionPhrase"]),
     determiner: {
         words: [true, ["word"]]
     },

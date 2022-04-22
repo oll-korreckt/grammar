@@ -39,7 +39,7 @@ export type CoordPhraseDefinitionMapper<Type extends CoordinatedPhraseType> =
     : Type extends CoordPhraseGuard<"coordinatedVerbPhrase"> ? CoordinatedDefinition<["verb", "verbPhrase"]>
     : Type extends CoordPhraseGuard<"coordinatedAdjectivePhrase"> ? CoordinatedDefinition<["adjective", "adjectivePhrase"]>
     : Type extends CoordPhraseGuard<"coordinatedAdverbPhrase"> ? CoordinatedDefinition<["adverb", "adverbPhrase"]>
-    : Type extends CoordPhraseGuard<"coordinatedPrepositionPhrase"> ? CoordinatedDefinition<["preposition", "prepositionPhrase"]>
+    : Type extends CoordPhraseGuard<"coordinatedPrepositionPhrase"> ? CoordinatedDefinition<["prepositionPhrase"]>
     : Type extends CoordPhraseGuard<"coordinatedGerundPhrase"> ? CoordinatedDefinition<["gerund", "gerundPhrase"]>
     : Type extends CoordPhraseGuard<"coordinatedInfinitivePhrase"> ? CoordinatedDefinition<["infinitive", "infinitivePhrase"]>
     : Type extends CoordPhraseGuard<"coordinatedParticiplePhrase"> ? CoordinatedDefinition<["participle", "participlePhrase"]>
