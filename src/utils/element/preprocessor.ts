@@ -56,7 +56,7 @@ function runElementCategory(type: ElementPageType_ElementCategory, data: ParseOb
                     && item.id === "coordTable") {
                     return {
                         ...item,
-                        content: ElementTable.createCordinationTable()
+                        content: ElementTable.createCoordinationTable()
                     };
                 }
                 return item;
@@ -97,6 +97,8 @@ function runElementCategory(type: ElementPageType_ElementCategory, data: ParseOb
         case "word":
             return data;
     }
+
+    throw `Unhandled category '${type}'`;
 }
 
 function runMainPage(data: ParseObject[]): ParseObject[] {
