@@ -133,8 +133,8 @@ function isElementCategory(value: string): value is ElementPageType_ElementCateg
     return elementCategorySet.has(value as any);
 }
 
-function createTypeLink(type: ElementPageType): HTMLAnchorObject {
-    const fullName = _getFullName(type);
+function createTypeLink(type: ElementPageType, plural?: boolean): HTMLAnchorObject {
+    const fullName = _getFullName(type, plural);
     return {
         type: "a",
         className: "typeLink",
@@ -146,18 +146,25 @@ function createTypeLink(type: ElementPageType): HTMLAnchorObject {
     };
 }
 
-function _getFullName(type: ElementPageType): string {
+function _getFullName(type: ElementPageType, plural?: boolean): string {
     if (isElementType(type)) {
-        return ElementDisplayInfo.getDisplayInfo(type).fullName;
+        const { fullName } = ElementDisplayInfo.getDisplayInfo(type);
+        return plural
+            ? `${fullName}s`
+            : fullName;
     } else if (isElementCategory(type)) {
         switch (type) {
             case "word":
             case "phrase":
             case "clause":
             case "sentence":
-                return `${Strings.capitalize(type)}s`;
+                return plural
+                    ? `${Strings.capitalize(type)}s`
+                    : Strings.capitalize(type);
             case "partOfSpeech":
-                return "Categories";
+                return plural
+                    ? "Categories"
+                    : "Category";
             case "coordinated":
                 return Strings.capitalize(type);
         }
