@@ -20,7 +20,7 @@ function _createFullPropertyInfo(type: ElementPageType_ElementType): FullPropert
     const displayInfo: Record<string, PropertyDisplayInfo> = ElementDisplayInfo.getDisplayInfo(type).properties;
     const elementDef: Record<string, PropertyDefinition> = getElementDefinition(type);
     if (!SimpleObject.sameKeys(displayInfo, elementDef)) {
-        throw `Incongruency between element defintion and display info for type '${type}'`;
+        throw `Incongruence between element definition and display info for type '${type}'`;
     }
     const output: FullPropertyInfoObject = {};
     const keys = Object.keys(displayInfo);
@@ -168,6 +168,7 @@ function createPropertyTable(type: ElementPageType_ElementType, property?: strin
 
 function createElementInfoTable(type: ElementPageType_ElementType): HTMLTableObject {
     const info = ElementDisplayInfo.getDisplayInfo(type);
+    const category = ElementCategory.getElementCategory(type);
     return {
         type: "table",
         head: {
@@ -176,6 +177,7 @@ function createElementInfoTable(type: ElementPageType_ElementType): HTMLTableObj
                 type: "tr",
                 cells: [
                     { type: "th", content: "Abbreviation" },
+                    { type: "th", content: "Type" },
                     { type: "th", content: "Coordination" },
                     { type: "th", content: "Color" }
                 ]
@@ -187,6 +189,7 @@ function createElementInfoTable(type: ElementPageType_ElementType): HTMLTableObj
                 type: "tr",
                 cells: [
                     { type: "td", content: info.header },
+                    { type: "td", content: ElementPage.createTypeLink(category) },
                     _createCoordinationCell(type),
                     { type: "td", custom: "color" }
                 ]
@@ -229,7 +232,7 @@ function _createCoordinationTableRow(type: ElementPageType_ElementType): HTMLTab
     };
 }
 
-function createCordinationTable(): HTMLTableObject {
+function createCoordinationTable(): HTMLTableObject {
     const rows: HTMLTableRowObject<"data">[] = [];
     for (let index = 0; index < elementTypeLists.element.length; index++) {
         const type = elementTypeLists.element[index];
@@ -259,5 +262,5 @@ export const ElementTable = {
     createElementInfoTable: createElementInfoTable,
     createPropertyTable: createPropertyTable,
     getHeaderType: getHeaderType,
-    createCordinationTable: createCordinationTable
+    createCoordinationTable: createCoordinationTable
 };
