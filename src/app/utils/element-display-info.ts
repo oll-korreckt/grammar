@@ -361,6 +361,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         ...{
             subject: {
                 ...indClauseProps.subject,
+                required: true,
                 displayOrder: 1
             },
             predicate: {
