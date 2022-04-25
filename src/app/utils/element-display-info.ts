@@ -342,7 +342,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
             fullName: "Subject",
             abrName: "Subj.",
             displayOrder: 0,
-            required: true
+            required: false
         },
         predicate: {
             fullName: "Predicate",
