@@ -13,16 +13,31 @@ Participle phrases are similar in structure to [verb phrases](verb-phrase), [inf
 ### Head Modifier
 > The *recently* elected mayor declared a state of emergency.
 
-### Head Compliment
+### Head Complement
 > The lottery ticket thrown *in the trash* turned out to be the winning ticket.
 
-### Subject Compliment
+### Subject Complement
+Despite not being a predicate, participle phrases formed by linking verbs can accept subject complements.
+
+#### Nouns
+> Sharks, being *fish*, live in the sea.
+<!-- .caption -->
+The noun, *fish* is the subject complement of the participle phrase, *being fish*.
+
+#### Adjectives
 > The dog, seeming *afraid*, left in a hurry.
+<!-- .caption -->
+The adjective, *afraid* is the subject complement of the participle phrase, *seeming afraid*.
+
+#### Preposition Phrases
+> John, feeling *under the weather*, slowly walked to his desk.
+<!-- .caption -->
+The preposition phrase, *under the weather* is the subject complement of the participle phrase, *feeling under the weather*.
 
 ### Direct Object
 > Look for the man wearing *a red hat*.
 
-### Direct Object Compliment (not supported)
+### Direct Object Complement (not supported)
 As mentioned earlier, participle phrases do not support the use of a direct object complement. Below is an attempt:
 > The person appointed her judge was happy when she accepted.
 
