@@ -8,6 +8,6 @@ Adverbs can be modified by other adverbs. When that is the case, they form an ad
 <!-- +propertySummary -->
 
 ## Examples
-> They *very quickly* realized their plan would not work.
+> They will *soon very quickly* realize that their plan will not work.
 <!-- .caption -->
-*Very* modifies the adverb *quickly*.
+The example is composed of 2 adverb phrases. In the first, *soon* modifies *very*. In the second, the adverb phrase *soon very* modifies *quickly* to form the adverb phrase *soon very quickly*.

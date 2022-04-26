@@ -1,7 +1,7 @@
 # Noun Phrases
 <!-- +elementInfo -->
 <!-- !nounPhrase -->
-A noun phrase is simply a single head-noun accompanied by all of its modifiers.
+A noun phrase is simply a single head-noun accompanied by all of its modifiers. Together, the head-noun and its modifiers function as a single noun.
 <!-- !nounPhrase -->
 
 ## Properties

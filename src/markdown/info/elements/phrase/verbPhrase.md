@@ -1,13 +1,13 @@
 # Verb Phrases
 <!-- +elementInfo -->
 <!-- !verbPhrase -->
-In terms of function, Verb Phrases are quite simple as they serve only as the predicate of a Clause.
+Verb phrases are composed of a head verb along with any modifiers, objects, and complements. Verb phrases function just like verbs are used as the predicate of a [clause](clause).
 <!-- !verbPhrase -->
 
 ## Properties
 <!-- +propertySummary -->
 
-Verb Phrases can assume many forms due to the number of possible properties they can have. Luckily, most Verb Phrases will only contain a few properties.
+In terms of properties, verb phrases are quite versatile can assume many forms due to the number of possible properties they can have, but it is primarily the case that most verb phrases will only contain one or two properties in addition to the head verb.
 
 <!-- #head -->
 ### Head
