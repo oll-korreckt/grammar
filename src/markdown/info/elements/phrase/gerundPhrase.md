@@ -23,7 +23,7 @@ Gerund phrases are similar in structure to [verb phrases](verb-phrase), [infinit
 *To them* complements *giving* in the gerund phrase *giving your money to them*.
 
 ### Subject Complement
-
+Despite not being a predicate, gerund phrases derived from linking verbs can accept subject complements.
 
 #### Nouns
 > Becoming *mayor* is his goal.

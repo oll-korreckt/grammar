@@ -18,6 +18,7 @@ The head modifier
 > It would be quite expensive to live *in that house*.
 
 ### Subject Complement
+Despite not being a predicate, infinitive phrase created from linking verbs can still accept a subject complement.
 
 #### Nouns
 > His goal is to become *mayor*.
