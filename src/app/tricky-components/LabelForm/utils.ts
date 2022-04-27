@@ -205,16 +205,44 @@ function _getEditActiveLabelSettings(mode: EditActiveLabelSettingsMode, diagram:
     return output;
 }
 
-function getLabelSettings(mode: LabelSettingsMode, diagram: DiagramState, lexemes: Lexeme[]): Record<ElementId, LabelSettings> {
-    if (mode.type === "edit.active") {
-        return _getEditActiveLabelSettings(mode, diagram, lexemes);
+function _getEditBrowseSettings(diagram: DiagramState, lexemes: ElementLexeme[]): Record<ElementId, LabelSettings> {
+    const output: Record<ElementId, LabelSettings> = {};
+    for (let index = 0; index < lexemes.length; index++) {
+        const { id } = lexemes[index];
+        const { type } = DiagramState.getItem(diagram, id);
+        if (type === "word") {
+            continue;
+        }
+        output[id] = getGeneralLabelSettings(diagram, id);
+    }
+    return output;
+}
+
+function _getDeleteSettings(diagram: DiagramState, lexemes: ElementLexeme[]): Record<ElementId, LabelSettings> {
+    const output: Record<ElementId, LabelSettings> = {};
+    for (let index = 0; index < lexemes.length; index++) {
+        const { id } = lexemes[index];
+        const { type } = DiagramState.getItem(diagram, id);
+        if (type === "word") {
+            continue;
+        }
+        output[id] = getGeneralLabelSettings(diagram, id);
+    }
+    return output;
+}
+
+function getLabelSettings(mode: LabelSettingsMode, diagram: DiagramState, lexemes: ElementLexeme[]): Record<ElementId, LabelSettings> {
+    switch (mode.type) {
+        case "edit.active":
+            return _getEditActiveLabelSettings(mode, diagram, lexemes);
+        case "edit.browse":
+            return _getEditBrowseSettings(diagram, lexemes);
+        case "delete":
+            return _getDeleteSettings(diagram, lexemes);
     }
     const output: Record<ElementId, LabelSettings> = {};
     for (let index = 0; index < lexemes.length; index++) {
         const lexeme = lexemes[index];
-        if (!Utils.isElementLabel(lexeme)) {
-            continue;
-        }
         const { id } = lexeme;
         if (id in output) {
             continue;
@@ -228,6 +256,16 @@ function getLabelSettings(mode: LabelSettingsMode, diagram: DiagramState, lexeme
         };
     }
     return output;
+}
+
+function getGeneralLabelSettings(diagram: DiagramState, id: ElementId): LabelSettings {
+    const { type, ref } = DiagramState.getItem(diagram, id);
+    const itemInfo = ElementDisplayInfo.getDisplayInfo(type);
+    const header = !!ref ? `🔗 ${itemInfo.header}` : itemInfo.header;
+    return {
+        color: itemInfo.color,
+        header
+    };
 }
 
 function isElementLabel(label: Lexeme): label is ElementLexeme {

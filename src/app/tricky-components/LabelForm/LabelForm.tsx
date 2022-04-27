@@ -1,5 +1,6 @@
 import { accessClassName } from "@app/utils";
 import React, { useEffect, useRef } from "react";
+import { ElementLexeme } from "../LabelView";
 import { LabelViewAssembly } from "../LabelViewAssembly";
 import { LabelViewNavBarAssembly } from "../LabelViewNavBarAssembly";
 import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./adapter";
@@ -27,7 +28,8 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const labelSettingsMode: LabelSettingsMode = state.mode === "edit.active"
         ? { type: "edit.active", id: state.id, property: state.property }
         : { type: state.mode };
-    const settings = Utils.getLabelSettings(labelSettingsMode, state.diagram, lexemes);
+    const elementLexemes = lexemes.filter(({ type }) => type === "element") as ElementLexeme[];
+    const settings = Utils.getLabelSettings(labelSettingsMode, state.diagram, elementLexemes);
     const onLabelClick = createOnLabelClick(state, extendedDispatch);
 
     const { onDiagramChange } = props;

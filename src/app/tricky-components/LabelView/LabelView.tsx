@@ -1,10 +1,9 @@
 import { Colors } from "@app/utils";
-import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
+import { makeRefComponent, withEventProp } from "@app/utils/hoc";
 import { ElementId } from "@domain/language";
 import { Lexeme, Utils } from "./utils";
 import React from "react";
 import { Label } from "@app/basic-components/Label";
-
 
 export interface LabelViewProps {
     children?: Lexeme[];
@@ -63,4 +62,4 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
     );
 });
 
-const ExtendedLabel = withClassNameProp(withEventProp(Label, "click"));
+const ExtendedLabel = withEventProp(Label, "click");

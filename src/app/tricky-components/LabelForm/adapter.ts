@@ -129,11 +129,19 @@ export function createOnLabelClick(state: State, dispatch: React.Dispatch<LabelF
                 type: "navigate: expanded",
                 expanded: id
             });
-        case "edit.browse":
-            return (id) => dispatch({
-                type: "edit.browse: edit.active",
-                id: id
-            });
+        case "edit.browse": {
+            return (id) => {
+                const { diagram } = state;
+                const { type } = DiagramState.getItem(diagram, id);
+                if (type === "word") {
+                    return;
+                }
+                dispatch({
+                    type: "edit.browse: edit.active",
+                    id: id
+                });
+            };
+        }
         case "edit.active": {
             const { diagram, property } = state;
             if (property === undefined) {
@@ -157,11 +165,19 @@ export function createOnLabelClick(state: State, dispatch: React.Dispatch<LabelF
                 };
             }
         }
-        case "delete":
-            return (id) => dispatch({
-                type: "delete: element",
-                id: id
-            });
+        case "delete": {
+            return (id) => {
+                const { diagram } = state;
+                const { type } = DiagramState.getItem(diagram, id);
+                if (type === "word") {
+                    return;
+                }
+                dispatch({
+                    type: "delete: element",
+                    id: id
+                });
+            };
+        }
     }
     return () => { return; };
 }
