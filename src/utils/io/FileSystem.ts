@@ -90,8 +90,18 @@ function walkdir({ children }: DirectoryItem): (FileItem | DirectoryItem)[] {
     return output;
 }
 
+function isFile(value: FileItem | DirectoryItem): value is FileItem {
+    return value.type === "file";
+}
+
+function isDirectory(value: FileItem | DirectoryItem): value is DirectoryItem {
+    return value.type === "dir";
+}
+
 export const FileSystem = {
     readdir: readdir,
     readdirSync: readdirSync,
-    walkdir: walkdir
+    walkdir: walkdir,
+    isFile: isFile,
+    isDirectory: isDirectory
 };
