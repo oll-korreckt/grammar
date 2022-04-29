@@ -67,6 +67,20 @@ function _extendHandler(handler: Handler): ApiRequestHandler {
     };
 }
 
+type HandlerWithBody<TBody> = (model: ElementModelAddress, body: TBody, res: NextApiResponse) => Promise<void>;
+
+function _extendHandlerWithBody<TBody>(handler: HandlerWithBody<TBody>): ApiRequestHandler {
+    return async (req, res) => {
+        const path = req.query.param;
+        const route = getRouteData(path);
+        if (isError(route)) {
+            sendError(res, route);
+            return;
+        }
+        await handler(route, req.body, res);
+    };
+}
+
 async function handlePut(address: ElementModelAddress, model: Model, res: NextApiResponse): Promise<void> {
     const result = await loader.setModel(address, model);
     switch (result) {
@@ -92,19 +106,33 @@ async function handleDelete(address: ElementModelAddress, res: NextApiResponse):
     return;
 }
 
+async function handlePatch(address: ElementModelAddress, newAddress: ElementModelAddress, res: NextApiResponse): Promise<void> {
+    const result = await loader.renameModel(address, newAddress);
+    switch (result) {
+        case "success":
+            res.status(200).end();
+            break;
+        case "error":
+            sendError(res, 500);
+            break;
+        case "invalid arg":
+            sendError(res, 400);
+            break;
+        case "not found":
+            sendError(res, 404);
+            break;
+    }
+    throw "not handled";
+}
+
 const handler = createApiRequestHandler({
     getRequest: _extendHandler(handleGet),
     putRequest: {
-        handler: async (req, res) => {
-            const path = req.query.param;
-            const route = getRouteData(path);
-            if (isError(route)) {
-                sendError(res, route);
-                return;
-            }
-            const model = req.body;
-            await handlePut(route, model, res);
-        },
+        handler: _extendHandlerWithBody(handlePut),
+        devOnly: true
+    },
+    patchRequest: {
+        handler: _extendHandlerWithBody(handlePatch),
         devOnly: true
     },
     deleteRequest: { handler: _extendHandler(handleDelete), devOnly: true }
