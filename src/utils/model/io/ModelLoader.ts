@@ -1,53 +1,47 @@
-import { ElementPage, ElementPageId } from "@utils/element";
+import { ElementPageId } from "@utils/element";
 import { Model } from "../types";
-import { promises as fs } from "fs";
-import { FileSystem } from "@utils/io";
+import fs from "fs";
+import { constants } from "fs";
+import { FileItem, FileSystem } from "@utils/io";
+import nodepath from "path";
 
 const FILE_IDENTIFIER = ".json";
 
-export type ModelLoader = (page: ElementPageId, model: string) => Promise<Model | "no model" | "invalid model">;
-
-type Cache = Record<string, string>;
-
-function _getKeyFromFilename(filename: string): string {
-    const end = filename.length - FILE_IDENTIFIER.length;
-    const section = filename.slice(0, end);
-    const sections = section.split(".");
-    if (sections.length !== 2) {
-        throw `Unexpected filename format: '${filename}'`;
-    }
-    const [pageType, model] = sections;
-    if (!ElementPage.isPageType(pageType)) {
-        throw `Filename '${filename}' does not contain a valid page type`;
-    }
-    const pageId = ElementPage.typeToId(pageType);
-    return `${pageId}.${model}`;
+export interface ModelLoader {
+    getModel: (address: ElementModelAddress) => Promise<Model | "no model" | "error">;
+    getModelAddresses: () => Promise<ElementModelAddress[] | "error">;
+    setModel: (address: ElementModelAddress, model: Model) => Promise<"success" | "invalid" | "error">;
+    deleteModel: (address: ElementModelAddress) => Promise<"success" | "error">;
 }
 
-async function _createCache(root: string): Promise<Cache> {
-    const output: Cache = {};
-    const dirItems = FileSystem.walkdir(await FileSystem.readdir(root));
-    for (let index = 0; index < dirItems.length; index++) {
-        const item = dirItems[index];
-        if (item.type === "file" && item.name.endsWith(FILE_IDENTIFIER)) {
-            const key = _getKeyFromFilename(item.name);
-            output[key] = item.fullPath;
-        }
-    }
-    return output;
+export interface ElementModelAddress {
+    page: ElementPageId;
+    name: string;
 }
 
-function _createCacheSync(root: string): Cache {
-    const output: Cache = {};
-    const dirItems = FileSystem.walkdir(FileSystem.readdirSync(root));
-    for (let index = 0; index < dirItems.length; index++) {
-        const item = dirItems[index];
-        if (item.type === "file" && item.name.endsWith(FILE_IDENTIFIER)) {
-            const key = _getKeyFromFilename(item.name);
-            output[key] = item.fullPath;
-        }
+function toString({ page, name }: ElementModelAddress): string {
+    return `${page}.${name}`;
+}
+
+function sort(a: ElementModelAddress, b: ElementModelAddress): number {
+    const aStr = toString(a);
+    const bStr = toString(b);
+    if (aStr > bStr) {
+        return 1;
+    } else if (aStr < bStr) {
+        return -1;
+    } else {
+        return 0;
     }
-    return output;
+}
+
+export const ElementModelAddress = {
+    toString: toString,
+    sort: sort
+};
+
+function _addressToFilename({ page, name }: ElementModelAddress): string {
+    return `${page}.${name}${FILE_IDENTIFIER}`;
 }
 
 function isModel(value: any): value is Model {
@@ -73,49 +67,96 @@ function isModel(value: any): value is Model {
     return true;
 }
 
-async function createLoader(root: string): Promise<ModelLoader> {
-    const cache = await _createCache(root);
-    return async (page, model) => {
-        const key = `${page}.${model}`;
-        const filepath = cache[key];
-        if (filepath === undefined) {
-            return "no model";
-        }
-        const buffer = await fs.readFile(filepath);
-        const content = buffer.toString();
-        if (content.length === 0) {
-            return "invalid model";
-        }
-        const output = JSON.parse(content);
-        if (!isModel(output)) {
-            return "invalid model";
-        }
-        return output;
-    };
+function getNameWithoutExtension({ extension, name }: FileItem): string {
+    const len = name.length - extension.length;
+    return name.slice(0, len);
 }
 
-function createLoaderSync(root: string): ModelLoader {
-    const cache = _createCacheSync(root);
-    return async (page, model) => {
-        const key = `${page}.${model}`;
-        const filepath = cache[key];
-        if (filepath === undefined) {
-            return "no model";
-        }
-        const buffer = await fs.readFile(filepath);
-        const content = buffer.toString();
-        if (content.length === 0) {
-            return "invalid model";
-        }
-        const output = JSON.parse(content);
-        if (!isModel(output)) {
-            return "invalid model";
-        }
-        return output;
+async function getModelAddresses(root: string): Promise<ElementModelAddress[] | "error"> {
+    if (!await checkAccess(root)) {
+        return "error";
+    }
+    const { children } = await FileSystem.readdir(root);
+    if (children === undefined) {
+        return [];
+    }
+    return Object.values(children)
+        .filter(FileSystem.isFile)
+        .map((child) => {
+            const name = getNameWithoutExtension(child);
+            const [page, model] = name.split(".");
+            return { page: page as ElementPageId, name: model };
+        });
+}
+
+async function getModel(root: string, address: ElementModelAddress): Promise<Model | "no model" | "error"> {
+    if (!await checkAccess(root)) {
+        return "error";
+    }
+    const filename = _addressToFilename(address);
+    const path = nodepath.resolve(root, filename);
+    if (!await checkAccess(path)) {
+        return "no model";
+    }
+    const buffer = await fs.promises.readFile(path);
+    const content = buffer.toString();
+    return JSON.parse(content);
+}
+
+async function setModel(root: string, address: ElementModelAddress, model: Model): Promise<"success" | "invalid" | "error"> {
+    if (!await checkAccess(root)) {
+        return "error";
+    }
+    if (!isModel(model)) {
+        return "invalid";
+    }
+    const filename = _addressToFilename(address);
+    const path = nodepath.resolve(root, filename);
+    const content = JSON.stringify(model);
+    try {
+        await fs.promises.writeFile(path, content);
+        return "success";
+    } catch {
+        return "error";
+    }
+}
+
+async function deleteModel(root: string, address: ElementModelAddress): Promise<"success" | "error"> {
+    if (!await checkAccess(root)) {
+        return "error";
+    }
+    const filename = _addressToFilename(address);
+    const path = nodepath.resolve(root, filename);
+    const fileExists = await checkAccess(path);
+    if (!fileExists) {
+        return "success";
+    }
+    try {
+        await fs.promises.unlink(path);
+        return "success";
+    } catch (error) {
+        return "error";
+    }
+}
+
+export async function checkAccess(path: string): Promise<boolean> {
+    try {
+        await fs.promises.access(path, constants.R_OK | constants.W_OK);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function createLoader(root: string): ModelLoader {
+    return {
+        getModelAddresses: async () => await getModelAddresses(root),
+        getModel: async (address) => await getModel(root, address),
+        setModel: async (address, model) => await setModel(root, address, model),
+        deleteModel: async (address) => await deleteModel(root, address)
     };
 }
 
 export const ModelLoader = {
-    createLoader: createLoader,
-    createLoaderSync: createLoaderSync
+    createLoader: createLoader
 };

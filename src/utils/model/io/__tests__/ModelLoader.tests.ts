@@ -1,57 +1,77 @@
-import { ModelLoader } from "../ModelLoader";
+import { ElementModelAddress, ModelLoader } from "../ModelLoader";
 import path from "path";
 import { assert } from "chai";
+import fs from "fs";
+import { FileSystem } from "@utils/io";
+import { Model } from "@utils/model/types";
+import { DiagramState } from "@app/utils";
 
 describe("ModelLoader", () => {
     const root = path.resolve(__dirname, "test-files");
+    const {
+        getModelAddresses,
+        getModel,
+        setModel,
+        deleteModel
+    } = ModelLoader.createLoader(root);
 
-    describe("createLoader", () => {
-        test("valid loads", async () => {
-            const loader = await ModelLoader.createLoader(root);
-            const result1 = await loader("adjective-phrase", "ex1");
-            const result2 = await loader("adjective-phrase", "ex2");
-            const result = await loader("noun-phrase", "ex");
-            const expected: any = { diagram: "" };
-            assert.deepStrictEqual(result, expected);
-            assert.deepStrictEqual(result1, expected);
-            assert.deepStrictEqual(result2, expected);
+    function clearDirectory(): void {
+        const { children } = FileSystem.readdirSync(root);
+        if (children === undefined) {
+            return;
+        }
+        Object.values(children).forEach(({ fullPath }) => {
+            fs.unlinkSync(fullPath);
         });
+    }
 
-        test("invalid model", async () => {
-            const loader = await ModelLoader.createLoader(root);
-            const result = await loader("verb", "invalid-model");
-            assert.strictEqual(result, "invalid model");
-        });
+    function createModel(address: ElementModelAddress, model?: Model): void {
+        const filename = `${address.page}.${address.name}.json`;
+        const filepath = path.resolve(root, filename);
+        const content = model ? JSON.stringify(model) : "";
+        fs.writeFileSync(filepath, content);
+    }
 
-        test("no model", async () => {
-            const loader = await ModelLoader.createLoader(root);
-            const result = await loader("participle", "hi");
-            assert.strictEqual(result, "no model");
-        });
+    test("getModelAddresses", async () => {
+        clearDirectory();
+        const expected: ElementModelAddress[] = [
+            { page: "adjective", name: "model1" },
+            { page: "adjective-phrase", name: "model2" }
+        ];
+        expected.forEach((address) => createModel(address));
+        const result = await getModelAddresses();
+        if (result === "error") {
+            throw result;
+        }
+        result.sort(ElementModelAddress.sort);
+        expected.sort(ElementModelAddress.sort);
+        assert.deepStrictEqual(result, expected);
     });
 
-    describe("createLoaderSync", () => {
-        test("valid loads", async () => {
-            const loader = ModelLoader.createLoaderSync(root);
-            const result1 = await loader("adjective-phrase", "ex1");
-            const result2 = await loader("adjective-phrase", "ex2");
-            const result = await loader("noun-phrase", "ex");
-            const expected: any = { diagram: "" };
-            assert.deepStrictEqual(result, expected);
-            assert.deepStrictEqual(result1, expected);
-            assert.deepStrictEqual(result2, expected);
-        });
+    test("setModel + getModel", async () => {
+        clearDirectory();
+        const address: ElementModelAddress = {
+            page: "adjective-phrase",
+            name: "item"
+        };
+        const expected: Model = {
+            defaultCategory: "sentence",
+            diagram: DiagramState.initEmpty()
+        };
+        await setModel(address, expected);
+        const result = await getModel(address);
+        assert.deepStrictEqual(result, expected);
+    });
 
-        test("invalid model", async () => {
-            const loader = ModelLoader.createLoaderSync(root);
-            const result = await loader("verb", "invalid-model");
-            assert.strictEqual(result, "invalid model");
-        });
-
-        test("no model", async () => {
-            const loader = ModelLoader.createLoaderSync(root);
-            const result = await loader("participle", "hi");
-            assert.strictEqual(result, "no model");
-        });
+    test("deleteModel", async () => {
+        clearDirectory();
+        const address: ElementModelAddress = {
+            page: "sentence",
+            name: "sentence"
+        };
+        await createModel(address);
+        await deleteModel(address);
+        const result = await getModel(address);
+        assert.strictEqual(result, "no model");
     });
 });
