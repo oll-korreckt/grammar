@@ -12,6 +12,7 @@ export interface ModelLoader {
     getModelAddresses: () => Promise<ElementModelAddress[] | "error">;
     setModel: (address: ElementModelAddress, model: Model) => Promise<"success" | "invalid" | "error">;
     deleteModel: (address: ElementModelAddress) => Promise<"success" | "error">;
+    renameModel: (address: ElementModelAddress, newAddress: ElementModelAddress) => Promise<"success" | "not found" | "invalid arg" | "error">;
 }
 
 export interface ElementModelAddress {
@@ -139,6 +140,34 @@ async function deleteModel(root: string, address: ElementModelAddress): Promise<
     }
 }
 
+async function renameModel(root: string, address: ElementModelAddress, newAddress: ElementModelAddress): Promise<"success" | "not found" | "invalid arg" | "error"> {
+    if (address.page !== newAddress.page
+        || address.name === newAddress.name) {
+        return "invalid arg";
+    }
+    if (!await checkAccess(root)) {
+        return "error";
+    }
+    const currFilename = _addressToFilename(address);
+    const currFilepath = nodepath.resolve(root, currFilename);
+    const currFileExists = await checkAccess(currFilepath);
+    if (!currFileExists) {
+        return "not found";
+    }
+    const newFilename = _addressToFilename(newAddress);
+    const newFilepath = nodepath.resolve(root, newFilename);
+    const newFileExists = await checkAccess(newFilepath);
+    if (newFileExists) {
+        return "invalid arg";
+    }
+    try {
+        await fs.promises.rename(currFilepath, newFilepath);
+        return "success";
+    } catch {
+        return "error";
+    }
+}
+
 export async function checkAccess(path: string): Promise<boolean> {
     try {
         await fs.promises.access(path, constants.R_OK | constants.W_OK);
@@ -153,7 +182,8 @@ function createLoader(root: string): ModelLoader {
         getModelAddresses: async () => await getModelAddresses(root),
         getModel: async (address) => await getModel(root, address),
         setModel: async (address, model) => await setModel(root, address, model),
-        deleteModel: async (address) => await deleteModel(root, address)
+        deleteModel: async (address) => await deleteModel(root, address),
+        renameModel: async (address, newAddress) => await renameModel(root, address, newAddress)
     };
 }
 
