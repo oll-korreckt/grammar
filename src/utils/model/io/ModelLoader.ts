@@ -9,7 +9,7 @@ const FILE_IDENTIFIER = ".json";
 
 export interface ModelLoader {
     getModel: (address: ElementModelAddress) => Promise<Model | "no model" | "error">;
-    getModelAddresses: () => Promise<ElementModelAddress[] | "error">;
+    getModelAddresses: (page?: ElementPageId) => Promise<ElementModelAddress[] | "error">;
     setModel: (address: ElementModelAddress, model: Model) => Promise<"success" | "invalid" | "error">;
     deleteModel: (address: ElementModelAddress) => Promise<"success" | "error">;
     renameModel: (address: ElementModelAddress, newAddress: ElementModelAddress) => Promise<"success" | "not found" | "invalid arg" | "error">;
@@ -73,7 +73,7 @@ function getNameWithoutExtension({ extension, name }: FileItem): string {
     return name.slice(0, len);
 }
 
-async function getModelAddresses(root: string): Promise<ElementModelAddress[] | "error"> {
+async function getModelAddresses(root: string, page?: ElementPageId): Promise<ElementModelAddress[] | "error"> {
     if (!await checkAccess(root)) {
         return "error";
     }
@@ -81,13 +81,23 @@ async function getModelAddresses(root: string): Promise<ElementModelAddress[] | 
     if (children === undefined) {
         return [];
     }
-    return Object.values(children)
-        .filter(FileSystem.isFile)
-        .map((child) => {
-            const name = getNameWithoutExtension(child);
-            const [page, model] = name.split(".");
-            return { page: page as ElementPageId, name: model };
-        });
+    const items = Object.values(children);
+    const output: ElementModelAddress[] = [];
+    for (let index = 0; index < items.length; index++) {
+        const child = items[index];
+        if (child.type !== "file") {
+            continue;
+        }
+        const name = getNameWithoutExtension(child);
+        const [pageId, model] = name.split(".");
+        if (page === undefined || page === pageId) {
+            output.push({
+                page: pageId as ElementPageId,
+                name: model
+            });
+        }
+    }
+    return output;
 }
 
 async function getModel(root: string, address: ElementModelAddress): Promise<Model | "no model" | "error"> {
@@ -179,7 +189,7 @@ export async function checkAccess(path: string): Promise<boolean> {
 
 function createLoader(root: string): ModelLoader {
     return {
-        getModelAddresses: async () => await getModelAddresses(root),
+        getModelAddresses: async (page) => await getModelAddresses(root, page),
         getModel: async (address) => await getModel(root, address),
         setModel: async (address, model) => await setModel(root, address, model),
         deleteModel: async (address) => await deleteModel(root, address),

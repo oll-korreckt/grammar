@@ -50,6 +50,52 @@ describe("ModelLoader", () => {
         assert.deepStrictEqual(result, expected);
     });
 
+    test("getModelAddresses: general + specific", async () => {
+        clearDirectory();
+        const address1: ElementModelAddress = {
+            page: "adjective",
+            name: "model1"
+        };
+        const address2: ElementModelAddress = {
+            page: "adjective",
+            name: "model2"
+        };
+        const address3: ElementModelAddress = {
+            page:"adverb-phrase",
+            name: "model1"
+        };
+        const blankModel: Model = {
+            defaultCategory: "sentence",
+            diagram: DiagramState.initEmpty()
+        };
+        await setModel(address1, blankModel);
+        await setModel(address2, blankModel);
+        await setModel(address3, blankModel);
+        const result1 = await getModelAddresses("adjective");
+        if (result1 === "error") {
+            throw result1;
+        }
+        const expected1 = [address1, address2];
+        assert.deepStrictEqual(
+            result1.sort(ElementModelAddress.sort),
+            expected1.sort(ElementModelAddress.sort)
+        );
+        const result2 = await getModelAddresses("adverb");
+        if (result2 === "error") {
+            throw result2;
+        }
+        assert.deepStrictEqual(result2, []);
+        const result3 = await getModelAddresses();
+        if (result3 === "error") {
+            throw result3;
+        }
+        const expected3 = [address1, address2, address3];
+        assert.deepStrictEqual(
+            result3.sort(ElementModelAddress.sort),
+            expected3.sort(ElementModelAddress.sort)
+        );
+    });
+
     test("setModel + getModel", async () => {
         clearDirectory();
         const address: ElementModelAddress = {
