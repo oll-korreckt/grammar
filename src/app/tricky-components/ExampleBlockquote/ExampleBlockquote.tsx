@@ -83,7 +83,7 @@ export const ExampleBlockquote: React.VFC<ExampleBlockquoteProps> = ({ blockquot
     const [state, dispatch] = useExampleBlockquote(blockquote);
     const { refetch } = useQuery(
         "ExampleBlockquote",
-        async () => queryFn(blockquote),
+        async () => await queryFn(blockquote),
         {
             retry: false,
             enabled: false,
