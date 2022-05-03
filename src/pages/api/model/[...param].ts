@@ -1,9 +1,9 @@
 import { NextApiResponse } from "next";
 import { ElementPage, ElementPageId } from "@utils/element";
 import nodepath from "path";
-import { ElementModelAddress, ModelLoader } from "@utils/model/io";
+import { isModelLoaderError, ModelLoader } from "@utils/model/io";
 import { ApiRequestHandler, createApiRequestHandler, ErrorMessage, sendError } from "@utils/api";
-import { Model } from "@utils/model";
+import { Model, ElementModelAddress } from "@utils/model";
 
 function isError(value: ElementModelAddress | ElementPageId | ErrorMessage): value is ErrorMessage {
     return typeof value === "object" && "status" in value;
@@ -49,25 +49,27 @@ const loader = ModelLoader.createLoader(nodepath.resolve("src", "data", "element
 async function handleGet(address: ElementModelAddress | ElementPageId, res: NextApiResponse): Promise<void> {
     if (typeof address === "string") {
         const result = await loader.getModelAddresses(address);
-        if (result === "error") {
-            sendError(res, 500);
-            return;
+        if (isModelLoaderError(result)) {
+            sendError(res, 500, result.msg);
         } else {
             res.status(200).json(result);
         }
     } else {
         const result = await loader.getModel(address);
-        switch (result) {
-            case "no model":
-            case "error":
-                const err: ErrorMessage = {
-                    status: 404,
-                    msg: `No model for ${address.page}: ${address.name}`
-                };
-                sendError(res, err);
+        if (!isModelLoaderError(result)) {
+            res.status(200).json(result);
+            return;
+        }
+
+        switch (result.errType) {
+            case "internal error":
+                sendError(res, 500, result.msg);
                 break;
-            default:
-                res.status(200).json(result);
+            case "invalid arg":
+                sendError(res, 400, result.msg);
+                break;
+            case "resource not found":
+                sendError(res, 404, result.msg);
                 break;
         }
     }
@@ -87,9 +89,9 @@ function _extendHandler(handler: Handler): ApiRequestHandler {
     };
 }
 
-type HandlerWithBody<TBody> = (model: ElementModelAddress | ElementPageId, body: TBody, res: NextApiResponse) => Promise<void>;
+type HandlerWithBody = (model: ElementModelAddress | ElementPageId, body: string, res: NextApiResponse) => Promise<void>;
 
-function _extendHandlerWithBody<TBody>(handler: HandlerWithBody<TBody>): ApiRequestHandler {
+function _extendHandlerWithBody(handler: HandlerWithBody): ApiRequestHandler {
     return async (req, res) => {
         const path = req.query.param;
         const route = getRouteData(path);
@@ -101,19 +103,26 @@ function _extendHandlerWithBody<TBody>(handler: HandlerWithBody<TBody>): ApiRequ
     };
 }
 
-async function handlePut(address: ElementModelAddress | ElementPageId, model: Model, res: NextApiResponse): Promise<void> {
+async function handlePut(address: ElementModelAddress | ElementPageId, modelBody: string, res: NextApiResponse): Promise<void> {
     if (typeof address === "string") {
         sendError(res, 400);
         return;
     }
-    const result = await loader.setModel(address, model);
-    switch (result) {
-        case "success":
-            res.status(200).end();
+    const model: Model = JSON.parse(modelBody);
+    const result = await loader.updateModel(address, model);
+    if (result === "success") {
+        res.status(200).end();
+        return;
+    }
+    switch (result.errType) {
+        case "internal error":
+            sendError(res, 500, result.msg);
             break;
-        case "invalid":
-        case "error":
-            sendError(res, 400);
+        case "invalid arg":
+            sendError(res, 400, result.msg);
+            break;
+        case "resource not found":
+            sendError(res, 404, result.msg);
             break;
     }
 }
@@ -124,39 +133,62 @@ async function handleDelete(address: ElementModelAddress | ElementPageId, res: N
         return;
     }
     const result = await loader.deleteModel(address);
-    switch (result) {
-        case "success":
-            res.status(200).end();
-            return;
-        case "error":
-            sendError(res, { status: 404 });
-            break;
+    if (result === "success") {
+        res.status(200).end();
+        return;
+    } else {
+        sendError(res, 500, result.msg);
+        return;
     }
-    res.end();
-    return;
 }
 
-async function handlePatch(address: ElementModelAddress | ElementPageId, newAddress: ElementModelAddress, res: NextApiResponse): Promise<void> {
+async function handlePatch(address: ElementModelAddress | ElementPageId, newAddressBody: string, res: NextApiResponse): Promise<void> {
     if (typeof address === "string") {
         sendError(res, 400);
         return;
     }
+    const newAddress = JSON.parse(newAddressBody);
     const result = await loader.renameModel(address, newAddress);
-    switch (result) {
-        case "success":
-            res.status(200).end();
-            break;
-        case "error":
-            sendError(res, 500);
+    if (result === "success") {
+        res.status(200).end();
+        return;
+    }
+    switch (result.errType) {
+        case "resource conflict":
+            sendError(res, 409, result.msg);
             break;
         case "invalid arg":
-            sendError(res, 400);
+            sendError(res, 400, result.msg);
             break;
-        case "not found":
-            sendError(res, 404);
+        case "internal error":
+            sendError(res, 500, result.msg);
+            break;
+        case "resource not found":
+            sendError(res, 404, result.msg);
             break;
     }
-    throw "not handled";
+}
+
+async function handlePost(address: ElementModelAddress | ElementPageId, modelBody: string, res: NextApiResponse): Promise<void> {
+    if (typeof address === "string"
+        || !ElementModelAddress.isValid(address)) {
+        sendError(res, 400);
+        return;
+    }
+    const model: Model | undefined = modelBody === "" ? undefined : JSON.parse(modelBody);
+    const result = await loader.addModel(address, model);
+    if (result === "success") {
+        res.status(200).end();
+        return;
+    }
+    switch (result.errType) {
+        case "internal error":
+            sendError(res, 500, result.msg);
+            break;
+        case "resource conflict":
+            sendError(res, 409, result.msg);
+            break;
+    }
 }
 
 const handler = createApiRequestHandler({
@@ -169,6 +201,10 @@ const handler = createApiRequestHandler({
         handler: _extendHandlerWithBody(handlePatch),
         devOnly: true
     },
-    deleteRequest: { handler: _extendHandler(handleDelete), devOnly: true }
+    deleteRequest: { handler: _extendHandler(handleDelete), devOnly: true },
+    postRequest: {
+        handler: _extendHandlerWithBody(handlePost),
+        devOnly: true
+    }
 });
 export default handler;
