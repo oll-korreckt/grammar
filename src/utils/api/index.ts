@@ -17,6 +17,7 @@ export interface ApiRequestHandlerObject {
     putRequest?: ApiRequestHandlerData | ApiRequestHandler;
     deleteRequest?: ApiRequestHandlerData | ApiRequestHandler;
     patchRequest?: ApiRequestHandlerData | ApiRequestHandler;
+    postRequest?: ApiRequestHandlerData | ApiRequestHandler;
 }
 
 export function sendError(res: NextApiResponse, error: ErrorMessage): void
@@ -65,6 +66,9 @@ export function createApiRequestHandler(reqObj: ApiRequestHandlerObject): ApiReq
                 break;
             case "PATCH":
                 await execute(reqObj.patchRequest, req, res);
+                break;
+            case "POST":
+                await execute(reqObj.postRequest, req, res);
                 break;
             default:
                 sendError(res, 400, "Bad Request");
