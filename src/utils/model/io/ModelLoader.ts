@@ -1,45 +1,67 @@
 import { ElementPageId } from "@utils/element";
-import { Model } from "../types";
+import { Model, ElementModelAddress } from "../types";
 import fs from "fs";
 import { constants } from "fs";
 import { FileItem, FileSystem } from "@utils/io";
 import nodepath from "path";
+import { DiagramState } from "@app/utils";
 
 const FILE_IDENTIFIER = ".json";
 
+export type ModelLoaderErrorType =
+    | "invalid arg"
+    | "internal error"
+    | "resource not found"
+    | "resource conflict";
+export interface ModelLoaderErrorBase {
+    errType: string;
+    msg: string;
+}
+export interface ModelLoaderError<TError extends ModelLoaderErrorType> extends ModelLoaderErrorBase {
+    errType: TError;
+}
+
+type GetModelOutput =
+    | Model
+    | ModelLoaderError<"invalid arg">
+    | ModelLoaderError<"resource not found">
+    | ModelLoaderError<"internal error">;
+type GetModelAddressesOutput =
+    | ElementModelAddress[]
+    | ModelLoaderError<"internal error">;
+type UpdateModelOutput =
+    | "success"
+    | ModelLoaderError<"resource not found">
+    | ModelLoaderError<"invalid arg">
+    | ModelLoaderError<"internal error">;
+type DeleteModelOutput =
+    | "success"
+    | ModelLoaderError<"internal error">;
+type AddModelOutput =
+    | "success"
+    | ModelLoaderError<"resource conflict">
+    | ModelLoaderError<"internal error">;
+type RenameModelOutput =
+    | "success"
+    | ModelLoaderError<"resource not found">
+    | ModelLoaderError<"resource conflict">
+    | ModelLoaderError<"invalid arg">
+    | ModelLoaderError<"internal error">;
+
+export function isModelLoaderError(value: any): value is ModelLoaderErrorBase {
+    return typeof value === "object"
+        && "errType" in value
+        && "msg" in value;
+}
+
 export interface ModelLoader {
-    getModel: (address: ElementModelAddress) => Promise<Model | "no model" | "error">;
-    getModelAddresses: (page?: ElementPageId) => Promise<ElementModelAddress[] | "error">;
-    setModel: (address: ElementModelAddress, model: Model) => Promise<"success" | "invalid" | "error">;
-    deleteModel: (address: ElementModelAddress) => Promise<"success" | "error">;
-    renameModel: (address: ElementModelAddress, newAddress: ElementModelAddress) => Promise<"success" | "not found" | "invalid arg" | "error">;
+    getModel: (address: ElementModelAddress) => Promise<GetModelOutput>;
+    getModelAddresses: (page?: ElementPageId) => Promise<GetModelAddressesOutput>;
+    updateModel: (address: ElementModelAddress, model: Model) => Promise<UpdateModelOutput>;
+    deleteModel: (address: ElementModelAddress) => Promise<DeleteModelOutput>;
+    addModel: (address: ElementModelAddress, model?: Model) => Promise<AddModelOutput>;
+    renameModel: (address: ElementModelAddress, newAddress: ElementModelAddress) => Promise<RenameModelOutput>;
 }
-
-export interface ElementModelAddress {
-    page: ElementPageId;
-    name: string;
-}
-
-function toString({ page, name }: ElementModelAddress): string {
-    return `${page}.${name}`;
-}
-
-function sort(a: ElementModelAddress, b: ElementModelAddress): number {
-    const aStr = toString(a);
-    const bStr = toString(b);
-    if (aStr > bStr) {
-        return 1;
-    } else if (aStr < bStr) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-export const ElementModelAddress = {
-    toString: toString,
-    sort: sort
-};
 
 function _addressToFilename({ page, name }: ElementModelAddress): string {
     return `${page}.${name}${FILE_IDENTIFIER}`;
@@ -68,14 +90,29 @@ function isModel(value: any): value is Model {
     return true;
 }
 
+function _createAccessErr(root: string, itemType?: "directory" | "file"): ModelLoaderError<"internal error"> {
+    const defItemType: "directory" | "file" = itemType ? itemType : "directory";
+    return {
+        errType: "internal error",
+        msg: `Unable to access ${defItemType}: ${root}`
+    };
+}
+
+function _createResourceNotFoundErr(address: ElementModelAddress): ModelLoaderError<"resource not found"> {
+    return {
+        errType: "resource not found",
+        msg: `No resource for '${ElementModelAddress.toString(address)}'`
+    };
+}
+
 function getNameWithoutExtension({ extension, name }: FileItem): string {
     const len = name.length - extension.length;
     return name.slice(0, len);
 }
 
-async function getModelAddresses(root: string, page?: ElementPageId): Promise<ElementModelAddress[] | "error"> {
+async function getModelAddresses(root: string, page?: ElementPageId): Promise<GetModelAddressesOutput> {
     if (!await checkAccess(root)) {
-        return "error";
+        return _createAccessErr(root);
     }
     const { children } = await FileSystem.readdir(root);
     if (children === undefined) {
@@ -100,41 +137,62 @@ async function getModelAddresses(root: string, page?: ElementPageId): Promise<El
     return output;
 }
 
-async function getModel(root: string, address: ElementModelAddress): Promise<Model | "no model" | "error"> {
+async function getModel(root: string, address: ElementModelAddress): Promise<GetModelOutput> {
     if (!await checkAccess(root)) {
-        return "error";
+        return _createAccessErr(root);
     }
     const filename = _addressToFilename(address);
     const path = nodepath.resolve(root, filename);
     if (!await checkAccess(path)) {
-        return "no model";
+        return {
+            errType: "resource not found",
+            msg: `No model for '${ElementModelAddress.toString(address)}'`
+        };
     }
     const buffer = await fs.promises.readFile(path);
     const content = buffer.toString();
-    return JSON.parse(content);
+    try {
+        const output = JSON.parse(content);
+        return output;
+    } catch {
+        return {
+            errType: "internal error",
+            msg: `Error parsing ${path}`
+        };
+    }
 }
 
-async function setModel(root: string, address: ElementModelAddress, model: Model): Promise<"success" | "invalid" | "error"> {
+async function updateModel(root: string, address: ElementModelAddress, model: Model): Promise<UpdateModelOutput> {
     if (!await checkAccess(root)) {
-        return "error";
+        return _createAccessErr(root);
     }
     if (!isModel(model)) {
-        return "invalid";
+        return {
+            errType: "invalid arg",
+            msg: "did not receive valid model argument"
+        };
     }
     const filename = _addressToFilename(address);
     const path = nodepath.resolve(root, filename);
+    const exists = await checkAccess(path);
+    if (!exists) {
+        return _createResourceNotFoundErr(address);
+    }
     const content = JSON.stringify(model);
     try {
         await fs.promises.writeFile(path, content);
         return "success";
     } catch {
-        return "error";
+        return {
+            errType: "internal error",
+            msg: `Error writing to file ${path}`
+        };
     }
 }
 
-async function deleteModel(root: string, address: ElementModelAddress): Promise<"success" | "error"> {
+async function deleteModel(root: string, address: ElementModelAddress): Promise<DeleteModelOutput> {
     if (!await checkAccess(root)) {
-        return "error";
+        return _createAccessErr(root);
     }
     const filename = _addressToFilename(address);
     const path = nodepath.resolve(root, filename);
@@ -145,36 +203,43 @@ async function deleteModel(root: string, address: ElementModelAddress): Promise<
     try {
         await fs.promises.unlink(path);
         return "success";
-    } catch (error) {
-        return "error";
+    } catch {
+        return {
+            errType: "internal error",
+            msg: `Unable to delete file ${path}`
+        };
     }
 }
 
-async function renameModel(root: string, address: ElementModelAddress, newAddress: ElementModelAddress): Promise<"success" | "not found" | "invalid arg" | "error"> {
-    if (address.page !== newAddress.page
-        || address.name === newAddress.name) {
-        return "invalid arg";
-    }
+async function renameModel(root: string, address: ElementModelAddress, newAddress: ElementModelAddress): Promise<RenameModelOutput> {
     if (!await checkAccess(root)) {
-        return "error";
+        return _createAccessErr(root);
     }
     const currFilename = _addressToFilename(address);
     const currFilepath = nodepath.resolve(root, currFilename);
     const currFileExists = await checkAccess(currFilepath);
     if (!currFileExists) {
-        return "not found";
+        return _createResourceNotFoundErr(address);
     }
     const newFilename = _addressToFilename(newAddress);
     const newFilepath = nodepath.resolve(root, newFilename);
     const newFileExists = await checkAccess(newFilepath);
     if (newFileExists) {
-        return "invalid arg";
+        const addStr = ElementModelAddress.toString(address);
+        const newAddStr = ElementModelAddress.toString(newAddress);
+        return {
+            errType: "resource conflict",
+            msg: `Cannot rename '${addStr}' to '${newAddStr}' as '${newAddStr}' already exists`
+        };
     }
     try {
         await fs.promises.rename(currFilepath, newFilepath);
         return "success";
     } catch {
-        return "error";
+        return {
+            errType: "internal error",
+            msg: `Unable to rename file ${currFilename} to ${newFilename}`
+        };
     }
 }
 
@@ -187,11 +252,40 @@ export async function checkAccess(path: string): Promise<boolean> {
     }
 }
 
+export async function addModel(root: string, address: ElementModelAddress, model?: Model): Promise<AddModelOutput> {
+    if (!await checkAccess(root)) {
+        return _createAccessErr(root);
+    }
+    const filename = _addressToFilename(address);
+    const filepath = nodepath.resolve(root, filename);
+    const fileExists = await checkAccess(filepath);
+    if (fileExists) {
+        return {
+            errType: "resource conflict",
+            msg: `Resource for '${ElementModelAddress.toString(address)}' already exists`
+        };
+    }
+    const defModel: Model = model
+        ? model
+        : { diagram: DiagramState.initEmpty() };
+    const content = JSON.stringify(defModel);
+    try {
+        await fs.promises.writeFile(filepath, content);
+        return "success";
+    } catch {
+        return {
+            errType: "internal error",
+            msg: `Unable to write to ${filename}`
+        };
+    }
+}
+
 function createLoader(root: string): ModelLoader {
     return {
         getModelAddresses: async (page) => await getModelAddresses(root, page),
         getModel: async (address) => await getModel(root, address),
-        setModel: async (address, model) => await setModel(root, address, model),
+        updateModel: async (address, model) => await updateModel(root, address, model),
+        addModel: async (address, model) => await addModel(root, address, model),
         deleteModel: async (address) => await deleteModel(root, address),
         renameModel: async (address, newAddress) => await renameModel(root, address, newAddress)
     };
