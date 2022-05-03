@@ -3,6 +3,7 @@ const config = {
     testRegex: "(\\.tests\\.(ts|tsx))$",
     moduleFileExtensions: ["ts", "tsx", "js"],
     testEnvironment: "jsdom",
+    modulePaths: ["<rootDir>"],
     moduleNameMapper: {
         "\\.(scss)$": "<rootDir>/__mocks__/styleMock.js",
         "@lib/(.*)": "<rootDir>/lib/$1",
