@@ -1,0 +1,29 @@
+.pageItem {
+    list-style: none;
+    padding: 10px 0 10px 10px;
+}
+
+.itemText {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    vertical-align: middle;
+    font-size: 18px;
+    gap: 5px;
+}
+
+.pageItemContent {
+    margin-top: 5px;
+}
+
+.nameItem {
+    list-style: none;
+}
+
+.redX {
+    color: red;
+}
+
+.icon {
+    cursor: pointer;
+}
