@@ -22,7 +22,6 @@ export type ElementPageType_ElementCategory =
     | ElementCategory
 
 export type ElementPageId =
-    | "coordinated"
     | "word"
     | "category"
     | "phrase"
@@ -53,6 +52,7 @@ export type ElementPageId =
     | "relative-clause"
     | "adverbial-clause"
     | "sentence"
+    | "coordinated"
 type PageIdToPageType = Record<ElementPageId, ElementPageType>;
 type PageTypeToPageId = Record<ElementPageType, ElementPageId>;
 
@@ -172,8 +172,50 @@ function _getFullName(type: ElementPageType, plural?: boolean): string {
     throw `Cannot find full name for type '${type}'`;
 }
 
+const pageIdOrderArray: ElementPageId[] = [
+    "word",
+    "category",
+    "noun",
+    "pronoun",
+    "verb",
+    "infinitive",
+    "participle",
+    "gerund",
+    "adjective",
+    "adverb",
+    "preposition",
+    "determiner",
+    "coordinator",
+    "subordinator",
+    "phrase",
+    "interjection",
+    "noun-phrase",
+    "verb-phrase",
+    "adjective-phrase",
+    "adverb-phrase",
+    "preposition-phrase",
+    "gerund-phrase",
+    "infinitive-phrase",
+    "participle-phrase",
+    "clause",
+    "independent-clause",
+    "noun-clause",
+    "relative-clause",
+    "adverbial-clause",
+    "sentence",
+    "coordinated"
+];
+
 function getAllPageIds(): ElementPageId[] {
-    return Object.keys(idToTypeMap) as ElementPageId[];
+    return [...pageIdOrderArray];
+}
+
+const pageIdOrderObj: Record<ElementPageId, number> = Object.fromEntries(pageIdOrderArray.map((value, index) => [value, index])) as any;
+
+function sortPageIds(a: ElementPageId, b: ElementPageId): number {
+    const aIndex = pageIdOrderObj[a];
+    const bIndex = pageIdOrderObj[b];
+    return aIndex - bIndex;
 }
 
 export const ElementPage = {
@@ -184,5 +226,6 @@ export const ElementPage = {
     isPageType: isElementPageType,
     isElementType: isElementType,
     isElementCategory: isElementCategory,
-    createTypeLink: createTypeLink
+    createTypeLink: createTypeLink,
+    sortPageIds: sortPageIds
 };
