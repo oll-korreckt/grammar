@@ -35,7 +35,7 @@ export function useResize<TRef extends HTMLElement>(callback: (e: TRef) => void)
         if (ref.current !== null) {
             const obs = new ResizeObserver((entries) => {
                 if (entries.length !== 1) {
-                    throw `unanticiplated number of entries: ${entries.length}`;
+                    throw `unanticipated number of entries: ${entries.length}`;
                 }
                 const [{ target }] = entries;
                 callback(target as TRef);
