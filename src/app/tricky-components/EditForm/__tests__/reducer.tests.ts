@@ -1,7 +1,7 @@
 import { InputFormErrorState } from "@app/tricky-components/InputForm";
 import { DiagramState } from "@app/utils";
 import { assert } from "chai";
-import { Action, allowLabelSwitch, allowProceed, InputStuff, ProceedResult, reducer, State } from "../reducer";
+import { Action, allowLabelSwitch, allowProceed, ProceedResult, reducer, EditFormInternalState, InputFormInternalState } from "../reducer";
 
 describe("reducer", () => {
     test("allowLabelSwitch", () => {
@@ -36,7 +36,7 @@ describe("reducer", () => {
     });
 
     describe("reducer", () => {
-        function runTest(before: State, after: State, action: Action): void {
+        function runTest(before: EditFormInternalState, after: EditFormInternalState, action: Action): void {
             const result = reducer(before, action);
             assert.deepStrictEqual(result, after);
         }
@@ -46,20 +46,20 @@ describe("reducer", () => {
                 runTest(
                     {
                         stage: "input",
-                        inputStuff: {
+                        inputState: {
                             initialValue: "the",
                             currentValue: "the dog"
                         },
-                        labelStuff: {}
+                        labelState: {}
                     },
                     {
                         stage: "input",
-                        inputStuff: {
+                        inputState: {
                             initialValue: "the",
                             currentValue: "the dog",
                             askReplace: true
                         },
-                        labelStuff: {}
+                        labelState: {}
                     },
                     { type: "stage switch" }
                 );
@@ -68,49 +68,49 @@ describe("reducer", () => {
                 const result = reducer(
                     {
                         stage: "input",
-                        inputStuff: {
+                        inputState: {
                             initialValue: "",
                             currentValue: "the"
                         },
-                        labelStuff: {}
+                        labelState: {}
                     },
                     { type: "stage switch" }
                 );
                 assert.deepStrictEqual(result.stage, "label");
                 assert.deepStrictEqual(
-                    result.inputStuff,
+                    result.inputState,
                     { initialValue: "the", currentValue: "the" }
                 );
-                assert.hasAllKeys(result.labelStuff, ["initialDiagram", "currentDiagram"]);
+                assert.hasAllKeys(result.labelState, ["initialDiagram", "currentDiagram"]);
             });
             test("input: go w/o update", () => {
                 const result = reducer(
                     {
                         stage: "input",
-                        inputStuff: {
+                        inputState: {
                             initialValue: "",
                             currentValue: "the"
                         },
-                        labelStuff: {}
+                        labelState: {}
                     },
                     { type: "stage switch" }
                 );
                 assert.deepStrictEqual(result.stage, "label");
                 assert.deepStrictEqual(
-                    result.inputStuff,
+                    result.inputState,
                     { initialValue: "the", currentValue: "the" }
                 );
-                assert.hasAllKeys(result.labelStuff, ["initialDiagram", "currentDiagram"]);
+                assert.hasAllKeys(result.labelState, ["initialDiagram", "currentDiagram"]);
             });
             test("label", () => {
                 const newDiagram = DiagramState.fromText("the");
-                const firstState: State = {
+                const firstState: EditFormInternalState = {
                     stage: "label",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the",
                         currentValue: "the"
                     },
-                    labelStuff: {
+                    labelState: {
                         initialDiagram: newDiagram,
                         currentDiagram: newDiagram
                     }
@@ -131,20 +131,20 @@ describe("reducer", () => {
             runTest(
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "",
                         currentValue: ""
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "",
                         currentValue: value,
                         enableLabelSwitch: false
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 {
                     type: "input: update state",
@@ -158,64 +158,64 @@ describe("reducer", () => {
             runTest(
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "dog",
                         currentValue: "new dog"
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "dog",
                         currentValue: "new dog",
                         askReplace: true
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 { type: "input: enter ask replace" }
             );
         });
 
         test("input: accept replace", () => {
-            const input: State = {
+            const input: EditFormInternalState = {
                 stage: "label",
-                inputStuff: {
+                inputState: {
                     initialValue: "the",
                     currentValue: "the dog",
                     askReplace: true
                 },
-                labelStuff: {}
+                labelState: {}
             };
             const result = reducer(input, { type: "input: accept replace" });
-            const expectedInputStuff: InputStuff = {
+            const expectedInputStuff: InputFormInternalState = {
                 initialValue: "the dog",
                 currentValue: "the dog",
                 askReplace: false
             };
-            assert.deepStrictEqual(result.inputStuff, expectedInputStuff);
-            assert.hasAllKeys(result.labelStuff, ["initialDiagram", "currentDiagram"]);
+            assert.deepStrictEqual(result.inputState, expectedInputStuff);
+            assert.hasAllKeys(result.labelState, ["initialDiagram", "currentDiagram"]);
         });
 
         test("input: reject replace", () => {
             runTest(
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the",
                         currentValue: "the dog",
                         askReplace: true
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the",
                         currentValue: "the dog",
                         askReplace: false
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 { type: "input: reject replace" }
             );
@@ -225,21 +225,22 @@ describe("reducer", () => {
             runTest(
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the",
                         currentValue: "the dog",
                         askReplace: true
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 {
                     stage: "input",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the",
                         currentValue: "the",
-                        askReplace: false
+                        askReplace: false,
+                        inputKey: "0"
                     },
-                    labelStuff: {}
+                    labelState: {}
                 },
                 { type: "input: discard changes" }
             );
@@ -251,28 +252,28 @@ describe("reducer", () => {
             runTest(
                 {
                     stage: "label",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the dog",
                         currentValue: "the dog"
                     },
-                    labelStuff: {
+                    labelState: {
                         initialDiagram: oldDiagram,
                         currentDiagram: oldDiagram
                     }
                 },
                 {
                     stage: "label",
-                    inputStuff: {
+                    inputState: {
                         initialValue: "the dog",
                         currentValue: "the dog"
                     },
-                    labelStuff: {
+                    labelState: {
                         initialDiagram: oldDiagram,
                         currentDiagram: newDiagram
                     }
                 },
                 {
-                    type: "label: update diagram",
+                    type: "label: update state",
                     diagram: newDiagram
                 }
             );

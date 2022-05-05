@@ -1,51 +1,48 @@
 import { InputFormErrorState } from "@app/tricky-components/InputForm";
-import { createLocalStorageHook, DiagramState, LocalStorageSerializer, Stage } from "@app/utils";
+import { DiagramState, Stage } from "@app/utils";
+import { ElementCategory } from "@domain/language";
+import { ElementId } from "@lib/utils";
 import { useReducer } from "react";
 
-export interface EditFormProps {
-    initialValue?: string | DiagramState;
-    initialStage?: Stage;
+export interface EditFormState {
+    stage?: Stage;
+    inputText?: string;
+    diagram?: DiagramState;
+    category?: ElementCategory;
+    selected?: ElementId;
 }
 
-function getText(initialValue: string | DiagramState | undefined): string {
-    if (initialValue === undefined) {
-        return "";
-    }
-    return typeof initialValue === "string"
-        ? initialValue
-        : DiagramState.getText(initialValue);
-}
-
-function getDiagram(initialValue: string | DiagramState | undefined): DiagramState | undefined {
-    if (initialValue === undefined) {
-        return DiagramState.initEmpty();
-    } else if (typeof initialValue === "object") {
-        return initialValue;
-    }
-    try {
-        return DiagramState.fromText(initialValue);
-    } finally {
-        return undefined;
-    }
-}
-
-export interface State {
+export interface EditFormInternalState {
     stage: Stage;
-    inputStuff: InputStuff;
-    labelStuff: LabelStuff;
+    inputState: InputFormInternalState;
+    labelState: LabelFormInternalState;
 }
 
-export interface InputStuff {
-    inputKey?: string;
+export interface InputFormInternalState {
+    inputKey?: "0" | "1";
     initialValue: string;
     currentValue: string;
     enableLabelSwitch?: boolean;
     askReplace?: boolean;
 }
 
-export interface LabelStuff {
+export interface LabelFormInternalState {
     initialDiagram?: DiagramState;
     currentDiagram?: DiagramState;
+    category?: ElementCategory;
+    selected?: ElementId;
+}
+
+export function convertToEditFormState({ stage, inputState, labelState }: EditFormInternalState): EditFormState {
+    const output: EditFormState = { stage, inputText: inputState.currentValue };
+    output.diagram = labelState.currentDiagram;
+    if (labelState.category) {
+        output.category = labelState.category;
+    }
+    if (labelState.selected) {
+        output.selected = labelState.selected;
+    }
+    return output;
 }
 
 export type Action = {
@@ -63,8 +60,10 @@ export type Action = {
 } | {
     type: "input: discard changes";
 } | {
-    type: "label: update diagram";
+    type: "label: update state";
     diagram: DiagramState;
+    category?: ElementCategory;
+    expanded?: ElementId;
 }
 
 export function allowLabelSwitch(currentValue: string, errorState: InputFormErrorState): boolean {
@@ -89,65 +88,125 @@ export function allowProceed(initialValue: string, currentValue: string): Procee
     }
 }
 
-export function initializer({ initialStage, initialValue }: EditFormProps): State {
-    const defInitialStage: Stage = initialStage !== undefined
-        ? initialStage
-        : "input";
-    const text = getText(initialValue);
-    const diagram = getDiagram(initialValue);
+const KEY_STATE_0 = "0";
+const KEY_STATE_1 = "1";
+
+function getDefaultState(): EditFormInternalState {
+    const emptyDiagram = DiagramState.initEmpty();
+
     return {
-        stage: defInitialStage,
-        inputStuff: {
-            initialValue: text,
-            currentValue: text,
-            enableLabelSwitch: allowLabelSwitch(text, "none")
+        stage: "input",
+        inputState: {
+            inputKey: KEY_STATE_0,
+            initialValue: "",
+            currentValue: "",
+            enableLabelSwitch: allowLabelSwitch("", "none")
         },
-        labelStuff: {
-            initialDiagram: diagram,
-            currentDiagram: diagram
+        labelState: {
+            initialDiagram: emptyDiagram,
+            currentDiagram: emptyDiagram
         }
     };
 }
 
-const KEY_STATE_0 = "0";
-const KEY_STATE_1 = "1";
+function getText(inputText: string | undefined, diagram: DiagramState | undefined): string {
+    const hasInputText = 1 << 0;
+    const hasDiagram = 1 << 1;
+    let state = 0;
+    if (inputText !== undefined) {
+        state |= hasInputText;
+    }
+    if (diagram !== undefined) {
+        state |= hasDiagram;
+    }
 
-const defaultState: State = {
-    stage: "input",
-    inputStuff: {
-        initialValue: "",
-        currentValue: "",
-        inputKey: KEY_STATE_0
-    },
-    labelStuff: {}
-};
+    switch (state) {
+        case 0: {
+            return "";
+        }
+        case hasInputText: {
+            return inputText as string;
+        }
+        case hasDiagram: {
+            return DiagramState.getText(diagram as DiagramState);
+        }
+        case hasInputText | hasDiagram: {
+            const defInputText = inputText as string;
+            const diagramText = DiagramState.getText(diagram as DiagramState);
+            if (defInputText !== diagramText) {
+                throw `Discrepancy between text defined in inputText and diagram.\ninputText: ${inputText}\ndiagram: ${diagramText}`;
+            }
+            return defInputText;
+        }
+        default:
+            throw `invalid state '${state}'`;
+    }
+}
 
-export function reducer(state: State, action: Action): State {
+export function initializer(state: EditFormState | undefined): EditFormInternalState {
+    if (state === undefined) {
+        return getDefaultState();
+    }
+
+    const { stage, inputText, diagram, category, selected } = state;
+
+    const defStage: Stage = stage !== undefined ? stage : "input";
+    const text = getText(inputText, diagram);
+    const defDiagram: DiagramState = diagram !== undefined
+        ? diagram : DiagramState.initEmpty();
+
+    const inputState: InputFormInternalState = {
+        inputKey: KEY_STATE_0,
+        initialValue: text,
+        currentValue: text,
+        enableLabelSwitch: allowLabelSwitch(text, "none"),
+        askReplace: false
+    };
+
+    const labelState: LabelFormInternalState = {
+        initialDiagram: defDiagram,
+        currentDiagram: defDiagram
+    };
+    if (category) {
+        labelState.category = category;
+    }
+    if (selected) {
+        labelState.selected = selected;
+    }
+
+    return {
+        stage: defStage,
+        inputState,
+        labelState
+    };
+}
+
+export function reducer(state: EditFormInternalState, action: Action): EditFormInternalState {
     switch (action.type) {
         case "stage switch": {
             if (state.stage === "input") {
-                const { inputStuff } = state;
-                const proceed = allowProceed(inputStuff.initialValue, inputStuff.currentValue);
+                const { inputState } = state;
+                const proceed = allowProceed(inputState.initialValue, inputState.currentValue);
                 switch (proceed) {
                     case "ask to update": {
                         return {
                             ...state,
-                            inputStuff: {
-                                ...inputStuff,
+                            inputState: {
+                                ...inputState,
                                 askReplace: true
                             }
                         };
                     }
                     case "go w/ update": {
-                        const newDiagram = DiagramState.fromText(inputStuff.currentValue);
+                        const newDiagram = DiagramState.fromText(inputState.currentValue);
                         return {
                             ...state,
                             stage: "label",
-                            inputStuff: {
-                                ...inputStuff,
-                                initialValue: inputStuff.currentValue
+                            inputState: {
+                                ...inputState,
+                                initialValue: inputState.currentValue
                             },
-                            labelStuff: {
+                            labelState: {
                                 initialDiagram: newDiagram,
                                 currentDiagram: newDiagram
                             }
@@ -157,9 +216,9 @@ export function reducer(state: State, action: Action): State {
                         return {
                             ...state,
                             stage: "label",
-                            inputStuff: {
-                                ...inputStuff,
-                                initialValue: inputStuff.currentValue
+                            inputState: {
+                                ...inputState,
+                                initialValue: inputState.currentValue
                             }
                         };
                     }
@@ -171,11 +230,11 @@ export function reducer(state: State, action: Action): State {
             };
         }
         case "input: update state": {
-            const { inputStuff } = state;
+            const { inputState } = state;
             return {
                 ...state,
-                inputStuff: {
-                    ...inputStuff,
+                inputState: {
+                    ...inputState,
                     currentValue: action.value,
                     enableLabelSwitch: allowLabelSwitch(
                         action.value,
@@ -185,63 +244,70 @@ export function reducer(state: State, action: Action): State {
             };
         }
         case "input: enter ask replace": {
-            const { inputStuff } = state;
+            const { inputState: inputStuff } = state;
             return {
                 ...state,
-                inputStuff: {
+                inputState: {
                     ...inputStuff,
                     askReplace: true
                 }
             };
         }
         case "input: accept replace": {
-            const { inputStuff } = state;
-            const newDiagram = DiagramState.fromText(inputStuff.currentValue);
+            const { inputState } = state;
+            const newDiagram = DiagramState.fromText(inputState.currentValue);
             return {
                 ...state,
                 stage: "label",
-                labelStuff: {
+                labelState: {
                     initialDiagram: newDiagram,
                     currentDiagram: newDiagram
                 },
-                inputStuff: {
-                    ...inputStuff,
-                    initialValue: inputStuff.currentValue,
+                inputState: {
+                    ...inputState,
+                    initialValue: inputState.currentValue,
                     askReplace: false
                 }
             };
         }
         case "input: reject replace": {
-            const { inputStuff } = state;
+            const { inputState: inputStuff } = state;
             return {
                 ...state,
-                inputStuff: {
+                inputState: {
                     ...inputStuff,
                     askReplace: false
                 }
             };
         }
         case "input: discard changes": {
-            const { inputStuff } = state;
+            const { inputState } = state;
             return {
                 ...state,
-                inputStuff: {
-                    ...inputStuff,
-                    currentValue: inputStuff.initialValue,
+                inputState: {
+                    ...inputState,
+                    currentValue: inputState.initialValue,
                     askReplace: false,
-                    inputKey: flipKey(inputStuff.inputKey)
+                    inputKey: flipKey(inputState.inputKey)
                 }
             };
         }
-        case "label: update diagram": {
-            const { labelStuff } = state;
-            return {
+        case "label: update state": {
+            const { labelState } = state;
+            const output: EditFormInternalState = {
                 ...state,
-                labelStuff: {
-                    ...labelStuff,
+                labelState: {
+                    ...labelState,
                     currentDiagram: action.diagram
                 }
             };
+            if (action.category) {
+                output.labelState.category = action.category;
+            }
+            if (action.expanded) {
+                output.labelState.selected = action.expanded;
+            }
+            return output;
         }
     }
 }
@@ -251,30 +317,6 @@ function flipKey(key: string | undefined): typeof KEY_STATE_0 | typeof KEY_STATE
         ? KEY_STATE_0 : KEY_STATE_1;
 }
 
-function serializeState(state: State): string {
-    const inputStuff = { ...state.inputStuff };
-    delete inputStuff.inputKey;
-    const serializeData = {
-        ...state,
-        inputStuff
-    };
-    return JSON.stringify(serializeData);
-}
-
-function deserializeState(data: string): State {
-    const state: State = JSON.parse(data);
-    const { inputStuff } = state;
-    inputStuff.inputKey = flipKey(inputStuff.inputKey);
-    return state;
-}
-
-const serializer: LocalStorageSerializer<State> = {
-    serialize: serializeState,
-    deserialize: deserializeState
-};
-
-export const useLocalStorage = createLocalStorageHook<State>("app", serializer, defaultState);
-
-export function useEditForm(initialValue: State): [State, React.Dispatch<Action>] {
-    return useReducer(reducer, initialValue);
+export function useEditForm(input: EditFormState | undefined): [EditFormInternalState, React.Dispatch<Action>] {
+    return useReducer(reducer, input, initializer);
 }

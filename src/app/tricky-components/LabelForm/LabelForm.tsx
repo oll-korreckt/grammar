@@ -5,7 +5,7 @@ import { LabelViewAssembly } from "../LabelViewAssembly";
 import { LabelViewNavBarAssembly } from "../LabelViewNavBarAssembly";
 import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./adapter";
 import { useLabelForm } from "./reducer";
-import { LabelFormAction, LabelFormProps } from "./types";
+import { LabelFormAction, LabelFormProps, LabelFormState } from "./types";
 import { LabelSettingsMode, Utils } from "./utils";
 import styles from "./_styles.module.scss";
 
@@ -15,6 +15,9 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const extendedDispatch: React.Dispatch<LabelFormAction> = (action) => {
         switch (action.type) {
             case "edit.active: submit":
+            case "navigate: category":
+            case "navigate: expanded":
+            case "navigate: up":
             case "delete: element":
             case "delete: all":
                 diagramChange.current = true;
@@ -32,15 +35,25 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const settings = Utils.getLabelSettings(labelSettingsMode, state.diagram, elementLexemes);
     const onLabelClick = createOnLabelClick(state, extendedDispatch);
 
-    const { onDiagramChange } = props;
+    const { onStateChange: onDiagramChange } = props;
     useEffect(() => {
         if (diagramChange.current) {
             diagramChange.current = false;
             if (onDiagramChange) {
-                onDiagramChange(state.diagram);
+                const arg: LabelFormState = {
+                    diagram: state.diagram
+                };
+                const { display } = state;
+                if (display.category) {
+                    arg.category = display.category;
+                }
+                if (display.expanded) {
+                    arg.expanded = display.category;
+                }
+                onDiagramChange(arg);
             }
         }
-    }, [state.diagram, onDiagramChange]);
+    }, [state, onDiagramChange]);
 
     return (
         <div className={accessClassName(styles, "labelForm")}>

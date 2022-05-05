@@ -1,14 +1,15 @@
 import { MessageBoxModal } from "@app/basic-components/MessageBoxModal";
+import { ElementId } from "@lib/utils";
 import React, { useEffect, useRef } from "react";
 import { EditFormView } from "../EditFormView";
 import { InputFormProps } from "../InputForm";
 import { LabelFormProps } from "../LabelForm/types";
 import { InputKeyContext } from "./context";
-import { Action, InputStuff, LabelStuff, useEditForm, useLocalStorage } from "./reducer";
+import { Action, convertToEditFormState, EditFormState, InputFormInternalState, LabelFormInternalState, useEditForm } from "./reducer";
 
-function convertToInputProps(stuff: InputStuff, dispatch: React.Dispatch<Action>): InputFormProps {
+function convertToInputProps(inputState: InputFormInternalState, dispatch: React.Dispatch<Action>): InputFormProps {
     return {
-        initialValue: stuff.currentValue,
+        initialValue: inputState.initialValue,
         onStateChange: (state) => dispatch({
             type: "input: update state",
             value: state.value,
@@ -17,38 +18,45 @@ function convertToInputProps(stuff: InputStuff, dispatch: React.Dispatch<Action>
     };
 }
 
-function convertToLabelProps(stuff: LabelStuff, dispatch: React.Dispatch<Action>): LabelFormProps {
+function convertToLabelProps(labelState: LabelFormInternalState, dispatch: React.Dispatch<Action>): LabelFormProps {
     return {
-        initialDiagram: stuff.currentDiagram,
-        onDiagramChange: (newDiagram) => {
+        initialDiagram: labelState.initialDiagram,
+        onStateChange: ({ diagram, category, expanded }) => {
             dispatch({
-                type: "label: update diagram",
-                diagram: newDiagram
+                type: "label: update state",
+                expanded: expanded as ElementId | undefined,
+                diagram,
+                category
             });
         }
     };
 }
 
-export const EditForm: React.VFC = () => {
-    const storage = useLocalStorage();
-    const [state, dispatch] = useEditForm(storage.value);
+export interface EditFormProps {
+    initialState?: EditFormState;
+    saveState?: (currentState: EditFormState) => void;
+}
+
+export const EditForm: React.VFC<EditFormProps> = ({ initialState, saveState }) => {
+    const [state, dispatch] = useEditForm(initialState);
     const updateRef = useRef(false);
     const extendedDispatch: typeof dispatch = (action) => {
         updateRef.current = true;
         dispatch(action);
     };
-    const { stage, inputStuff, labelStuff } = state;
-    const inputProps = convertToInputProps(inputStuff, extendedDispatch);
-    const labelProps = convertToLabelProps(labelStuff, extendedDispatch);
+    const { stage, inputState, labelState } = state;
+    const inputProps = convertToInputProps(inputState, extendedDispatch);
+    const labelProps = convertToLabelProps(labelState, extendedDispatch);
 
     useEffect(() => {
-        if (updateRef.current) {
-            storage.update(state);
+        if (updateRef.current && !!saveState) {
+            const serializedState = convertToEditFormState(state);
+            saveState(serializedState);
         }
         updateRef.current = false;
-    }, [state, storage]);
+    }, [state, saveState]);
 
-    const { inputKey } = inputStuff;
+    const { inputKey, enableLabelSwitch } = inputState;
 
     return (
         <InputKeyContext.Provider value={{ inputKey }}>
@@ -61,9 +69,9 @@ export const EditForm: React.VFC = () => {
                 }}
                 inputFormProps={inputProps}
                 labelFormProps={labelProps}
-                disableLabelMode={!inputStuff.enableLabelSwitch}
+                disableLabelMode={stage === "input" && !enableLabelSwitch}
             />
-            {inputStuff.askReplace &&
+            {inputState.askReplace &&
                 <MessageBoxModal
                     buttons={[
                         { text: "Discard Changes", alignment: "left" },

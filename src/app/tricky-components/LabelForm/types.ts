@@ -48,13 +48,18 @@ export interface DisplaySettings {
     expanded?: ElementId;
 }
 
-export type DiagramChange = (newDiagram: DiagramState) => void;
+export interface LabelFormState {
+    diagram: DiagramState;
+    category?: ElementCategory;
+    expanded?: ElementId;
+}
+export type LabelFormStateChange = (state: LabelFormState) => void;
 
 export interface LabelFormProps {
     initialDiagram?: DiagramState;
     initialMode?: LabelFormMode;
     initialDisplay?: DisplaySettings;
-    onDiagramChange?: DiagramChange;
+    onStateChange?: LabelFormStateChange;
 }
 
 export type LabelFormAction = {
