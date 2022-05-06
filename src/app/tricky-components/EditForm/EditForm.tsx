@@ -1,5 +1,4 @@
 import { MessageBoxModal } from "@app/basic-components/MessageBoxModal";
-import { ElementId } from "@domain/language";
 import React, { useEffect, useRef } from "react";
 import { EditFormView } from "../EditFormView";
 import { InputFormProps } from "../InputForm";
