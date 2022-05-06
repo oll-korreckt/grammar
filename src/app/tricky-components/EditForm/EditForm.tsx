@@ -1,5 +1,5 @@
 import { MessageBoxModal } from "@app/basic-components/MessageBoxModal";
-import { ElementId } from "@lib/utils";
+import { ElementId } from "@domain/language";
 import React, { useEffect, useRef } from "react";
 import { EditFormView } from "../EditFormView";
 import { InputFormProps } from "../InputForm";
@@ -24,7 +24,7 @@ function convertToLabelProps(labelState: LabelFormInternalState, dispatch: React
         onStateChange: ({ diagram, category, expanded }) => {
             dispatch({
                 type: "label: update state",
-                expanded: expanded as ElementId | undefined,
+                expanded,
                 diagram,
                 category
             });
@@ -39,6 +39,7 @@ export interface EditFormProps {
 
 export const EditForm: React.VFC<EditFormProps> = ({ initialState, saveState }) => {
     const [state, dispatch] = useEditForm(initialState);
+    console.log(state);
     const updateRef = useRef(false);
     const extendedDispatch: typeof dispatch = (action) => {
         updateRef.current = true;

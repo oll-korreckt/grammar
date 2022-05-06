@@ -1,7 +1,6 @@
 import { InputFormErrorState } from "@app/tricky-components/InputForm";
 import { DiagramState, Stage } from "@app/utils";
-import { ElementCategory } from "@domain/language";
-import { ElementId } from "@lib/utils";
+import { ElementCategory, ElementId } from "@domain/language";
 import { useReducer } from "react";
 
 export interface EditFormState {

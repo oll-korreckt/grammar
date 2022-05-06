@@ -35,11 +35,11 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const settings = Utils.getLabelSettings(labelSettingsMode, state.diagram, elementLexemes);
     const onLabelClick = createOnLabelClick(state, extendedDispatch);
 
-    const { onStateChange: onDiagramChange } = props;
+    const { onStateChange } = props;
     useEffect(() => {
         if (diagramChange.current) {
             diagramChange.current = false;
-            if (onDiagramChange) {
+            if (onStateChange) {
                 const arg: LabelFormState = {
                     diagram: state.diagram
                 };
@@ -48,12 +48,12 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
                     arg.category = display.category;
                 }
                 if (display.expanded) {
-                    arg.expanded = display.category;
+                    arg.expanded = display.expanded;
                 }
-                onDiagramChange(arg);
+                onStateChange(arg);
             }
         }
-    }, [state, onDiagramChange]);
+    }, [state, onStateChange]);
 
     return (
         <div className={accessClassName(styles, "labelForm")}>
