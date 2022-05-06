@@ -1,11 +1,17 @@
 import React, { useContext, useReducer, useState } from "react";
-import { AddressCluster, ModelPageContext } from "../types";
+import { ModelPageContext } from "../types";
 import { FaTimes, FaEdit, FaPlus } from "react-icons/fa";
 import { accessClassName, useOutsideClick } from "@app/utils";
 import styles from "./_styles.module.scss";
 import { ElementModelAddress } from "@utils/model";
+import { ElementPageId } from "@utils/element";
 
-export interface PageClusterProps {
+export interface AddressCluster {
+    page: ElementPageId;
+    names: string[];
+}
+
+export interface AddressClusterProps {
     children: AddressCluster;
 }
 
@@ -19,7 +25,7 @@ function createKey(keys: string[]): string {
     return output;
 }
 
-export const PageCluster: React.VFC<PageClusterProps> = ({ children }) => {
+export const AddressCluster: React.VFC<AddressClusterProps> = ({ children }) => {
     const { sendAdd } = useContext(ModelPageContext);
     const [state, setState] = useState<"display" | "add">("display");
     const { page, names } = children;
@@ -139,7 +145,7 @@ const ModelItem: React.VFC<ModelItemProps> = ({ children }) => {
     const { page, name } = children;
     const [state, dispatch] = useReducer(reducer, { type: "display", name });
     const ref = useOutsideClick<HTMLLIElement>(() => dispatch({ type: "rename: cancel" }));
-    const { sendRename, sendDelete } = useContext(ModelPageContext);
+    const { sendRename, sendDelete, enterEdit } = useContext(ModelPageContext);
 
     return (
         <li
@@ -155,7 +161,7 @@ const ModelItem: React.VFC<ModelItemProps> = ({ children }) => {
                     </span>
                     <FaEdit
                         className={accessClassName(styles, "icon")}
-                        // onClick={() => dispatch({ type: "display: enter rename" })}
+                        onClick={() => enterEdit(children)}
                     />
                     <FaTimes
                         className={accessClassName(styles, "icon")}
