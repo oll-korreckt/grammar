@@ -1,29 +1,16 @@
 import { EditForm } from "@app/tricky-components/EditForm";
 import { EditFormState } from "@app/tricky-components/EditForm/reducer";
 import { accessClassName, DiagramState } from "@app/utils";
-import { ElementPageId } from "@utils/element";
 import { ElementModelAddress, Model } from "@utils/model/types";
 import { SERVER } from "config";
 import React, { useRef } from "react";
-import { QueryFunctionContext, useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
+import Link from "next/link";
 import styles from "./_styles.module.scss";
 
 export interface EditModelPageProps {
-    children: ElementModelAddress;
-    exitEdit?: () => void;
-}
-
-type QueryKey = ["EditModelPage", ElementPageId, string];
-
-async function queryFn({ queryKey }: QueryFunctionContext<QueryKey>): Promise<Model> {
-    const [, page, name] = queryKey;
-    const queryStr = `${SERVER}/api/model/${page}/${name}`;
-    const response = await fetch(queryStr);
-    if (!response.ok) {
-        throw `error while fetching data for '${page}.${name}'`;
-    }
-    const output = await response.json();
-    return output;
+    address: ElementModelAddress;
+    children: Model;
 }
 
 interface UpdateArg {
@@ -46,34 +33,20 @@ async function updateFn({ address, model }: UpdateArg): Promise<void> {
     }
 }
 
-export const EditModelPage: React.VFC<EditModelPageProps> = ({ children, exitEdit }) => {
-    const { page, name } = children;
-    const key: QueryKey = ["EditModelPage", page, name];
-    const query = useQuery(key, queryFn, { retry: false });
+export const EditModelPage: React.VFC<EditModelPageProps> = ({ children, address }) => {
     const saveModel = useMutation(updateFn);
 
-    switch (query.status) {
-        case "idle":
-            throw "unexpected state";
-        case "error":
-            throw `error loading data for '${page}.${name}'`;
-        case "loading":
-            return <>Loading</>;
-        case "success":
-            return (
-                <EditModelPageView
-                    initialModel={query.data}
-                    saveModel={(model) => saveModel.mutate({ address: children, model })}
-                    exitEdit={exitEdit}
-                />
-            );
-    }
+    return (
+        <EditModelPageView
+            initialModel={children}
+            saveModel={(model) => saveModel.mutate({ address, model })}
+        />
+    );
 };
 
 interface EditModelPageViewProps {
     initialModel?: Model;
     saveModel?: (model: Model) => void;
-    exitEdit?: () => void;
 }
 
 function getEditFormState(model: Model | undefined): EditFormState | undefined {
@@ -113,7 +86,7 @@ function getModel(state: EditFormState | undefined): Model {
     return output;
 }
 
-const EditModelPageView: React.VFC<EditModelPageViewProps> = ({ initialModel, saveModel, exitEdit }) => {
+const EditModelPageView: React.VFC<EditModelPageViewProps> = ({ initialModel, saveModel }) => {
     const stateRef = useRef(getEditFormState(initialModel));
 
     function saveState(state: EditFormState): void {
@@ -140,9 +113,11 @@ const EditModelPageView: React.VFC<EditModelPageViewProps> = ({ initialModel, sa
                 >
                     Save
                 </button>
-                <button onClick={() => exitEdit && exitEdit()}>
-                    Exit
-                </button>
+                <Link href={`${SERVER}/model`}>
+                    <button>
+                        Exit
+                    </button>
+                </Link>
             </div>
         </div>
     );

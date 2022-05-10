@@ -5,6 +5,8 @@ import { accessClassName, useOutsideClick } from "@app/utils";
 import styles from "./_styles.module.scss";
 import { ElementModelAddress } from "@utils/model";
 import { ElementPageId } from "@utils/element";
+import Link from "next/link";
+import { SERVER } from "config";
 
 export interface AddressCluster {
     page: ElementPageId;
@@ -145,7 +147,7 @@ const ModelItem: React.VFC<ModelItemProps> = ({ children }) => {
     const { page, name } = children;
     const [state, dispatch] = useReducer(reducer, { type: "display", name });
     const ref = useOutsideClick<HTMLLIElement>(() => dispatch({ type: "rename: cancel" }));
-    const { sendRename, sendDelete, enterEdit } = useContext(ModelPageContext);
+    const { sendRename, sendDelete } = useContext(ModelPageContext);
 
     return (
         <li
@@ -159,10 +161,11 @@ const ModelItem: React.VFC<ModelItemProps> = ({ children }) => {
                     >
                         {name}
                     </span>
-                    <FaEdit
-                        className={accessClassName(styles, "icon")}
-                        onClick={() => enterEdit(children)}
-                    />
+                    <Link href={`${SERVER}/model/${page}/${name}`}>
+                        <a>
+                            <FaEdit className={accessClassName(styles, "icon")}/>
+                        </a>
+                    </Link>
                     <FaTimes
                         className={accessClassName(styles, "icon")}
                         onClick={() => sendDelete(children)}

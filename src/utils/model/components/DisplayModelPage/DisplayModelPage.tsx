@@ -62,11 +62,7 @@ async function addFn({ address, model }: AddArg): Promise<void> {
     }
 }
 
-export interface DisplayModelPageProps {
-    enterEdit?: (address: ElementModelAddress) => void;
-}
-
-export const DisplayModelPage: React.VFC<DisplayModelPageProps> = ({ enterEdit }) => {
+export const DisplayModelPage: React.VFC = () => {
     const addressQuery = useQuery(
         "ModelPage: AddressQuery",
         addressQueryFn,
@@ -102,8 +98,7 @@ export const DisplayModelPage: React.VFC<DisplayModelPageProps> = ({ enterEdit }
     const ctxVal: ModelPageContext = {
         sendAdd: (address, onSuccess) => addMut.mutate({ address }, { onSuccess }),
         sendDelete: (address, onSuccess) => deleteMut.mutate(address, { onSuccess }),
-        sendRename: (address, newAddress, onSuccess) => renameMut.mutate({ address, newAddress }, { onSuccess }),
-        enterEdit: (address) => enterEdit && enterEdit(address)
+        sendRename: (address, newAddress, onSuccess) => renameMut.mutate({ address, newAddress }, { onSuccess })
     };
 
     const addressClusters = getClusters(addressQuery.data);
