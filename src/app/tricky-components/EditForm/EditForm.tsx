@@ -38,7 +38,6 @@ export interface EditFormProps {
 
 export const EditForm: React.VFC<EditFormProps> = ({ initialState, saveState }) => {
     const [state, dispatch] = useEditForm(initialState);
-    console.log(state);
     const updateRef = useRef(false);
     const extendedDispatch: typeof dispatch = (action) => {
         updateRef.current = true;
