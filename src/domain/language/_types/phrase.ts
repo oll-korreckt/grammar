@@ -99,14 +99,14 @@ export interface NounPhrase extends Phrase, ReferencingElement<NounPhraseDefinit
 // Coordinated: the ugly horse and the lazy bear
 export type FunctionalNounPhrase = FunctionalTypeGuard<[...FunctionalNoun, ...FunctionalPronoun, "nounPhrase", "coordinatedNounPhrase"]>;
 
-type HeadModifer = [
+type HeadModifier = [
     ...FunctionalAdverbPhrase,
     ...FunctionalAdverbialClause,
     ...FunctionalNounPhrase,
     ...FunctionalPrepositionPhrase,
     ...FunctionalInfinitivePhrase
 ];
-type HeadComplement = HeadModifer;
+type HeadComplement = HeadModifier;
 type SubjectComplement = [
     ...FunctionalNounPhrase,
     ...FunctionalNounClause,
@@ -137,7 +137,7 @@ export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"
         Ex1: told the story QUICKLY
         Ex2: QUICKLY told the story
     */
-    headModifier: [false, HeadModifer];
+    headModifier: [true, HeadModifier];
     /*
         Semantically essential. Always located after the verb. Appears
         immediately after the verb if verb is intransitive. Appears after the
