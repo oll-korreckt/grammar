@@ -150,6 +150,7 @@ export const AddMenu = makeRefComponent<HTMLDivElement, AddMenuProps>("AddMenu",
                     icon={FaLayerGroup}
                     active={activeCategory === "sentence"}
                     enabled={availableCategories.includes("sentence")}
+                    onClick={() => setActiveCategory("sentence")}
                 >
                     Sentence
                 </Category>
