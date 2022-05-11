@@ -1,9 +1,10 @@
-import { Colors } from "@app/utils";
-import { makeRefComponent, withEventProp } from "@app/utils/hoc";
+import { accessClassName, Colors } from "@app/utils";
+import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
 import { ElementId } from "@domain/language";
 import { Lexeme, Utils } from "./utils";
 import React from "react";
 import { Label } from "@app/basic-components/Label";
+import styles from "./_styles.module.scss";
 
 export interface LabelViewProps {
     children?: Lexeme[];
@@ -44,8 +45,13 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                 }
                 const { id, lexemes } = label;
                 const idCnt = incrementIdCount(idCounts, id);
-                const { fade, color, header }: LabelSettings = id in defSettings ? defSettings[id] : {};
+                const containsId = id in defSettings;
+                const { fade, color, header }: LabelSettings = containsId ? defSettings[id] : {};
                 const labelKey = `${id}-${idCnt}`;
+                const classes = [];
+                if (!containsId) {
+                    classes.push("disableClick");
+                }
                 return (
                     <ExtendedLabel
                         key={labelKey}
@@ -53,6 +59,7 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                         color={color}
                         fade={fade}
                         onClick={() => onLabelClick && onLabelClick(id)}
+                        className={accessClassName(styles, ...classes)}
                     >
                         {lexemes.map(({ lexeme }) => lexeme)}
                     </ExtendedLabel>
@@ -62,4 +69,4 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
     );
 });
 
-const ExtendedLabel = withEventProp(Label, "click");
+const ExtendedLabel = withClassNameProp(withEventProp(Label, "click"));
