@@ -11,10 +11,10 @@ An infinitive is the "raw" form of verb without any conjugation. In English, inf
 As mentioned earlier, infinitives can function as a noun, adjective, or adverb.
 
 ### Noun
-> I like *to eat* food.
+> I like *to eat*.
 
 ### Adjective
-> The Broncos are the team *to beat* this year.
+> The Broncos are the team *to beat*.
 
 ### Adverb
 > She went to the beach *to swim*.

@@ -25,22 +25,27 @@ Optionally, verb phrases can contain head modifiers which modify the head of the
 Head modifiers are similar to head complements with the distinguishing feature being that head modifiers are not semantically essential whereas head complements are.
 
 #### Adverbs
+<!-- *verbPhrase.head-modifier_adverb -->
 > The dog ran *quickly*.
 <!-- .caption -->
 Adverb
 
+<!-- *verbPhrase.head-modifier_adverb-phrase -->
 > The dog ran *very quickly*.
 <!-- .caption -->
 Adverb Phrase
 
+<!-- *verbPhrase.head-modifier_adverbial-clause -->
 > The dog ran *when he saw a squirrel*.
 <!-- .caption -->
 Adverbial Clause
 
 #### Nouns
+<!-- *verbPhrase.head-modifier_noun -->
 > The dog ran *five miles*.
 
 #### Preposition Phrases
+<!-- *verbPhrase. -->
 > The dog ran *across the field*.
 
 #### Infinitives

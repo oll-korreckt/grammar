@@ -10,6 +10,7 @@ Verbs are an essential part of clauses. All clauses must contain a predicate, an
 ### Main Verb
 All verbs must contain a main verb property. In order to account for phrasal verbs, the main verb property can reference multiple words so that the main verb and particle can both be referenced by said property.
 
+<!-- *verb.main-verb -->
 > I *give up*.
 <!-- .caption -->
 The main verb property consists of *give* and *up*.
@@ -30,6 +31,7 @@ Certain English verb tenses and moods require the use of an auxiliary verb. Addi
 
 Certain verb tenses and moods require multiple auxiliary verbs. Thus, the auxiliary verb property can contain multiple words.
 
+<!-- *verb.aux-verb -->
 > They *have been* waiting for quite some time.
 <!-- .caption -->
 The auxiliary verbs *have* and *been* are used in combination with *waiting* to form the present perfect continuous verb tense.

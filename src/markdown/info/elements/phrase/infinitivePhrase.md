@@ -8,6 +8,7 @@ Infinitive phrases are similar in structure to [verb phrases](verb-phrase), [ger
 <!-- +propertySummary -->
 
 ### Head
+<!-- *infinitivePhrase.head -->
 > I came here *to eat* food.
 
 ### Head Modifier
