@@ -1,4 +1,5 @@
 @use "main";
+@use "../../basic-components/Label/mixins.scss" as *;
 
 .buttonContainer {
     padding: 5px;
@@ -13,6 +14,18 @@
 .labelView {
     display: inline;
     margin: 20px 10px;
+
+    @include main.smMdScreen {
+        @include labelHeaderSize(10px);
+        font-size: 20px;
+        line-height: 50px;
+    }
+
+    @include main.lgScreen {
+        @include labelHeaderSize(12px);
+        font-size: 30px;
+        line-height: 70px;
+    }
 }
 
 $spinner-size: 20px;
@@ -88,20 +101,6 @@ $spinner-thickness: 5px;
     font-size: 12px;
 }
 
-.resetButton {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-size: 12px;
-    user-select: none;
-
-    >svg {
-        font-size: 24px;
-        margin-bottom: 2px;
-    }
-}
-
 .resetButtonEnabled {
     cursor: pointer;
 }
@@ -110,15 +109,77 @@ $spinner-thickness: 5px;
     color: lightgray;
 }
 
+$smMdSvgFont: 14px;
+$smMdTxtFont: 10px;
+$lgSvgFont: 18px;
+$lgTxtFont: 14px;
+
+.resetButton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+
+    @include main.smMdScreen {
+        font-size: $smMdTxtFont;
+
+        >svg {
+            font-size: $smMdSvgFont;
+            margin-bottom: 2px;
+        }
+    }
+
+    @include main.lgScreen {
+        font-size: $lgTxtFont;
+
+        >svg {
+            font-size: $lgSvgFont;
+            margin-bottom: 2px;
+        }
+    }
+}
+
 .navMenuContainer {
     display: flex;
-    gap: 15px;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     margin: 5px 0;
+
+    @include main.smMdScreen {
+        gap: 5px;
+    }
+
+    @include main.lgScreen {
+        gap: 15px;
+    }
 }
 
 .navMenu {
-    width: 400px;
+    @include main.lgScreen {
+        width: 375px;
+        // height: 50px;
+
+        svg {
+            font-size: $lgSvgFont;
+        }
+
+        div {
+            font-size: $lgTxtFont;
+        }
+    }
+
+    @include main.smMdScreen {
+        width: 275px;
+        height: 40px !important;
+
+        svg {
+            font-size: $smMdSvgFont;
+        }
+
+        div {
+            font-size: $smMdTxtFont;
+        }
+    }
 }

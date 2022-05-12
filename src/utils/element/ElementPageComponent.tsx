@@ -85,6 +85,6 @@ const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest
 
 const CustomBlockquote: GenericHTMLObjectComponent<"blockquote"> = ({ children, ...rest }) => {
     return children.custom
-        ? <ExampleBlockquote blockquote={children}/>
+        ? <ExampleBlockquote>{children}</ExampleBlockquote>
         : <Blockquote {...rest}>{children}</Blockquote>;
 };
