@@ -167,6 +167,7 @@ $lgTxtFont: 14px;
 .navMenu {
     @include main.lgScreen {
         width: 375px;
+        height: 50px !important;
 
         svg {
             font-size: $lgSvgFont;
