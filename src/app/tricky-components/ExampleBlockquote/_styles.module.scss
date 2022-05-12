@@ -13,17 +13,16 @@
 
 .labelView {
     display: inline;
-    margin: 20px 10px;
+    margin: 0 10px;
 
     @include main.smMdScreen {
         @include labelHeaderSize(10px);
-        font-size: 20px;
+        font-size: 14px;
         line-height: 50px;
     }
-
     @include main.lgScreen {
         @include labelHeaderSize(12px);
-        font-size: 30px;
+        font-size: 16px;
         line-height: 70px;
     }
 }
@@ -63,14 +62,21 @@ $spinner-thickness: 5px;
     }
 }
 
-.displayContent {
-    display: grid;
-    grid-template-columns: 1fr auto;
-
+.exampleBlockquote {
     >p {
         margin-top: auto;
         margin-bottom: auto;
     }
+}
+
+.exampleBlockquoteClosed {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.labelViewContainer {
+    display: grid;
+    grid-template-columns: 1fr auto;
 }
 
 .errorMsg {
@@ -146,6 +152,8 @@ $lgTxtFont: 14px;
     justify-content: center;
     align-items: center;
     margin: 5px 0;
+    padding: 5px 0;
+    width: 100%;
 
     @include main.smMdScreen {
         gap: 5px;

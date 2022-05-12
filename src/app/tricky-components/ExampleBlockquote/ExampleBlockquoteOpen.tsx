@@ -65,7 +65,7 @@ export const ExampleBlockquoteOpen: React.VFC<ExampleBlockquoteOpenProps> = ({ c
     switch (query.status) {
         case "loading":
             return (
-                <blockquote className={accessClassName(styles, "displayContent")}>
+                <blockquote className={accessClassName(styles, "exampleBlockquote", "exampleBlockquoteClosed")}>
                     <RenderFragment>
                         {children.content}
                     </RenderFragment>

@@ -13,7 +13,7 @@ export interface ExampleBlockquoteClosedProps {
 export const ExampleBlockquoteClosed: React.VFC<ExampleBlockquoteClosedProps> = ({ children, onOpen }) => {
     const { content } = children;
     return (
-        <blockquote className={accessClassName(styles, "displayContent")}>
+        <blockquote className={accessClassName(styles, "exampleBlockquote", "exampleBlockquoteClosed")}>
             <RenderFragment>
                 {content}
             </RenderFragment>

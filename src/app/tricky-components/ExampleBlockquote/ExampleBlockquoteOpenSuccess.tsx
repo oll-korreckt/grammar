@@ -139,16 +139,18 @@ export const ExampleBlockquoteOpenSuccess: React.VFC<ExampleBlockquoteOpenSucces
         allowReset ? "resetButtonEnabled" : "resetButtonDisabled"
     ];
     return (
-        <blockquote className={accessClassName(styles, "displayContent")}>
-            <ExtendedLabelView
-                className={accessClassName(styles, "labelView")}
-                onLabelClick={(id) => dispatch({ type: "element select", id })}
-                settings={labelSettings}
-            >
-                {lexemes}
-            </ExtendedLabelView>
-            <div className={accessClassName(styles, "buttonContainer")}>
-                <FaTimes onClick={onExit}/>
+        <blockquote className={accessClassName(styles, "exampleBlockquote")}>
+            <div className={accessClassName(styles, "labelViewContainer")}>
+                <ExtendedLabelView
+                    className={accessClassName(styles, "labelView")}
+                    onLabelClick={(id) => dispatch({ type: "element select", id })}
+                    settings={labelSettings}
+                >
+                    {lexemes}
+                </ExtendedLabelView>
+                <div className={accessClassName(styles, "buttonContainer")}>
+                    <FaTimes onClick={onExit}/>
+                </div>
             </div>
             <div className={accessClassName(styles, "navMenuContainer")}>
                 <div className={accessClassName(styles, ...resetClasses)}>
