@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps<ModelPageProps, ModelPagePar
     if (params === undefined) {
         return {
             props: {
-                error: "Hello"
+                error: "No address provided"
             }
         };
     }
@@ -21,14 +21,14 @@ export const getServerSideProps: GetServerSideProps<ModelPageProps, ModelPagePar
     if (!Array.isArray(modelAddress)) {
         return {
             props: {
-                error: "Hello"
+                error: `Invalid address data-type. Received: ${typeof modelAddress}`
             }
         };
     }
     if (modelAddress.length !== 2) {
         return {
             props: {
-                error: "Hello"
+                error: `Address should only contain 2 parts. Received: ${modelAddress.length}`
             }
         };
     }
@@ -36,9 +36,14 @@ export const getServerSideProps: GetServerSideProps<ModelPageProps, ModelPagePar
     const queryUrl = `${SERVER}/api/model/${page}/${name}`;
     const response = await fetch(queryUrl);
     if (!response.ok) {
+        let errMsg = `An error occurred while trying to fetch data for '${page}.${name}'`;
+        try {
+            errMsg = await response.text();
+        } catch {
+        }
         return {
             props: {
-                error: "Hello"
+                error: errMsg
             }
         };
     }
@@ -61,15 +66,27 @@ const ModelPage: NextPage<ModelPageProps> = ({ error, address, model }) => {
         return null;
     }
     if (error !== undefined) {
-        return <>{error}</>;
+        return <Error>{error}</Error>;
     }
     if (address === undefined || model === undefined) {
-        return <>Error: Model + Address not provided</>;
+        return <Error>Error: Model + Address not provided</Error>;
     }
     return (
         <EditModelPage address={address}>
             {model}
         </EditModelPage>
+    );
+};
+
+const Error: React.VFC<{ children: string; }> = ({ children }) => {
+    return (
+        <p
+            style={{
+                color: "red"
+            }}
+        >
+            {children}
+        </p>
     );
 };
 
