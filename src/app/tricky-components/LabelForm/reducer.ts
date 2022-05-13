@@ -193,7 +193,6 @@ function reducer(state: State, action: LabelFormAction): State {
             if (priorMode === undefined) {
                 throw "no prior mode provided";
             }
-            // invokeDiagramChange(state.diagram);
             return {
                 ...priorMode,
                 diagram: state.diagram
@@ -264,7 +263,6 @@ function reducer(state: State, action: LabelFormAction): State {
         }
         case "delete: element": {
             const newDiagram = DiagramStateFunctions.deleteItem(state.diagram, action.id);
-            // invokeDiagramChange(newDiagram);
             return {
                 ...state,
                 diagram: newDiagram
@@ -272,7 +270,6 @@ function reducer(state: State, action: LabelFormAction): State {
         }
         case "delete: all": {
             const newDiagram = DiagramStateFunctions.deleteAll(state.diagram);
-            // invokeDiagramChange(newDiagram);
             return {
                 ...state,
                 diagram: newDiagram,
