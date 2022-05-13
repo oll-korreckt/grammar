@@ -1,5 +1,5 @@
 import { createState, Ids } from "@app/testing";
-import { Adjective, ElementId, ElementRecord, ElementReference, Identifiable, Noun, Verb, VerbPhrase, Word } from "@domain/language";
+import { Adjective, ElementId, ElementMapper, ElementRecord, ElementReference, Identifiable, Noun, Verb, VerbPhrase, Word } from "@domain/language";
 import { SimpleObject } from "@lib/utils";
 import { assert } from "chai";
 import { DiagramState, TypedDiagramStateItem } from "..";
@@ -246,6 +246,83 @@ describe("DiagramStateFunctions", () => {
                 }
             };
             assert.deepStrictEqual(result2, expected2);
+        });
+
+        test("double reference", () => {
+            const verbId = "verb";
+            const pronounId = "pronoun";
+            const adjectiveId = "adjective";
+            const verbPhraseId = "verbPhrase";
+            const relClauseId = "relClause";
+            const verb: TypedDiagramStateItem<"verb"> = {
+                ref: verbPhraseId,
+                type: "verb",
+                value: {
+                    id: "verb",
+                    posType: "verb"
+                }
+            };
+            const adjective: TypedDiagramStateItem<"adjective"> = {
+                ref: verbPhraseId,
+                type: "adjective",
+                value: {
+                    id: "adjective",
+                    posType: "adjective"
+                }
+            };
+            const pronoun: TypedDiagramStateItem<"pronoun"> = {
+                ref: relClauseId,
+                type: "pronoun",
+                value: {
+                    id: "pronoun",
+                    posType: "pronoun"
+                }
+            };
+            const verbPhrase: TypedDiagramStateItem<"verbPhrase"> = {
+                ref: relClauseId,
+                type: "verbPhrase",
+                value: {
+                    id: "verbPhrase",
+                    phraseType: "verb",
+                    head: { type: "verb", id: verbId },
+                    subjCompl: { type: "adjective", id: adjectiveId }
+                }
+            };
+            const relClause: TypedDiagramStateItem<"relativeClause"> = {
+                type: "relativeClause",
+                value: {
+                    id: "relClause",
+                    clauseType: "relative",
+                    dependentWord: { type: "pronoun", id: pronounId },
+                    predicate: { type: "verbPhrase", id: verbPhraseId }
+                }
+            };
+            const diagram: DiagramState = {
+                lexemes: [],
+                elements: {
+                    [verbId]: verb,
+                    [adjectiveId]: adjective,
+                    [pronounId]: pronoun,
+                    [verbPhraseId]: verbPhrase,
+                    [relClauseId]: relClause
+                }
+            };
+            const result = DiagramStateFunctions.addReference(diagram, relClauseId, "subject", pronounId);
+            const expectedRelClause: ElementMapper<"relativeClause"> = {
+                ...relClause.value,
+                subject: { type: "pronoun", id: pronounId }
+            };
+            const expected: DiagramState = {
+                lexemes: [],
+                elements: {
+                    ...diagram.elements,
+                    [relClauseId]: {
+                        ...relClause,
+                        value: expectedRelClause
+                    }
+                }
+            };
+            assert.deepStrictEqual(expected, result);
         });
     });
 

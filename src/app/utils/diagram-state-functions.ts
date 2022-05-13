@@ -213,15 +213,12 @@ function _addParentToChildReference(elements: DiagramState["elements"], parentId
 
 function _addChildToParentReference(elements: DiagramState["elements"], parentId: ElementId, childId: ElementId): void {
     const childItem = elements[childId];
-    if (childItem.ref === parentId) {
-        throw `Child '${childId}' already references '${parentId}'`;
-    }
     elements[childId] = {
         ...childItem,
         ref: parentId
     };
     // child is referencing another element so need to remove that reference
-    if (childItem.ref !== undefined) {
+    if (childItem.ref !== undefined && childItem.ref !== parentId) {
         _deleteParentToChildReferences(elements, childItem.ref, childId);
     }
 }

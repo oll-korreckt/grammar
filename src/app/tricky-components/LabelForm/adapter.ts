@@ -9,7 +9,7 @@ import { EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenuProps } from "../NavigateMenu";
 import { LabelViewNavBarAssemblyProps } from "../LabelViewNavBarAssembly";
 import { getAddMenuElements } from "./add-menu-elements";
-import { State, LabelFormAction } from "./types";
+import { State, LabelFormAction, EditActiveState } from "./types";
 
 export function createEditActiveDispatch(dispatch: React.Dispatch<LabelFormAction>): EditActiveMenuDispatch {
     return (action) => {
@@ -122,6 +122,36 @@ export function convertToMenuProps(state: State, dispatch: React.Dispatch<LabelF
     }
 }
 
+function getEditSelectType(state: EditActiveState, childId: ElementId): "1st reference" | "2nd reference" | "de-reference" {
+    const { diagram, property } = state;
+    if (property === undefined) {
+        throw "no active property";
+    }
+    const childItem = DiagramState.getItem(diagram, childId);
+    if (childItem.ref === undefined) {
+        return "1st reference";
+    }
+    const parentId = state.id;
+    const parentItem = DiagramState.getItem(diagram, parentId);
+    if (parentItem.type === "word") {
+        throw "cannot edit a word";
+    }
+    const referencedProperties = DiagramState.getReferencingProperties(
+        parentItem.type,
+        parentItem.value,
+        childId
+    );
+    switch (typeof referencedProperties) {
+        case "string":
+            return referencedProperties === property
+                ? "de-reference" : "2nd reference";
+        case "object":
+            return "de-reference";
+        case "undefined":
+            return "1st reference";
+    }
+}
+
 export function createOnLabelClick(state: State, dispatch: React.Dispatch<LabelFormAction>): (id: ElementId) => void {
     switch (state.mode) {
         case "navigate":
@@ -143,24 +173,28 @@ export function createOnLabelClick(state: State, dispatch: React.Dispatch<LabelF
             };
         }
         case "edit.active": {
-            const { diagram, property } = state;
+            const { property } = state;
             if (property === undefined) {
                 return () => { return; };
             } else {
                 return (id) => {
-                    const item = DiagramState.getItem(diagram, id);
-                    if (item.ref === state.id) {
-                        dispatch({
-                            type: "edit.active: remove reference",
-                            property: property,
-                            id: id
-                        });
-                    } else {
-                        dispatch({
-                            type: "edit.active: add reference",
-                            property: property,
-                            id: id
-                        });
+                    const selectType = getEditSelectType(state, id);
+                    switch (selectType) {
+                        case "1st reference":
+                        case "2nd reference":
+                            dispatch({
+                                type: "edit.active: add reference",
+                                property,
+                                id
+                            });
+                            break;
+                        case "de-reference":
+                            dispatch({
+                                type: "edit.active: remove reference",
+                                property,
+                                id
+                            });
+                            break;
                     }
                 };
             }

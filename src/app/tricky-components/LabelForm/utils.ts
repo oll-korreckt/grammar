@@ -1,5 +1,5 @@
-import { DiagramState, ElementDisplayInfo, LabelFormMode } from "@app/utils";
-import { ElementCategory, ElementId, ElementRecord, ElementType, getElementDefinition } from "@domain/language";
+import { DiagramState, DiagramStateItem, ElementDisplayInfo, LabelFormMode } from "@app/utils";
+import { ElementCategory, ElementId, ElementRecord, ElementType, getElementDefinition, isDoubleRefProp } from "@domain/language";
 import { ElementLexeme, Lexeme } from "../LabelView";
 import { LabelSettings } from "../LabelView/LabelView";
 import { DisplaySettings } from "./types";
@@ -136,6 +136,61 @@ function _getPropertyHeader(keys: string | [string, string], info: ElementDispla
     throw "unexpected data type";
 }
 
+function _createAlreadyRefChecker(parent: DiagramStateItem, property: string): (item: DiagramStateItem) => boolean {
+    const parentChildRefs = DiagramState.getElementReferences(
+        parent.type as Exclude<ElementType, "word">,
+        parent.value
+    );
+    const propertyChildIds: Set<ElementId> = property in parentChildRefs
+        ? new Set(parentChildRefs[property].map(({ id }) => id))
+        : new Set();
+    return ({ value }) => {
+        const childId = value.id;
+        return propertyChildIds.has(childId);
+    };
+}
+
+function _createAllowRefChecker(parent: DiagramStateItem, property: string): (item: DiagramStateItem) => boolean {
+    const parentId = parent.value.id;
+    const parentTypeDef = getElementDefinition(parent.type as Exclude<ElementType, "word">);
+    if (!(property in parentTypeDef)) {
+        throw `no property definition for '${property}' in '${parent.type}' element`;
+    }
+    const allowDoubleRef = isDoubleRefProp(parent.type, property);
+    const validPropTypes = new Set(parentTypeDef[property][1]);
+    return ({ ref, type, value }) => {
+        const childId = value.id;
+        // criterion 1: item is a valid type for this property
+        if (!validPropTypes.has(type)) {
+            return false;
+        }
+        /*
+            criterion 2:
+                - satisfies 1
+                - unreferenced
+        */
+        if (ref === undefined) {
+            return true;
+        }
+        /*
+            criterion 3:
+                - satisfies 1
+                - property allows for double references
+                - item is not referenced by another element
+                - item is referenced exactly once by parent element but not for this property
+        */
+        if (allowDoubleRef && ref === parentId) {
+            const refProps = DiagramState.getReferencingProperties(
+                parent.type as Exclude<ElementType, "word">,
+                parent.value,
+                childId
+            );
+            return typeof refProps === "string" && refProps !== property;
+        }
+        return false;
+    };
+}
+
 function _getEditActiveLabelSettings(mode: EditActiveLabelSettingsMode, diagram: DiagramState, lexemes: Lexeme[]): Record<ElementId, LabelSettings> {
     const output: Record<ElementId, LabelSettings> = {};
     const parent = DiagramState.getItem(diagram, mode.id);
@@ -166,21 +221,12 @@ function _getEditActiveLabelSettings(mode: EditActiveLabelSettingsMode, diagram:
         });
     } else {
         // edit property mode
-        const parentDef = getElementDefinition(parent.type);
-        if (!(mode.property in parentDef)) {
-            throw `no property definition for '${mode.property}' in '${parent.type}' element`;
-        }
-        const children = DiagramState.getElementReferences(parent.type, parent.value);
-        const childrenIds: ElementId[] = mode.property in children
-            ? children[mode.property].map((child) => child.id)
-            : [];
-        const childrenIdSet = new Set(childrenIds);
-        const [, validPropTypes] = parentDef[mode.property];
-        const validPropTypeSet = new Set(validPropTypes);
+        const alreadyReferencedByProperty = _createAlreadyRefChecker(parent, mode.property);
+        const allowReference = _createAllowRefChecker(parent, mode.property);
         lexemes.filter(Utils.isElementLabel).forEach((element) => {
             const item = DiagramState.getItem(diagram, element.id);
             const itemInfo = ElementDisplayInfo.getDisplayInfo(item.type);
-            if (childrenIdSet.has(element.id)) {
+            if (alreadyReferencedByProperty(item)) {
                 const keys = DiagramState.getReferencingProperties(
                     parent.type as Exclude<ElementType, "word">,
                     parent.value,
@@ -193,7 +239,7 @@ function _getEditActiveLabelSettings(mode: EditActiveLabelSettingsMode, diagram:
                     color: itemInfo.color,
                     header: _getPropertyHeader(keys, parentInfo)
                 };
-            } else if (item.ref === undefined && validPropTypeSet.has(item.type)) {
+            } else if (allowReference(item)) {
                 output[element.id] = {
                     fade: true,
                     color: itemInfo.color,
