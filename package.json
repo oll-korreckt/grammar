@@ -13,7 +13,6 @@
         "@types/react": "^17.0.4",
         "@types/react-dom": "^17.0.3",
         "@types/react-test-renderer": "^17.0.1",
-        "@types/uuid": "^8.3.0",
         "@typescript-eslint/eslint-plugin": "^4.22.0",
         "@typescript-eslint/parser": "^4.22.0",
         "chai": "^4.3.4",
@@ -39,6 +38,7 @@
         "start": "webpack serve --open"
     },
     "dependencies": {
+        "@types/uuid": "^8.3.4",
         "framer-motion": "^4.1.17",
         "next": "^12.1.0",
         "react": "^17.0.2",
@@ -46,6 +46,7 @@
         "react-icons": "^4.2.0",
         "react-query": "^3.34.19",
         "slate": "^0.70.0",
-        "slate-react": "^0.70.2"
+        "slate-react": "^0.70.2",
+        "uuid": "^8.3.2"
     }
 }

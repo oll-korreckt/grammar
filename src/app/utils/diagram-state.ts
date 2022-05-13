@@ -1,8 +1,8 @@
-import { SerialId } from "@app/tricky-components/serial-id";
 import { ElementDefinitionMapper, ElementId, ElementMapper, ElementReference, ElementType, getElementDefinition, Identifiable, scan, Word } from "@domain/language";
 import { initElement } from "@domain/language/element-init";
 import { DefinitionMapper } from "@domain/language/_types/utils";
 import { AtomicChange } from "@lib/utils";
+import { v4 as uuid4 } from "uuid";
 
 export type DiagramStateItem = {
     value: Identifiable;
@@ -44,7 +44,7 @@ function isWhitespaceLexeme(lexeme: DiagramStateLexeme): lexeme is WhitespaceLex
 }
 
 export function getNewItemId(): string {
-    return SerialId.getNextId();
+    return uuid4();
 }
 
 function initEmpty(): DiagramState {
