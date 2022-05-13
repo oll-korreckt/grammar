@@ -504,3 +504,17 @@ export const ElementCategory = {
         return category !== undefined ? category : "sentence";
     }
 };
+
+type ElementProp<Type extends Exclude<ElementType, "word">> = keyof ElementDefinitionMapper<Type>;
+type DoubleRefPropObj = {
+    [Key in Exclude<ElementType, "word">]?: ElementProp<Key>[];
+}
+const dblRefPropObj: DoubleRefPropObj = {
+    nounClause: ["dependentWord", "subject"],
+    relativeClause: ["dependentWord", "subject"]
+};
+
+export function isDoubleRefProp(type: ElementType, key: string): boolean {
+    const propList: string[] = (dblRefPropObj as Record<string, string[]>)[type];
+    return propList === undefined ? false : propList.includes(key);
+}
