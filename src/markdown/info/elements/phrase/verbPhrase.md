@@ -51,10 +51,12 @@ Adverbial Clause
 #### Infinitives
 One can use infinitives in order to modify the verb. However, it is worth noting that infinitives can also be used as a direct object. Thus, it is important to take great care determine whether an infinitive is being used to modify the main verb or as object of the main verb.
 
+<!-- *verbPhrase.head-modifier_coordinated-infinitive -->
 > You should play *to win* and *to learn*.
 <!-- .caption -->
 Coordinated Indirect
 
+<!-- *verbPhrase.head-modifier_infinitive-phrase -->
 > The dog ran *to catch the squirrel*.
 <!-- .caption -->
 Infinitive Phrase
