@@ -35,7 +35,7 @@ export const NavBar: React.VFC = () => {
                 </li>
                 <li>
                     <NavBarItem
-                        href="/"
+                        href="/about"
                         icon={FaInfoCircle}
                     >
                         About
