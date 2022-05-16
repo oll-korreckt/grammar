@@ -18,6 +18,23 @@ function toString({ page, name }: ElementModelAddress): string {
     return `${page}.${name}`;
 }
 
+function fromString(addressStr: string): ElementModelAddress {
+    const errMsg = `'${addressStr}' is not of format '<page>.<name>'`;
+    const parts = addressStr.split(".");
+    if (parts.length !== 2) {
+        throw errMsg;
+    }
+    const [page, name] = parts;
+    const output: ElementModelAddress = {
+        page: page as ElementPageId,
+        name
+    };
+    if (!isValid(output)) {
+        throw errMsg;
+    }
+    return output;
+}
+
 function sort(a: ElementModelAddress, b: ElementModelAddress): number {
     const aStr = toString(a);
     const bStr = toString(b);
@@ -50,6 +67,7 @@ function isValid(address: ElementModelAddress): boolean {
 
 export const ElementModelAddress = {
     toString: toString,
+    fromString: fromString,
     sort: sort,
     isValid: isValid
 };
