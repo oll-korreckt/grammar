@@ -1,4 +1,5 @@
 import { HTMLBlockquoteObject } from "@lib/utils";
+import { ElementPage, ElementPageType } from "@utils/element";
 import { ElementModelAddress } from "@utils/model";
 import { SERVER } from "config";
 import React, { useEffect, useReducer } from "react";
@@ -58,7 +59,12 @@ export const ExampleBlockquote: React.VFC<ExampleBlockquoteProps> = ({ children 
         }
         if (process.env.NODE_ENV === "development"
             && query.status === "success") {
-            if (!query.data.has(children.custom)) {
+            const [pageType, name] = children.custom.split(".");
+            const value = ElementModelAddress.toString({
+                page: ElementPage.typeToId(pageType as ElementPageType),
+                name: name
+            });
+            if (!query.data.has(value)) {
                 dispatch({
                     type: "error",
                     msg: `No model exists for '${children.custom}'`
