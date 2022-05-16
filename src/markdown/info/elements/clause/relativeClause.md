@@ -28,4 +28,6 @@ The pronoun *who* refers to the pronoun *someone* which is what is being modifie
 
 #### Preposition Phrase
 <!-- *relativeClause.dep-word_prep-phrase -->
-> The person with whom I spoke was very nice.
+> The person *with whom* I spoke was very nice.
+<!-- .caption -->
+The preposition phrase *with whom* introduces the relative clause *with whom I spoke*.
