@@ -67,7 +67,7 @@ export interface DependentClauseDefinition extends IndependentClauseDefinition, 
 
 // sometimes the dependent word also acts as a subject or object of the clause
 export interface NounClauseDefinition extends DependentClauseDefinition {
-    dependentWord: [false, ["subordinator", "pronoun"]];
+    dependentWord: [false, ["subordinator", "pronoun", "prepositionPhrase"]];
 }
 export interface NounClause extends Clause, ReferencingElement<NounClauseDefinition> {
     clauseType: "noun";
@@ -76,7 +76,7 @@ export interface NounClause extends Clause, ReferencingElement<NounClauseDefinit
 export type FunctionalNounClause = ClauseFunctionalTypeGuard<"noun">;
 
 export interface RelativeClauseDefinition extends DependentClauseDefinition {
-    dependentWord: [false, ["adverb", "pronoun"]];
+    dependentWord: [false, ["adverb", "pronoun", "prepositionPhrase"]];
 }
 export interface RelativeClause extends Clause, ReferencingElement<RelativeClauseDefinition> {
     clauseType: "relative";

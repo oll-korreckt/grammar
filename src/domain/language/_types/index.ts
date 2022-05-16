@@ -262,7 +262,7 @@ const definitionObject: DefinitionObject = {
         ]
     },
     coordinatedNounPhrase: createCoordinatedDefinition(["noun", "pronoun", "nounPhrase"]),
-    nounClause: createDependentClauseDefinition(["subordinator", "pronoun"]),
+    nounClause: createDependentClauseDefinition(["subordinator", "pronoun", "prepositionPhrase"]),
     coordinatedNounClause: createCoordinatedDefinition(["nounClause"]),
     pronoun: {
         words: [true, ["word"]]
@@ -376,7 +376,7 @@ const definitionObject: DefinitionObject = {
         predicate: [false, fnVerbPhrase]
     },
     coordinatedIndependentClause: createCoordinatedDefinition(["independentClause"]),
-    relativeClause: createDependentClauseDefinition(["adverb", "pronoun"]),
+    relativeClause: createDependentClauseDefinition(["adverb", "pronoun", "prepositionPhrase"]),
     coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"]),
     sentence: {
         items: [true, ["interjection", "independentClause", "coordinatedIndependentClause"]]
