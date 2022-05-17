@@ -11,7 +11,7 @@ Pronouns are words (or sometimes groups of words) that typically reference a [no
 Due to the diverse set of responsibilities given to them, pronouns can sometimes be difficult to identify within a sentence.
 
 ### Noun
-
+The most common use-case ascribed to pronouns is to function as nouns which means that they can serve as the subject of a clause, object of a verb or preposition.
 
 ### Interrogative
 Certain pronouns (ex: *who*, *whom*, *whose*, *which*, *what*) can be used to create questions. When used in such a manner, they function as a noun.
