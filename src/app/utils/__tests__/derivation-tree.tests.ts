@@ -1,75 +1,48 @@
+import { ElementType } from "@domain/language";
 import { assert } from "chai";
 import { DerivationTree } from "../derivation-tree";
 
-describe("derivation-tree", () => {
-    describe("getDerivationTree", () => {
-        test("available", () => {
-            const result = DerivationTree.getDerivationTree("noun");
-            const expected: DerivationTree = {
-                partOfSpeech: [{
-                    baseType: "noun",
-                    coordType: {
-                        type: "coordinatedNoun",
-                        properties: ["items"]
-                    }
-                }],
-                phrase: [
-                    {
-                        baseType: "nounPhrase",
-                        primaryType: {
-                            type: "nounPhrase",
-                            properties: ["head"]
-                        },
-                        coordType: {
-                            type: "coordinatedNounPhrase",
-                            properties: ["items"]
-                        }
-                    },
-                    {
-                        baseType: "prepositionPhrase",
-                        primaryType: {
-                            type: "prepositionPhrase",
-                            properties: ["object"]
-                        }
-                    }
-                ],
-                clause: [
-                    {
-                        baseType: "independentClause",
-                        primaryType: {
-                            type: "independentClause",
-                            properties: ["subject"]
-                        }
-                    },
-                    {
-                        baseType: "nounClause",
-                        primaryType: {
-                            type: "nounClause",
-                            properties: ["subject"]
-                        }
-                    },
-                    {
-                        baseType: "relativeClause",
-                        primaryType: {
-                            type: "relativeClause",
-                            properties: ["subject"]
-                        }
-                    },
-                    {
-                        baseType: "adverbialClause",
-                        primaryType: {
-                            type: "adverbialClause",
-                            properties: ["subject"]
-                        }
-                    }
-                ]
-            };
+describe("DerivationTree", () => {
+    describe("getElements", () => {
+        test("no coordinator", () => {
+            const input: ElementType[] = [
+                "noun",
+                "verb"
+            ];
+            const result = DerivationTree.getElements(input);
+            const expected: ElementType[] = [
+                "nounPhrase",
+                "verbPhrase",
+                "independentClause"
+            ];
+            assert.deepStrictEqual(result.sort(), expected.sort());
+        });
+
+        test("coordinator", () => {
+            const input: ElementType[] = ["coordinator"];
+            const result = DerivationTree.getElements(input);
+            const expected: ElementType[] = [];
             assert.deepStrictEqual(result, expected);
         });
 
-        test("unavailable", () => {
-            const result = DerivationTree.getDerivationTree("coordinatedAdjectivePhrase");
-            assert.isUndefined(result);
+        test("word", () => {
+            const result = DerivationTree.getElements(["word"]);
+            const expected: ElementType[] = [
+                "noun",
+                "pronoun",
+                "verb",
+                "infinitive",
+                "participle",
+                "gerund",
+                "adjective",
+                "adverb",
+                "preposition",
+                "determiner",
+                "coordinator",
+                "subordinator",
+                "interjection"
+            ];
+            assert.deepStrictEqual(result.sort(), expected.sort());
         });
     });
 });
