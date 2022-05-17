@@ -3,7 +3,7 @@ import { ElementDisplayInfo } from "./element-display-info";
 
 
 interface ElementChecker {
-    type: ElementType;
+    type: Exclude<ElementType, "word">;
     isPossible: PossibleFunction;
 }
 
@@ -72,7 +72,7 @@ function createAvailableFn(available: ElementType[]): AvailableFunction {
     return (type) => availSet.has(type);
 }
 
-function getElements(available: ElementType[]): ElementType[] {
+function getElements(available: ElementType[]): Exclude<ElementType, "word">[] {
     const availFn = createAvailableFn(available);
     return checkers
         .filter(({ isPossible }) => isPossible(availFn))

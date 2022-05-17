@@ -1,4 +1,4 @@
-import { DiagramState, LabelFormMode } from "@app/utils";
+import { DerivationTree, DiagramState, LabelFormMode } from "@app/utils";
 import { Element, ElementId, ElementType } from "@domain/language";
 import React from "react";
 import { AddMenuProps } from "../AddMenu";
@@ -8,8 +8,8 @@ import { EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 import { EditBrowseMenuProps } from "../EditBrowseMenu";
 import { NavigateMenuProps } from "../NavigateMenu";
 import { LabelViewNavBarAssemblyProps } from "../LabelViewNavBarAssembly";
-import { getAddMenuElements } from "./add-menu-elements";
-import { State, LabelFormAction, EditActiveState } from "./types";
+import { State, LabelFormAction, EditActiveState, DisplaySettings } from "./types";
+import { Utils } from "./utils";
 
 export function createEditActiveDispatch(dispatch: React.Dispatch<LabelFormAction>): EditActiveMenuDispatch {
     return (action) => {
@@ -214,4 +214,13 @@ export function createOnLabelClick(state: State, dispatch: React.Dispatch<LabelF
         }
     }
     return () => { return; };
+}
+
+function getAddMenuElements(diagram: DiagramState, display: DisplaySettings): Exclude<ElementType, "word">[] {
+    const visibleElementTypes = Utils.getLabelData(diagram, display)
+        .filter(Utils.isElementLabel)
+        .filter(({ id }) => DiagramState.getItem(diagram, id).ref === undefined)
+        .map(({ id }) => DiagramState.getItem(diagram, id).type);
+    const output = DerivationTree.getElements(visibleElementTypes);
+    return output;
 }
