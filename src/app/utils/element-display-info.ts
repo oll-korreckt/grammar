@@ -270,7 +270,7 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
         },
         subjCompl: {
             fullName: "Subject Complement",
-            abrName: "Subj. Complement",
+            abrName: "Subj. Compl.",
             displayOrder: 3
         },
         dirObj: {
