@@ -24,14 +24,12 @@ The preposition phrase *on the circumstances* and the verb *will depend* combine
 
 <!-- #modifiers -->
 ### Modifiers
-Optionally, verb phrases can contain head modifiers which modify the head of the phrase. The head modifier should answer one of the following questions:
+Optionally, verb phrases can contain modifiers which modify the head of the phrase. Each modifier should answer one of the following questions:
 - when?
 - where?
 - why?
 - in what manner?
 - to what degree?
-
-Head modifiers are similar to head complements with the distinguishing feature being that head modifiers are not semantically essential whereas head complements are.
 
 #### Adverbs
 <!-- *verbPhrase.modifiers_adverb -->
@@ -54,8 +52,10 @@ Adverbial Clause
 > The dog ran *five miles*.
 
 #### Preposition Phrases
-<!-- *verbPhrase. -->
+<!-- *verbPhrase.modifiers_preposition-phrase -->
 > The dog ran *across the field*.
+<!-- .caption -->
+The preposition phrase *across the field* modifies the verb *ran*.
 
 #### Infinitives
 One can use infinitives in order to modify the verb. However, it is worth noting that infinitives can also be used as a direct object. Thus, it is important to take great care determine whether an infinitive is being used to modify the main verb or as object of the main verb.
