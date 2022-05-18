@@ -37,4 +37,16 @@ Certain verb tenses and moods require multiple auxiliary verbs. Thus, the auxili
 The auxiliary verbs *have* and *been* are used in combination with *waiting* to form the present perfect continuous verb tense.
 
 ## Phrasal Verbs
-Certain verbs can be used in combination with a particle or preposition in order to fundamentally alter the semantic meaning of the verb. When a particle is used, it is referenced by the main verb property. When a preposition is used, the verb and the resulting preposition phrase form a verb phrase. 
+Certain verbs can be used in combination with a particle or [preposition phrase](preposition-phrase) in order to fundamentally alter the semantic meaning of the verb. When a particle is used, it is referenced by the main verb property. When a preposition phrase is used, the verb and the resulting preposition phrase form a [verb phrase](verb-phrase).
+
+### Particle
+<!-- *verb.phrasal-verb_particle -->
+> We *took* the trash *out*.
+<!-- .caption -->
+The verb *took* and the particle *out* form the phrasal verb *to take out*.
+
+### Preposition Phrase
+<!-- *verb.phrasal-verb_preposition-phrase -->
+> Please look after my children while I am away.
+<!-- .caption -->
+The preposition phrase *after my children* combines with the verb *look* to form the phrasal verb *look after*.
