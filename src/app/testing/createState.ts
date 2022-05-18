@@ -148,7 +148,7 @@ export function createState(): DiagramState {
     const [jumpsVerbPhraseId, jumpsVerbPhrase] = createPhrase("verb", {
         id: "jumpsVerbPhrase",
         phraseType: "verb",
-        headModifier: { id: overPrepPhraseId, type: "prepositionPhrase" },
+        modifiers: [{ id: overPrepPhraseId, type: "prepositionPhrase" }],
         head: { id: jumpsVerbId, type: "verb" }
     });
     const [indClauseId, indClause] = createClause("independent", {

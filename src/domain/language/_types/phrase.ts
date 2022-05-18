@@ -99,7 +99,7 @@ export interface NounPhrase extends Phrase, ReferencingElement<NounPhraseDefinit
 // Coordinated: the ugly horse and the lazy bear
 export type FunctionalNounPhrase = FunctionalTypeGuard<[...FunctionalNoun, ...FunctionalPronoun, "nounPhrase", "coordinatedNounPhrase"]>;
 
-type HeadModifier = [
+type Modifiers = [
     ...FunctionalAdverbPhrase,
     ...FunctionalAdverbialClause,
     ...FunctionalNounPhrase,
@@ -130,14 +130,14 @@ type VerbDirectObjectComplement = [
     ...FunctionalRelativeClause,
     ...FunctionalAdverbialClause
 ];
-export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"head" | "phrasal" | "headModifier" | "subjCompl" | "dirObj" | "dirObjCompl" | "indObj"> {
+export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"head" | "phrasal" | "modifiers" | "subjCompl" | "dirObj" | "dirObjCompl" | "indObj"> {
     phrasal: [false, ["prepositionPhrase"]];
     /*
         Not semantically essential. Can come before or after the verb.
         Ex1: told the story QUICKLY
         Ex2: QUICKLY told the story
     */
-    headModifier: [true, HeadModifier];
+    modifiers: [true, Modifiers];
     /*
         Can only be used with linking verbs. Describes the subject.
         Ex: He is A GOOD DOCTOR.

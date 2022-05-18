@@ -181,7 +181,7 @@ describe("DiagramState", () => {
                 id: "input",
                 phraseType: "verb",
                 head: { id: "a", type: "verb" },
-                headModifier: [{ id: "a", type: "noun" }],
+                modifiers: [{ id: "a", type: "noun" }],
                 dirObj: { id: "a", type: "gerund" }
             };
             assert.throw(

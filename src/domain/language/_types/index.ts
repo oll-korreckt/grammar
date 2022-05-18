@@ -148,7 +148,7 @@ function createVerbPhraseBaseDefinition<T extends ElementType[]>(head: T): Omit<
     return {
         head: [false, head],
         phrasal: [false, ["prepositionPhrase"]],
-        headModifier: [
+        modifiers: [
             true,
             [
                 ...fnAdverbPhrase,

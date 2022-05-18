@@ -13,8 +13,8 @@ In terms of properties, verb phrases are quite versatile can assume many forms d
 ### Head
 All verb phrases must be headed by a verb.
 
-<!-- #headModifier -->
-### Head Modifier
+<!-- #modifiers -->
+### Modifiers
 Optionally, verb phrases can contain head modifiers which modify the head of the phrase. The head modifier should answer one of the following questions:
 - when?
 - where?
@@ -25,23 +25,23 @@ Optionally, verb phrases can contain head modifiers which modify the head of the
 Head modifiers are similar to head complements with the distinguishing feature being that head modifiers are not semantically essential whereas head complements are.
 
 #### Adverbs
-<!-- *verbPhrase.head-modifier_adverb -->
+<!-- *verbPhrase.modifiers_adverb -->
 > The dog ran *quickly*.
 <!-- .caption -->
 Adverb
 
-<!-- *verbPhrase.head-modifier_adverb-phrase -->
+<!-- *verbPhrase.modifiers_adverb-phrase -->
 > The dog ran *very quickly*.
 <!-- .caption -->
 Adverb Phrase
 
-<!-- *verbPhrase.head-modifier_adverbial-clause -->
+<!-- *verbPhrase.modifiers_adverbial-clause -->
 > The dog ran *when he saw a squirrel*.
 <!-- .caption -->
 Adverbial Clause
 
 #### Nouns
-<!-- *verbPhrase.head-modifier_noun -->
+<!-- *verbPhrase.modifiers_noun -->
 > The dog ran *five miles*.
 
 #### Preposition Phrases
@@ -51,12 +51,12 @@ Adverbial Clause
 #### Infinitives
 One can use infinitives in order to modify the verb. However, it is worth noting that infinitives can also be used as a direct object. Thus, it is important to take great care determine whether an infinitive is being used to modify the main verb or as object of the main verb.
 
-<!-- *verbPhrase.head-modifier_coordinated-infinitive -->
+<!-- *verbPhrase.modifiers_coordinated-infinitive -->
 > You should play *to win* and *to learn*.
 <!-- .caption -->
 Coordinated Indirect
 
-<!-- *verbPhrase.head-modifier_infinitive-phrase -->
+<!-- *verbPhrase.modifiers_infinitive-phrase -->
 > The dog ran *to catch the squirrel*.
 <!-- .caption -->
 Infinitive Phrase

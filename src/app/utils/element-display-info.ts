@@ -36,7 +36,7 @@ function createPhrase<T extends PartOfSpeechType & PhraseType>(elementInfo: Type
 
 function modifier(displayOrder: number): { fullName: string; displayOrder: number; } {
     return {
-        fullName: "Modifer",
+        fullName: "Modifier",
         displayOrder: displayOrder
     };
 }
@@ -263,9 +263,8 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
             abrName: "Phrasal",
             displayOrder: 1
         },
-        headModifier: {
-            fullName: "Head Modifier",
-            abrName: "Head Mod.",
+        modifiers: {
+            fullName: "Modifiers",
             displayOrder: 2
         },
         subjCompl: {

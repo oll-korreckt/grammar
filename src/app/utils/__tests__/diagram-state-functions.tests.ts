@@ -84,9 +84,9 @@ describe("DiagramStateFunctions", () => {
             const newChild = DiagramState.getItem(result, Ids.jumpsVerb);
             const newParent = DiagramState.getItem(result, Ids.jumpsVerbPhrase);
             assert.strictEqual(oldChild.ref, Ids.jumpsVerbPhrase);
-            assert.hasAllKeys(oldParent.value, ["id", "phraseType", "head", "headModifier"]);
+            assert.hasAllKeys(oldParent.value, ["id", "phraseType", "head", "modifiers"]);
             assert.isUndefined(newChild.ref);
-            assert.hasAllKeys(newParent.value, ["id", "phraseType", "headModifier"]);
+            assert.hasAllKeys(newParent.value, ["id", "phraseType", "modifiers"]);
         });
 
         test("array property", () => {
