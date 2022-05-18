@@ -106,7 +106,6 @@ type HeadModifier = [
     ...FunctionalPrepositionPhrase,
     ...FunctionalInfinitivePhrase
 ];
-type HeadComplement = HeadModifier;
 type SubjectComplement = [
     ...FunctionalNounPhrase,
     ...FunctionalNounClause,
@@ -131,21 +130,13 @@ type VerbDirectObjectComplement = [
     ...FunctionalRelativeClause,
     ...FunctionalAdverbialClause
 ];
-export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"head" | "headModifier" | "headCompl" | "subjCompl" | "dirObj" | "dirObjCompl" | "indObj"> {
+export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"head" | "headModifier" | "subjCompl" | "dirObj" | "dirObjCompl" | "indObj"> {
     /*
         Not semantically essential. Can come before or after the verb.
         Ex1: told the story QUICKLY
         Ex2: QUICKLY told the story
     */
     headModifier: [true, HeadModifier];
-    /*
-        Semantically essential. Always located after the verb. Appears
-        immediately after the verb if verb is intransitive. Appears after the
-        direct object if the verb is transitive.
-        Ex1: We are staying IN THE HOTEL.
-        Ex2: She gave the book BACK TO ME.
-    */
-    headCompl: [false, HeadComplement];
     /*
         Can only be used with linking verbs. Describes the subject.
         Ex: He is A GOOD DOCTOR.

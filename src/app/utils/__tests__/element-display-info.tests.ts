@@ -4,8 +4,8 @@ import { assert } from "chai";
 
 function containsRequired(properties: ElementDisplayInfo["properties"][keyof ElementDisplayInfo["properties"]][]): boolean {
     for (let index = 0; index < properties.length; index++) {
-        const { displayOrder, required } = properties[index];
-        if (displayOrder === 0 && required) {
+        const { required } = properties[index];
+        if (required) {
             return true;
         }
     }
@@ -106,10 +106,8 @@ describe("ElementDisplayInfo", () => {
                 const type = types[index];
                 const info = ElementDisplayInfo.getDisplayInfo(type);
                 const properties = Object.entries(info.properties).map((prop) => prop[1]);
-                assert.isTrue(
-                    containsRequired(properties),
-                    `type '${type}' does not have required property`
-                );
+                const result = containsRequired(properties);
+                assert.isTrue(result, `type '${type}' does not have required property`);
             }
         });
     });

@@ -61,22 +61,6 @@ Coordinated Indirect
 <!-- .caption -->
 Infinitive Phrase
 
-<!-- #headCompl -->
-### Head Complement
-Head complements semantically alter a verb. In order to determine whether an element is functioning as a head modifier or a head complement, you can try removing the element from the sentence in order to see if the meaning of the verb is altered. For example, there is a semantic difference between the following sentences:
-
-> Put the car *in the garage*.
-
-> Put the car.
-
-On the other hand,
-
-> *Quickly* put the car in the garage.
-
-> Put the car in the garage.
-
-do not have a difference in semantic meaning.
-
 <!-- #subjCompl -->
 ### Subject Compliment
 Subject compliments are only used with certain verbs.

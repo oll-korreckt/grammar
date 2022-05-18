@@ -263,37 +263,32 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
             abrName: "Head Mod.",
             displayOrder: 1
         },
-        headCompl: {
-            fullName: "Head Complement",
-            abrName: "Head Compl.",
-            displayOrder: 2
-        },
         subjCompl: {
             fullName: "Subject Complement",
             abrName: "Subj. Compl.",
-            displayOrder: 3
+            displayOrder: 2
         },
         dirObj: {
             fullName: "Direct Object",
             abrName: "Dir. Obj.",
-            displayOrder: 4
+            displayOrder: 3
         },
         dirObjCompl: {
             fullName: "Direct Object Complement",
             abrName: "Dir. Obj. Compl.",
-            displayOrder: 5
+            displayOrder: 4
         },
         indObj: {
             fullName: "Indirect Object",
             abrName: "Ind. Obj.",
-            displayOrder: 6
+            displayOrder: 5
         }
     };
     const partPhraseProps: Omit<typeof verblikePhraseProps, "dirObjCompl"> = {
         ...verblikePhraseProps,
         indObj: {
             ...verblikePhraseProps.indObj,
-            displayOrder: 5
+            displayOrder: 4
         }
     };
     delete (partPhraseProps as any).dirObjCompl;

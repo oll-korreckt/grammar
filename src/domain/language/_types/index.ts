@@ -158,17 +158,6 @@ function createVerbPhraseBaseDefinition<T extends ElementType[]>(head: T): Omit<
                 ...fnInfinitivePhrase
             ]
         ],
-        headCompl: [
-            false,
-            [
-                ...fnAdverbPhrase,
-                "adverbialClause",
-                "coordinatedAdverbialClause",
-                ...fnNounPhrase,
-                ...fnPrepositionPhrase,
-                ...fnInfinitivePhrase
-            ]
-        ],
         subjCompl: [
             false,
             [

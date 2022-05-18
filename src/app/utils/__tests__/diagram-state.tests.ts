@@ -105,7 +105,7 @@ describe("DiagramState", () => {
                 }
             ],
             complement: {
-                type: "noun",
+                type: "infinitive",
                 id: "5"
             }
         };
@@ -123,7 +123,7 @@ describe("DiagramState", () => {
                     id: "4"
                 }
             ],
-            complement: [{ type: "noun", id: "5" }]
+            complement: [{ type: "infinitive", id: "5" }]
         };
         result = sortReferenceObject(result);
         expected = sortReferenceObject(expected);
@@ -181,8 +181,8 @@ describe("DiagramState", () => {
                 id: "input",
                 phraseType: "verb",
                 head: { id: "a", type: "verb" },
-                headModifier: { id: "a", type: "noun" },
-                headCompl: { id: "a", type: "noun" }
+                headModifier: [{ id: "a", type: "noun" }],
+                dirObj: { id: "a", type: "gerund" }
             };
             assert.throw(
                 () => DiagramState.getReferencingProperties("verbPhrase", input, "a"),
