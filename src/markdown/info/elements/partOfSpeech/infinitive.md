@@ -11,13 +11,22 @@ An infinitive is the "raw" form of verb without any conjugation. In English, inf
 As mentioned earlier, infinitives can function as a noun, adjective, or adverb.
 
 ### Noun
+<!-- *infinitive.noun -->
 > I like *to eat*.
+<!-- .caption -->
+*To eat* functions as a noun and is the object of the verb *like*.
 
 ### Adjective
+<!-- *infinitive.adjective -->
 > The Broncos are the team *to beat*.
+<!-- .caption -->
+*To beat* functions as an adjective and describes the noun *team*.
 
 ### Adverb
+<!-- *infinitive.adverb -->
 > She went to the beach *to swim*.
+<!-- .caption -->
+*To swim* functions as an adverb and describes the verb *went*.
 
 ## Identification
 The word *to* is often used to from a [preposition phrases](preposition-phrase). As such, it might be tempting to label an infinitive as preposition phrase. The easiest way to differentiate between the two is to focus on the word associated with *to*:
