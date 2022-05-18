@@ -147,6 +147,7 @@ const fnVerbPhrase: FunctionalVerbPhrase = [
 function createVerbPhraseBaseDefinition<T extends ElementType[]>(head: T): Omit<VerbPhraseBaseDefinition, "head"> & { head: [false, T]; } {
     return {
         head: [false, head],
+        phrasal: [false, ["prepositionPhrase"]],
         headModifier: [
             true,
             [

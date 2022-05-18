@@ -258,37 +258,42 @@ function getDisplayInfo(type: ElementType): ElementDisplayInfo {
     );
     const verblikePhraseProps = {
         head: head,
+        phrasal: {
+            fullName: "Phrasal",
+            abrName: "Phrasal",
+            displayOrder: 1
+        },
         headModifier: {
             fullName: "Head Modifier",
             abrName: "Head Mod.",
-            displayOrder: 1
+            displayOrder: 2
         },
         subjCompl: {
             fullName: "Subject Complement",
             abrName: "Subj. Compl.",
-            displayOrder: 2
+            displayOrder: 3
         },
         dirObj: {
             fullName: "Direct Object",
             abrName: "Dir. Obj.",
-            displayOrder: 3
+            displayOrder: 4
         },
         dirObjCompl: {
             fullName: "Direct Object Complement",
             abrName: "Dir. Obj. Compl.",
-            displayOrder: 4
+            displayOrder: 5
         },
         indObj: {
             fullName: "Indirect Object",
             abrName: "Ind. Obj.",
-            displayOrder: 5
+            displayOrder: 6
         }
     };
     const partPhraseProps: Omit<typeof verblikePhraseProps, "dirObjCompl"> = {
         ...verblikePhraseProps,
         indObj: {
             ...verblikePhraseProps.indObj,
-            displayOrder: 4
+            displayOrder: 5
         }
     };
     delete (partPhraseProps as any).dirObjCompl;

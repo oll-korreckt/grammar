@@ -130,7 +130,8 @@ type VerbDirectObjectComplement = [
     ...FunctionalRelativeClause,
     ...FunctionalAdverbialClause
 ];
-export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"head" | "headModifier" | "subjCompl" | "dirObj" | "dirObjCompl" | "indObj"> {
+export interface VerbPhraseBaseDefinition extends ReferencingElementDefinition<"head" | "phrasal" | "headModifier" | "subjCompl" | "dirObj" | "dirObjCompl" | "indObj"> {
+    phrasal: [false, ["prepositionPhrase"]];
     /*
         Not semantically essential. Can come before or after the verb.
         Ex1: told the story QUICKLY
