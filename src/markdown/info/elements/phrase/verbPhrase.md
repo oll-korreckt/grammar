@@ -13,6 +13,15 @@ In terms of properties, verb phrases are quite versatile can assume many forms d
 ### Head
 All verb phrases must be headed by a verb.
 
+<!-- #phrasal -->
+### Phrasal
+Rather than using a particle, certain phrasal verbs are created via a [preposition phrase](preposition-phrase).
+
+<!-- *verbPhrase.phrasal -->
+> The answer will depend *on the circumstances*.
+<!-- .caption -->
+The preposition phrase *on the circumstances* and the verb *will depend* combine to form the phrasal verb *depend on*.
+
 <!-- #modifiers -->
 ### Modifiers
 Optionally, verb phrases can contain head modifiers which modify the head of the phrase. The head modifier should answer one of the following questions:
