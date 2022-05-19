@@ -6,12 +6,22 @@ When one asks: "what is a noun?" the answer typically received is "a person, pla
 
 ## Properties
 <!-- +propertySummary -->
-As mentioned before, a noun can be composed of one or more words.
-> a delicious *Taco*
+Nouns are typically thought of as being just a single word but it is also possible for a noun to be formed from multiple words.
 
+<!-- *noun.single-word -->
+> a delicious *taco*
+<!-- .caption -->
+*Taco* is a single word that functions as a noun.
+
+<!-- *noun.two-word -->
 > She is an *electronics specialist*.
+<!-- .caption -->
+*Electronics* and *specialist* are both nouns. In this case, they form a single noun: *electronics specialist*.
 
-> Hello, *Mr. Smith*.
+<!-- *noun.two-word_proper-noun -->
+> *Mr. Smith* works as a lawyer.
+<!-- .caption -->
+*Mr.* is a title and *Smith* is a proper noun. Together they form the proper noun *Mr. Smith*.
 
 ## Identification
 - Refer to a dictionary to see if the word/words can be used as a noun.
