@@ -29,9 +29,15 @@ When it comes to placement within a sentence, adverbs tend to be quite flexible 
 
 Yet another example:
 
+<!-- *adverb.identification_front -->
 > *Tomorrow*, we are eating spaghetti for dinner.
+<!-- .caption -->
+*Tomorrow* modifies the verb *are eating*.
 
+<!-- *adverb.identification_end -->
 > We are eating spaghetti for dinner *tomorrow*.
+<!-- .caption -->
+*Tomorrow* still modifies the verb *are eating* in this example.
 
 It is important to remember, however, that not all adverbs can be re-positioned within a sentence:
 
@@ -40,22 +46,34 @@ It is important to remember, however, that not all adverbs can be re-positioned 
 There is only one possible position for *around* to occupy in this sentence.
 
 ### Time
+The adverbs in the following examples answer the question *when*?
+
 > She is *still* the best.
 
 > I *just* ate.
 
 ### Location
+The adverbs in the following examples answer the question *where*?
+
 > One can find bamboo *everywhere*.
 
 > He jumped *vertically*.
 
 ### Purpose
-> The child was caught stealing from the cookie jar and was punished *consequently*.
+<!-- *adverb.identification_purpose -->
+> The child was caught stealing from the cookie jar and was *therefore* punished.
+<!-- .caption -->
+*Therefore* modifies the verb *was punished* and answers the question *why*?.
 
 ### Manner
+<!-- *adverb.identification_manner -->
 > The dog *happily* ate her meal.
+<!-- .caption -->
+*Happily* modifies *ate* and answers the question *in what manner*?
 
 ### Degree
+The adverbs in each example answer the question *to what degree*?
+
 > Her hair is *not* short.
 
 > Her hair is *quite* short.
