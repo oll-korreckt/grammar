@@ -11,7 +11,7 @@ Coordinators are used to combine grammatically similar elements into a singular 
 Coordinators can fall into two categories: **coordinating conjunctions** and **correlative conjunctions**.
 
 ### Coordinating Conjunctions
-The English lanauge contains only 7 coordinating conjunctions which can be memorized using the mnemonic *FANBOYS:*
+The English language contains only 7 coordinating conjunctions which can be memorized using the mnemonic *FANBOYS:*
 - for
 - and
 - nor
@@ -20,13 +20,17 @@ The English lanauge contains only 7 coordinating conjunctions which can be memor
 - yet
 - so
 
+<!-- *coordinator.coord_for -->
 > I must find water, *for* I am thirsty.
 
+<!-- *coordinator.coord_and -->
 > He bought celery, bread, *and* chocolate at the grocery store.
 
-> We will not buy a new car, *nor* will he buy a new computer.
+<!-- *coordinator.coord_nor -->
+> We will not buy a new car, *nor* will we buy a new computer.
 
-> I'd love to watch a movie tonight, *but* unfortunately, I've already made other plans.
+<!-- *coordinator.coord_but -->
+> I would love to watch a movie tonight, *but* unfortunately, I have already made other plans.
 
 > We could eat dinner at my place, *or* we could eat it at yours.
 
