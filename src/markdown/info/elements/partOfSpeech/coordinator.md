@@ -32,15 +32,20 @@ The English language contains only 7 coordinating conjunctions which can be memo
 <!-- *coordinator.coord_but -->
 > I would love to watch a movie tonight, *but* unfortunately, I have already made other plans.
 
+<!-- *coordinator.coord_or -->
 > We could eat dinner at my place, *or* we could eat it at yours.
 
+<!-- *coordinator.coord_yet -->
 > My mother was stern *yet* fair.
 
-> Please leave your name and number, *so* we can return your phone call.
+<!-- *coordinator.coord_so -->
+> I am quite tired, so I will take a nap.
 
 ### Correlative Conjunctions
 Correlative conjunctions are pairs of words that are used to combine just 2 grammatically similar elements.
 
+<!-- *coordinator.corr_either-or -->
 > We can *either* eat at a restaurant *or* make dinner at home.
 
-> That's *neither* here *nor* there.
+<!-- *coordinator.corr_neither-nor -->
+> That is *neither* here *nor* there.
