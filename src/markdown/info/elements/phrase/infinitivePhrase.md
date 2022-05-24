@@ -8,15 +8,33 @@ Infinitive phrases are similar in structure to [verb phrases](verb-phrase), [ger
 <!-- +propertySummary -->
 
 ### Head
-<!-- *infinitivePhrase.head -->
 > I came here *to eat* food.
 
-### Head Modifier
-The head modifier
-> I like to finish my homework *quickly*.
+### Phrasal
+Certain phrasal verbs are created by combining a verb with a preposition phrase. The phrasal property can be used to signify such verbs.
 
-### Head Complement
+> The company plans to deal *with the dwindling sales* by launching a new advertising campaign.
+<!-- .caption -->
+When combined with the preposition phrase *with the dwindling sales*, the infinitive *to deal* becomes a phrasal verb since it alters the semantic meaning of *to deal*. Thus, the preposition phrase *with the dwindling sales* belongs in the **phrasal** property.
+
+> The plane rose to fly *over the mountain*.
+<!-- .caption -->
+Combining *over the mountain* with the infinitive *to fly* does not modify the semantic meaning of *to fly*. The preposition phrase *over the mountain* therefore belongs in the **modifier** property.
+
+### Modifiers
+Modifiers can consist of any element that functions adverbially and does not alter the semantic meaning of the infinitive.
+
+> The dog likes to *quickly* eat his food.
+<!-- .caption -->
+*Quickly* is an adverb that modifies *to eat*.
+
+> I always try to play *to win*.
+<!-- .caption -->
+The infinitive *to win* modifies the infinitive *to play*.
+
 > It would be quite expensive to live *in that house*.
+<!-- .caption -->
+The preposition phrase *in that house* modifies *to live*. It does not, however, alter its semantic meaning and so does not belong under the **Phrasal** property.
 
 ### Subject Complement
 Despite not being a predicate, infinitive phrase created from linking verbs can still accept a subject complement.
