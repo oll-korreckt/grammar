@@ -10,6 +10,18 @@ Participle phrases are similar in structure to [verb phrases](verb-phrase), [inf
 ### Head
 > The newly *printed* book weighed over 10 pounds.
 
+### Phrasal
+> Nurses looking *after numerous patients* during long shifts can be prone to burnout.
+<!-- .caption -->
+The preposition phrase *after numerous patients* alters the semantic meaning of the participle *looking* and thus belongs in **phrasal** property.
+
+### Modifiers
+Elements functioning as adverbs which do not alter the semantic meaning of the verb which they are modifying belong in **modifiers** property.
+
+> His *hastily* completed homework assignment received a poor grade.
+<!-- .caption -->
+*Hastily* is an adverb which modifies the gerund *completed*.
+
 ### Head Modifier
 > The *recently* elected mayor declared a state of emergency.
 

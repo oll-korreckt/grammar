@@ -12,7 +12,16 @@ Gerund phrases are similar in structure to [verb phrases](verb-phrase), [infinit
 <!-- .caption -->
 *Leaving* is the head of the gerund phrase, *leaving the television on*.
 
-### Head Modifier
+### Phrasal
+> Looking *after children* can require a lot of energy.
+<!-- .caption -->
+*After children* semantically modifies meaning of the gerund *looking*
+
+### Modifiers
+> Be sure to check for ticks after walking *in the woods*.
+<!-- .caption -->
+The preposition phrase *in the woods* modifies *walking*. The semantic meaning of *walking* has not been modified, and so *in the woods* is a modifier.
+
 > *Absent-mindedly* checking your homework is unlikely to result in finding many errors.
 <!-- .caption -->
 *Absent-mindedly* modifies *checking* in the gerund phrase *absent-mindedly checking your homework*.
