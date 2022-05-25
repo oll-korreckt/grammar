@@ -23,6 +23,13 @@ Nouns are typically thought of as being just a single word but it is also possib
 <!-- .caption -->
 *Mr.* is a title and *Smith* is a proper noun. Together they form the proper noun *Mr. Smith*.
 
+## Nouns of address
+Like [interjections](interjection), nouns of address are grammatically separate from the rest of the sentence and are demarcated with a comma.
+
+> It is nice to see you, *John*.
+<!-- .caption -->
+*John* is a noun of address.
+
 ## Identification
 - Refer to a dictionary to see if the word/words can be used as a noun.
 - Are the word/words being capitalized despite not being located at the start of a sentence (indicating a possible proper noun)?
@@ -31,3 +38,4 @@ Nouns are typically thought of as being just a single word but it is also possib
 - Is it being described by an [adjective](adjective)?
 - Is it plural or could you pluralize it?
 - Is it the object of a [verb phrase](verb-phrase) or [preposition phrase](preposition-phrase)?
+- Is it grammatically separate from the rest of the sentence, demarcated with a comma, and not a pronoun or interjection?

@@ -37,11 +37,19 @@ When the subject of a clause is also the object of clause's predicate, a reflexi
 ### Intensifier
 Intensive pronouns always reference the subject of the sentence and are used to provided increased emphasis on the subject. In spite of referencing a noun, however, intensive pronouns function as [adverbs](adverb) within a sentence, and should therefore be marked as such.
 
+### Address
+Like nouns, pronouns can be used to address someone. When used in such a manner, they are demarcated with a comma and are grammatically separate from the rest of the sentence.
+
+> *You*, can you help me with this?
+<!-- .caption -->
+The first *you* is a pronoun of a address.
+
 #### Identification
 - Is it a single word that ends with -*self*?
 - Does the word reference the subject of the sentence?
 - Can you remove the word from the sentence without changing the sentence's core meaning?
 - Does the word answer the question "in what manner?"
+- Is it grammatically separate from the rest of the sentence, demarcated with a comma, and not a noun or interjection?
 
 <!-- *pronoun.intensifier_ex1 -->
 > Even the king *himself* attended the funeral.
