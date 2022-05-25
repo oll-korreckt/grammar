@@ -7,7 +7,12 @@ A noun phrase is simply a single head-noun accompanied by all of its modifiers. 
 ## Properties
 <!-- +propertySummary -->
 
+### Head
+The head of a noun phrase can be either a noun or a pronoun.
+
 ### Modifiers
+Modifiers include any determiners and/or elements functioning as adjectives which are modifying the head of the noun phrase.
+
 <!-- *nounPhrase.modifiers -->
 > *His elderly* mother just had *her 100th* birthday.
 <!-- .caption -->
