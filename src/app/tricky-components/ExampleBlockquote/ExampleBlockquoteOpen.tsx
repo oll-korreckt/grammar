@@ -1,8 +1,8 @@
 import { RenderFragment } from "@app/basic-components/HTMLObjectRender/elements";
 import { accessClassName } from "@app/utils";
 import { HTMLBlockquoteObject } from "@lib/utils";
-import { ElementPage, ElementPageId } from "@utils/element";
-import { Model } from "@utils/model";
+import { ElementPageId } from "@utils/element";
+import { ElementModelAddress, Model } from "@utils/model";
 import { SERVER } from "config";
 import React from "react";
 import { IconType } from "react-icons";
@@ -22,15 +22,7 @@ function getKey({ custom }: HTMLBlockquoteObject): ExampleBlockquoteKey {
     if (custom === undefined) {
         throw "BlockquoteObject is missing a 'custom' property value";
     }
-    const idParts = custom.split(".");
-    if (idParts.length !== 2) {
-        throw `Invalid id: '${custom}'`;
-    }
-    const [pageValue, name] = idParts;
-    if (!ElementPage.isPageType(pageValue)) {
-        throw `Invalid ElementPageType: '${custom}'`;
-    }
-    const page = ElementPage.typeToId(pageValue);
+    const { page, name } = ElementModelAddress.fromString(custom);
     return ["ExampleBlockquote", page, name];
 }
 

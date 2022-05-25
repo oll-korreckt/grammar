@@ -1,7 +1,7 @@
 import { Anchor, Blockquote, GenericHTMLObjectComponent, HTMLObjectRender, TableData } from "@app/basic-components/HTMLObjectRender";
 import { ExampleBlockquote } from "@app/tricky-components/ExampleBlockquote";
 import { accessClassName, ElementDisplayInfo } from "@app/utils";
-import { HTMLObject } from "@lib/utils";
+import { HTMLBlockquoteObject, HTMLObject } from "@lib/utils";
 import { NextPage } from "next";
 import Link from "next/link";
 import React from "react";
@@ -83,8 +83,37 @@ const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest
     );
 };
 
+function convertCustom(custom: string): string {
+    const customParts = custom.split(".");
+    const errMsg = `Invalid custom property '${custom}'`;
+    if (customParts.length !== 2) {
+        throw errMsg;
+    }
+    const [pageType, name] = customParts;
+    if (!ElementPage.isPageType(pageType)) {
+        throw errMsg;
+    }
+    const pageId = ElementPage.typeToId(pageType);
+    return `${pageId}.${name}`;
+}
+
 const CustomBlockquote: GenericHTMLObjectComponent<"blockquote"> = ({ children, ...rest }) => {
-    return children.custom
-        ? <ExampleBlockquote>{children}</ExampleBlockquote>
-        : <Blockquote {...rest}>{children}</Blockquote>;
+    if (children.custom) {
+        const newCustom = convertCustom(children.custom);
+        const newChildren: HTMLBlockquoteObject = {
+            ...children,
+            custom: newCustom
+        };
+        return (
+            <ExampleBlockquote {...rest}>
+                {newChildren}
+            </ExampleBlockquote>
+        );
+    } else {
+        return (
+            <Blockquote {...rest}>
+                {children}
+            </Blockquote>
+        );
+    }
 };
