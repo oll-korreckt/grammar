@@ -53,7 +53,7 @@ The preposition phrase, *under the weather* is the subject complement of the par
 As mentioned earlier, participle phrases do not support the use of a direct object complement. Below is an attempt:
 > The person appointed her judge was happy when she accepted.
 
-The sentence is grammatically incorrect because it contains two predicates. In order to make the sentence correct while still keeping the underlying semantic meaning intact would be to use a relative pronoun to introduce a relative clause:
+The sentence is grammatically incorrect because it contains two predicates: *appointed her judge* and *was happy when she accepted*. One way to make the sentence correct while still keeping the underlying semantic meaning intact would be to use a relative pronoun to introduce a relative clause:
 > The person who appointed her judge was happy when she accepted.
 
 ### Indirect Object
