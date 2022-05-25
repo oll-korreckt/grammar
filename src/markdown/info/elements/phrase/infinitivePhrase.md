@@ -1,7 +1,7 @@
 # Infinitive Phrases
 <!-- +elementInfo -->
 <!-- !infinitivePhrase -->
-Infinitive phrases are similar in structure to [verb phrases](verb-phrase), [gerund phrases](gerund-phrase), and [participle phrases](participle-phrase). Like infinitive elements, infinitive phrases function as nouns, adjectives, or adverbs.
+Infinitive phrases are similar in structure to [verb phrases](verb-phrase), [gerund phrases](gerund-phrase), and [participle phrases](participle-phrase). Like infinitive elements, infinitive phrases function as nouns, adjectives, or adverbs. As is the case with participles, participle phrases function as adjectives.
 <!-- !infinitivePhrase -->
 
 ## Properties

@@ -1,7 +1,7 @@
 # Gerund Phrases
 <!-- +elementInfo -->
 <!-- !gerundPhrase -->
-Gerund phrases are similar in structure to [verb phrases](verb-phrase), [infinitive phrases](infinitive-phrase), and [participle phrases](participle-phrase).
+Gerund phrases are similar in structure to [verb phrases](verb-phrase), [infinitive phrases](infinitive-phrase), and [participle phrases](participle-phrase). Like gerunds, gerund phrases function as nouns.
 <!-- !gerundPhrase -->
 
 ## Properties
