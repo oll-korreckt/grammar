@@ -225,8 +225,19 @@ export type DefinitionMapper<Type> = undefined | (Type extends [boolean, Element
 export interface Word extends Identifiable {
     lexeme: string;
 }
+type SentenceItemsList = [
+    "noun",
+    "pronoun",
+    "coordinatedNoun",
+    "coordinatedPronoun",
+    "nounPhrase",
+    "coordinatedNounPhrase",
+    "interjection",
+    "independentClause",
+    "coordinatedIndependentClause"
+];
 export interface SentenceDefinition extends ReferencingElementDefinition<"items"> {
-    items: [true, ["interjection", "independentClause", "coordinatedIndependentClause"]];
+    items: [true, SentenceItemsList];
 }
 export interface Sentence extends Identifiable, ReferencingElement<SentenceDefinition> {
     elementType: "sentence";

@@ -369,7 +369,20 @@ const definitionObject: DefinitionObject = {
     relativeClause: createDependentClauseDefinition(["adverb", "pronoun", "prepositionPhrase"]),
     coordinatedRelativeClause: createCoordinatedDefinition(["relativeClause"]),
     sentence: {
-        items: [true, ["interjection", "independentClause", "coordinatedIndependentClause"]]
+        items: [
+            true,
+            [
+                "noun",
+                "pronoun",
+                "coordinatedNoun",
+                "coordinatedPronoun",
+                "nounPhrase",
+                "coordinatedNounPhrase",
+                "interjection",
+                "independentClause",
+                "coordinatedIndependentClause"
+            ]
+        ]
     }
 };
 
