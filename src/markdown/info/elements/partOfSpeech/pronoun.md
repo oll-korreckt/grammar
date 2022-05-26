@@ -37,6 +37,7 @@ When the subject of a clause is also the object of clause's predicate, a reflexi
 ### Intensifier
 Intensive pronouns always reference the subject of the sentence and are used to provided increased emphasis on the subject. In spite of referencing a noun, however, intensive pronouns function as [adverbs](/element/adverb) within a sentence, and should therefore be marked as such.
 
+<!-- #pronoun-of-address -->
 ### Address
 Like nouns, pronouns can be used to address someone. When used in such a manner, they are demarcated with a comma and are grammatically separate from the rest of the sentence.
 
