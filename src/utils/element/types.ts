@@ -138,7 +138,7 @@ function createTypeLink(type: ElementPageType, plural?: boolean): HTMLAnchorObje
     return {
         type: "a",
         className: "typeLink",
-        href: typeToId(type),
+        href: `/element/${typeToId(type)}`,
         content: {
             type: "code",
             content: fullName
