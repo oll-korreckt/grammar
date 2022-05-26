@@ -70,12 +70,8 @@ const CustomAnchor: GenericHTMLObjectComponent<"a"> = ({ children, href, ...rest
     if (href === undefined) {
         throw "anchor does not have an 'href' attribute";
     }
-    if (!ElementPage.isPageId(href)) {
-        throw `'${href}' is not a valid elementpage`;
-    }
-    const modifiedHref = `/element/${href}`;
     return (
-        <Link href={modifiedHref} passHref>
+        <Link href={href} passHref>
             <Anchor {...rest}>
                 {children}
             </Anchor>
