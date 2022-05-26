@@ -1,7 +1,7 @@
 # Subordinators
 <!-- +elementInfo -->
 <!-- !subordinator -->
-Subordinators (or subordinating conjunctions) are used to introduce 2 types of subordinate clauses: [noun clauses](noun-clause) and [adverbial clauses](adverbial-clause).
+Subordinators (or subordinating conjunctions) are used to introduce 2 types of subordinate clauses: [noun clauses](/element/noun-clause) and [adverbial clauses](/element/adverbial-clause).
 <!-- !subordinator -->
 
 ## Properties
@@ -24,7 +24,7 @@ Subordinators are frequently used to form adverbial clauses. For example:
 *As though* introduces the adverbial clause *as though he has nothing to lose* which modifies the verb *gambles*.
 
 ### Introducing Noun Clauses
-Noun clauses are typically introduced via a [pronoun](pronoun), but subordinators can also be used for such a purpose.
+Noun clauses are typically introduced via a [pronoun](/element/pronoun), but subordinators can also be used for such a purpose.
 
 <!-- *subordinator.noun-clause_after -->
 > My favorite time to do my homework is *after* I have eaten dinner.

@@ -1,7 +1,7 @@
 # Prepositions
 <!-- +elementInfo -->
 <!-- !preposition -->
-Prepositions are used in combination with an object to form [preposition phrases](preposition-phrase), which can then be used an adjectival or adverbial manner.
+Prepositions are used in combination with an object to form [preposition phrases](/element/preposition-phrase), which can then be used an adjectival or adverbial manner.
 <!-- !preposition -->
 
 ## Properties

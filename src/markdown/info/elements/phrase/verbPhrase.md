@@ -1,7 +1,7 @@
 # Verb Phrases
 <!-- +elementInfo -->
 <!-- !verbPhrase -->
-Verb phrases are composed of a head verb along with any modifiers, objects, and complements. Verb phrases function just like verbs are used as the predicate of a [clause](clause).
+Verb phrases are composed of a head verb along with any modifiers, objects, and complements. Verb phrases function just like verbs are used as the predicate of a [clause](/element/clause).
 <!-- !verbPhrase -->
 
 ## Properties
@@ -15,7 +15,7 @@ All verb phrases must be headed by a verb.
 
 <!-- #phrasal -->
 ### Phrasal
-Rather than using a particle, certain phrasal verbs are created via a [preposition phrase](preposition-phrase).
+Rather than using a particle, certain phrasal verbs are created via a [preposition phrase](/element/preposition-phrase).
 
 <!-- *verbPhrase.phrasal -->
 > The answer will depend *on the circumstances*.

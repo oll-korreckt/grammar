@@ -29,8 +29,8 @@ As mentioned earlier, infinitives can function as a noun, adjective, or adverb.
 *To swim* functions as an adverb and describes the verb *went*.
 
 ## Identification
-The word *to* is often used to from a [preposition phrases](preposition-phrase). As such, it might be tempting to label an infinitive as preposition phrase. The easiest way to differentiate between the two is to focus on the word associated with *to*:
-- If the word is a [noun](noun) or [pronoun](pronoun), the element in question is a preposition phrase.
+The word *to* is often used to from a [preposition phrases](/element/preposition-phrase). As such, it might be tempting to label an infinitive as preposition phrase. The easiest way to differentiate between the two is to focus on the word associated with *to*:
+- If the word is a [noun](/element/noun) or [pronoun](/element/pronoun), the element in question is a preposition phrase.
 - If the word is a verb, the element in question is an infinitive.
 
 ### Preposition Phrase

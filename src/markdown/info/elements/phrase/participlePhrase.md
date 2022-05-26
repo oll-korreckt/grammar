@@ -1,7 +1,7 @@
 # Participle Phrases
 <!-- +elementInfo -->
 <!-- !participlePhrase -->
-Participle phrases are similar in structure to [verb phrases](verb-phrase), [infinitive phrases](infinitive-phrase), and [gerund phrases](gerund-phrase). Unlike the aforementioned elements, however, participle phrases do not support direct object complements.
+Participle phrases are similar in structure to [verb phrases](/element/verb-phrase), [infinitive phrases](/element/infinitive-phrase), and [gerund phrases](/element/gerund-phrase). Unlike the aforementioned elements, however, participle phrases do not support direct object complements.
 <!-- !participlePhrase -->
 
 ## Properties

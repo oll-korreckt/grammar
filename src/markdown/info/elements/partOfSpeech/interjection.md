@@ -1,7 +1,7 @@
 # Interjections
 <!-- +elementInfo -->
 <!-- !interjection -->
-Interjections are used to express some sort of excitement, surprise, anger, glee, etc. They are not referenced by any other grammatical elements besides [sentences](sentence).
+Interjections are used to express some sort of excitement, surprise, anger, glee, etc. They are not referenced by any other grammatical elements besides [sentences](/element/sentence).
 <!-- !interjection -->
 
 ## Properties

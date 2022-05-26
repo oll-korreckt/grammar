@@ -1,7 +1,7 @@
 # Pronouns
 <!-- +elementInfo -->
 <!-- !pronoun -->
-Pronouns are words (or sometimes groups of words) that typically reference a [noun](noun). The noun being referenced typically resides somewhere within the same sentence or an adjacent sentence but it depends on the context. However, as is the case with *dummy pronouns*, it is possible for a pronoun not to reference a noun at all. 
+Pronouns are words (or sometimes groups of words) that typically reference a [noun](/element/noun). The noun being referenced typically resides somewhere within the same sentence or an adjacent sentence but it depends on the context. However, as is the case with *dummy pronouns*, it is possible for a pronoun not to reference a noun at all. 
 <!-- !pronoun -->
 
 ## Properties
@@ -35,7 +35,7 @@ When the subject of a clause is also the object of clause's predicate, a reflexi
 *Yourself* is the indirect object of *found* and references *you* which is the subject of the noun clause *that you found yourself a new job*.
 
 ### Intensifier
-Intensive pronouns always reference the subject of the sentence and are used to provided increased emphasis on the subject. In spite of referencing a noun, however, intensive pronouns function as [adverbs](adverb) within a sentence, and should therefore be marked as such.
+Intensive pronouns always reference the subject of the sentence and are used to provided increased emphasis on the subject. In spite of referencing a noun, however, intensive pronouns function as [adverbs](/element/adverb) within a sentence, and should therefore be marked as such.
 
 ### Address
 Like nouns, pronouns can be used to address someone. When used in such a manner, they are demarcated with a comma and are grammatically separate from the rest of the sentence.
@@ -62,7 +62,7 @@ The first *you* is a pronoun of a address.
 *Myself* is an adverb that modifies *handle*.
 
 ### Relative
-Yet another function of pronouns is to introduce a [relative clause](relative-clause).
+Yet another function of pronouns is to introduce a [relative clause](/element/relative-clause).
 
 <!-- *pronoun.relative_ex1 -->
 > She is someone *who* can get stuff done.
