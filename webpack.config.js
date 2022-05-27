@@ -50,7 +50,8 @@ module.exports = {
         alias: {
             "@app": path.resolve(__dirname, "src/app"),
             "@lib": path.resolve(__dirname, "src/lib"),
-            "@domain": path.resolve(__dirname, "src/domain")
+            "@domain": path.resolve(__dirname, "src/domain"),
+            "@public": path.resolve(__dirname, "public")
         }
     },
     output: {
