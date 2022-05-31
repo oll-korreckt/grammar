@@ -57,12 +57,15 @@ function reducer(state: State, action: Action): State {
                 allowReset: true,
                 selectedElement: action.id
             };
-        case "category select":
-            return {
+        case "category select": {
+            const output: State = {
                 ...state,
                 allowReset: true,
                 selectedCategory: action.category
             };
+            delete output.selectedElement;
+            return output;
+        }
         case "up level": {
             const { selectedElement, selectedCategory, diagram } = state;
             if (selectedElement === undefined) {
