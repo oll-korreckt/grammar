@@ -1,13 +1,10 @@
-import { accessClassName } from "@app/utils";
 import React, { useEffect, useRef } from "react";
+import { LabelFormView } from "../LabelFormView";
 import { ElementLexeme } from "../LabelView";
-import { LabelViewAssembly } from "../LabelViewAssembly";
-import { LabelViewNavBarAssembly } from "../LabelViewNavBarAssembly";
 import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./adapter";
 import { useLabelForm } from "./reducer";
 import { LabelFormAction, LabelFormProps, LabelFormState } from "./types";
 import { LabelSettingsMode, Utils } from "./utils";
-import styles from "./_styles.module.scss";
 
 export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const [state, dispatch] = useLabelForm(props);
@@ -56,19 +53,14 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     }, [state, onStateChange]);
 
     return (
-        <div className={accessClassName(styles, "labelForm")}>
-            <LabelViewAssembly
-                mode={state.mode}
-                settings={settings}
-                onLabelClick={onLabelClick}
-            >
-                {lexemes}
-            </LabelViewAssembly>
-            <LabelViewNavBarAssembly
-                mode={state.mode}
-                onModeChange={onModeChange}
-                props={menuProps}
-            />
-        </div>
+        <LabelFormView
+            mode={state.mode}
+            labelSettings={settings}
+            onLabelClick={onLabelClick}
+            onModeChange={onModeChange}
+            navBarProps={menuProps}
+        >
+            {lexemes}
+        </LabelFormView>
     );
 };
