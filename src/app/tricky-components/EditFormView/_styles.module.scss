@@ -9,27 +9,6 @@
     overflow: hidden;
 }
 
-.navBar {
-    border-bottom: 1px solid black;
-}
-
-.navBarContent {
-    @include main.smScreen {
-        height: 60px;
-    }
-    @include main.mdScreen {
-        height: 70px;
-    }
-    @include main.lgScreen {
-        height: 80px;
-    }
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: min(800px, 100%);
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .content {
     position: relative;
     width: 100%;
@@ -40,58 +19,4 @@
     position: absolute;
     width: 100%;
     height: 100%;
-}
-
-.item {
-    @include main.center-content;
-}
-
-.itemContent {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    user-select: none;
-    cursor: pointer;
-}
-
-.itemContentDisabled {
-    color: grey;
-    pointer-events: none;
-}
-
-.itemIcon, .itemChildren {
-    display: inline-block;
-}
-
-.itemIcon {
-    @include main.smScreen {
-        font-size: 24px;
-    }
-    @include main.mdScreen {
-        font-size: 28px;
-    }
-    @include main.lgScreen {
-        font-size: 30px;
-    }
-}
-
-.itemChildren {
-    @include main.smScreen {
-        font-size: 12px;
-    }
-    @include main.mdScreen {
-        font-size: 16px;
-    }
-    @include main.lgScreen {
-        font-size: 18px;
-    }
-}
-
-.underline {
-    position: absolute;
-    bottom: -5px;
-    width: 100%;
-    height: 5px;
-    background-color: black;
 }

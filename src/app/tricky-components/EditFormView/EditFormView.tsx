@@ -1,9 +1,8 @@
 import { accessClassName } from "@app/utils";
-import { AnimatePresence, AnimateSharedLayout, motion, Transition } from "framer-motion";
+import { AnimatePresence, motion, Transition } from "framer-motion";
 import React, { useContext } from "react";
-import { IconType } from "react-icons";
-import { FaEdit, FaTag } from "react-icons/fa";
 import { InputKeyContext } from "../EditForm/context";
+import { EditFormNavBar } from "../EditFormNavBar";
 import { InputForm, InputFormProps } from "../InputForm";
 import { LabelForm } from "../LabelForm";
 import { LabelFormProps } from "../LabelForm/types";
@@ -32,27 +31,12 @@ export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, 
 
     return (
         <div className={accessClassName(styles, "editFormView")}>
-            <div className={accessClassName(styles, "navBar")}>
-                <div className={accessClassName(styles, "navBarContent")}>
-                    <AnimateSharedLayout type="crossfade">
-                        <Item
-                            icon={FaEdit}
-                            selected={mode === "input"}
-                            onClick={() => onModeClick && onModeClick("input")}
-                        >
-                            Input
-                        </Item>
-                        <Item
-                            icon={FaTag}
-                            selected={mode === "label"}
-                            onClick={() => onModeClick && onModeClick("label")}
-                            disabled={disableLabelMode}
-                        >
-                            Label
-                        </Item>
-                    </AnimateSharedLayout>
-                </div>
-            </div>
+            <EditFormNavBar
+                mode={mode}
+                transitionDuration={0.4}
+                onModeSwitch={onModeClick}
+                disableLabelMode={disableLabelMode}
+            />
             <div className={accessClassName(styles, "content")}>
                 <AnimatePresence
                     initial={false}
@@ -86,43 +70,6 @@ export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, 
                         </motion.div>
                     }
                 </AnimatePresence>
-            </div>
-        </div>
-    );
-};
-
-interface ItemProps {
-    onClick?: () => void;
-    icon: IconType;
-    selected?: boolean | undefined;
-    children: string;
-    disabled?: boolean | undefined;
-}
-
-const Item: React.VFC<ItemProps> = ({ onClick, icon, selected, children, disabled }) => {
-    const Icon = icon;
-    const classes = ["itemContent"];
-    if (disabled) {
-        classes.push("itemContentDisabled");
-    }
-    return (
-        <div className={accessClassName(styles, "item")}>
-            <div
-                className={accessClassName(styles, ...classes)}
-                onClick={() => onClick && onClick()}
-            >
-                <Icon className={accessClassName(styles, "itemIcon")} />
-                <div className={accessClassName(styles, "itemChildren")}>
-                    {children}
-                </div>
-                {selected &&
-                    <motion.div
-                        className={accessClassName(styles, "underline")}
-                        transition={transition}
-                        layout
-                        layoutId="underline"
-                    />
-                }
             </div>
         </div>
     );
