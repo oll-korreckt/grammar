@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { EditFormView } from "../EditFormView";
 import { InputFormProps } from "../InputForm";
 import { LabelFormProps } from "../LabelForm/types";
-import { InputKeyContext } from "./context";
+import { InputKeyContext } from "../context";
 import { Action, convertToEditFormState, EditFormState, InputFormInternalState, LabelFormInternalState, useEditForm } from "./reducer";
 
 function convertToInputProps(inputState: InputFormInternalState, dispatch: React.Dispatch<Action>): InputFormProps {

@@ -1,8 +1,7 @@
 import { accessClassName } from "@app/utils";
-import { AnimatePresence, motion, Transition } from "framer-motion";
-import React, { useContext } from "react";
-import { InputKeyContext } from "../EditForm/context";
+import React from "react";
 import { EditFormNavBar } from "../EditFormNavBar";
+import { createEditFormViewSwitch } from "../EditFormViewSwitch";
 import { InputForm, InputFormProps } from "../InputForm";
 import { LabelForm } from "../LabelForm";
 import { LabelFormProps } from "../LabelForm/types";
@@ -18,9 +17,7 @@ export interface EditFormViewProps {
 
 export type EditFormViewMode = "input" | "label";
 
-const transition: Transition = { duration: 0.4 };
 export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, disableLabelMode, inputFormProps, labelFormProps }) => {
-    const { inputKey } = useContext(InputKeyContext);
     const defMode: EditFormViewMode = mode !== undefined ? mode : "input";
     const defInputFormProps: InputFormProps = inputFormProps !== undefined
         ? inputFormProps
@@ -37,40 +34,14 @@ export const EditFormView: React.VFC<EditFormViewProps> = ({ mode, onModeClick, 
                 onModeSwitch={onModeClick}
                 disableLabelMode={disableLabelMode}
             />
-            <div className={accessClassName(styles, "content")}>
-                <AnimatePresence
-                    initial={false}
-                >
-                    {defMode === "input" &&
-                        <motion.div
-                            key="input"
-                            initial={{ x: "-100vw" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "-100vw" }}
-                            transition={transition}
-                            className={accessClassName(styles, "contentPanel")}
-                        >
-                            <InputForm
-                                key={inputKey}
-
-                                {...defInputFormProps}
-                            />
-                        </motion.div>
-                    }
-                    {defMode === "label" &&
-                        <motion.div
-                            key="label"
-                            initial={{ x: "100vw" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "100vw" }}
-                            transition={transition}
-                            className={accessClassName(styles, "contentPanel")}
-                        >
-                            <LabelForm {...defLabelFormProps} />
-                        </motion.div>
-                    }
-                </AnimatePresence>
-            </div>
+            <EditFormViewSwitch
+                mode={defMode}
+                transitionDuration={0.4}
+                inputProps={defInputFormProps}
+                labelProps={defLabelFormProps}
+            />
         </div>
     );
 };
+
+const EditFormViewSwitch = createEditFormViewSwitch(InputForm, LabelForm);
