@@ -3,12 +3,12 @@ import React from "react";
 import { motion } from "framer-motion";
 import styles from "./_styles.module.scss";
 
-export interface SceneFadeProps {
+export interface FadeFrameProps {
     duration?: number;
     onComplete?: () => void;
 }
 
-export const SceneFadeOut: React.FC<SceneFadeProps> = ({ duration, onComplete, children }) => {
+export const FadeOutFrame: React.FC<FadeFrameProps> = ({ duration, onComplete, children }) => {
     return (
         <div className={accessClassName(styles, "parent")}>
             <motion.div
@@ -24,7 +24,7 @@ export const SceneFadeOut: React.FC<SceneFadeProps> = ({ duration, onComplete, c
     );
 };
 
-export const SceneFadeIn: React.FC<SceneFadeProps> = ({ duration, onComplete, children }) => {
+export const FadeInFrame: React.FC<FadeFrameProps> = ({ duration, onComplete, children }) => {
     return (
         <div className={accessClassName(styles, "parent")}>
             <motion.div
