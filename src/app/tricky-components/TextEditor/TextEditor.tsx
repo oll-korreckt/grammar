@@ -189,9 +189,9 @@ function extractText(descendents: Descendant[]): string {
 export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("TextEditor", ({ children, errorDelay, errorChangeInvoke, onErrorChange, onInputChange, editor, editorRef }, ref) => {
     const timerId = useRef<any>();
     const privateTextEditorRef = useRef<HTMLDivElement>(null);
-    const [descendents, setDescendents] = useState<Descendant[]>(initChildren(children));
+    const [descendants, setDescendants] = useState<Descendant[]>(initChildren(children));
     const [decorations, setDecorations] = useDecorations(
-        descendents,
+        descendants,
         errorChangeInvoke !== undefined
             ? errorChangeInvoke
             : "on changes",
@@ -199,7 +199,7 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Tex
             ? onErrorChange
             : () => { return; }
     );
-    const textRef = useRef<string>(extractText(descendents));
+    const textRef = useRef<string>(extractText(descendants));
     const extendedRef = extendRef<HTMLDivElement>(ref, (instance) => {
         if (instance === null
             || instance.firstElementChild === null) {
@@ -245,7 +245,7 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Tex
         >
             <Slate
                 editor={editor}
-                value={descendents}
+                value={descendants}
                 onChange={(newValue) => {
                     clearTimeout(timerId.current);
                     const newText = extractText(newValue);
@@ -261,7 +261,7 @@ export const TextEditor = makeRefComponent<HTMLDivElement, TextEditorProps>("Tex
                         }
                     }
                     textRef.current = newText;
-                    setDescendents(newValue);
+                    setDescendants(newValue);
                 }}
             >
                 <Editable
