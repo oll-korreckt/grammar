@@ -6,7 +6,7 @@ import InputFormStyles from "../InputForm/_styles.module.scss";
 import TextEditorStyles from "../TextEditor/_styles.module.scss";
 import styles from "./_styles.module.scss";
 
-export interface EditFormInputFrameRenderProps {
+export interface InputFrameRenderProps {
     inputText?: string;
     showErrors?: boolean;
 }
@@ -22,7 +22,7 @@ function getErrors(inputText: string, showErrors: boolean | undefined): ScannerE
     return scanResult.data;
 }
 
-export const EditFormInputFrameRender: React.FC<EditFormInputFrameRenderProps> = ({ inputText, showErrors }) => {
+export const InputFrameRender: React.FC<InputFrameRenderProps> = ({ inputText, showErrors }) => {
     const defInputText = inputText !== undefined ? inputText : "";
     const errors = getErrors(defInputText, showErrors);
     const errorListItems: ErrorListItem[] = errors.map((err, index) => {
