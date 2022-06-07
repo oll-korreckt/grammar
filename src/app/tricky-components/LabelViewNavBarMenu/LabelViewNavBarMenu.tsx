@@ -1,28 +1,8 @@
 import { accessClassName, LabelFormMode } from "@app/utils";
-import { makeRefComponent } from "@app/utils/hoc";
+import { makeRefComponent, RefComponent } from "@app/utils/hoc";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import React, { useRef } from "react";
-import { AddMenu, AddMenuProps } from "../AddMenu";
-import { DeleteMenu, DeleteMenuProps } from "../DeleteMenu";
-import { EditActiveMenuInterface, EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
-import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
-import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
 import styles from "./_styles.module.scss";
-
-export type LabelViewNavBarMenuProps =
-    | MenuState<"navigate">
-    | MenuState<"add">
-    | MenuState<"edit.browse">
-    | MenuState<"edit.active">
-    | MenuState<"delete">;
-
-type MenuState<TMode extends LabelFormMode> =
-    TMode extends "navigate" ? { mode: TMode; props: NavigateMenuProps; }
-    : TMode extends "add" ? { mode: TMode; props: AddMenuProps; }
-    : TMode extends "edit.browse" ? { mode: TMode; props: EditBrowseMenuProps; }
-    : TMode extends "edit.active" ? { mode: TMode; props: EditActiveMenuInterfaceProps; }
-    : TMode extends "delete" ? { mode: TMode; props: DeleteMenuProps; }
-    : never;
 
 type Direction = "fromLeft" | "fromRight";
 
@@ -51,31 +31,32 @@ function getDirection(prevMode: LabelFormMode, currMode: LabelFormMode): Directi
     }
 }
 
-const negVw = "-110vw";
-const posVw = "110vw";
-
-const variants: Variants = {
-    initial: (d: Direction | undefined) => {
-        switch (d) {
-            case "fromLeft":
-                return { x: negVw };
-            case "fromRight":
-                return { x: posVw };
-            case undefined:
-                return {};
+function createVariants(unit?: string): Variants  {
+    const pos = unit !== undefined ? unit : "110vw";
+    const neg = `-${pos}`;
+    return {
+        initial: (d: Direction | undefined) => {
+            switch (d) {
+                case "fromLeft":
+                    return { x: neg };
+                case "fromRight":
+                    return { x: pos };
+                case undefined:
+                    return {};
+            }
+        },
+        exit: (d: Direction | undefined) => {
+            switch (d) {
+                case "fromLeft":
+                    return { x: pos };
+                case "fromRight":
+                    return { x: neg };
+                case undefined:
+                    return {};
+            }
         }
-    },
-    exit: (d: Direction | undefined) => {
-        switch (d) {
-            case "fromLeft":
-                return { x: posVw };
-            case "fromRight":
-                return { x: negVw };
-            case undefined:
-                return {};
-        }
-    }
-};
+    };
+}
 
 const containerClasses: Record<LabelFormMode, string[]> = {
     "navigate": ["navigateContainer"],
@@ -85,56 +66,91 @@ const containerClasses: Record<LabelFormMode, string[]> = {
     "delete": ["deleteContainer"]
 };
 
-export const LabelViewNavBarMenu = makeRefComponent<HTMLDivElement, LabelViewNavBarMenuProps>("LabelViewNavBarMenu", ({ mode, props }, ref) => {
-    const prevMode = useRef(mode);
-    const directionRef = useRef<Direction>();
+export type LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps> =
+{
+    unit?: string;
+} & ({
+    mode: "navigate";
+    props: TNavProps;
+} | {
+    mode: "add";
+    props: TAddProps;
+} | {
+    mode: "edit.browse";
+    props: TEditBrowseProps;
+} | {
+    mode: "edit.active";
+    props: TEditActiveProps;
+} | {
+    mode: "delete";
+    props: TDeleteProps;
+})
 
-    if (mode !== prevMode.current) {
-        directionRef.current = getDirection(prevMode.current, mode);
-        prevMode.current = mode;
-    }
+export function createLabelViewNavBarMenu<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>(
+    displayName: string,
+    navMenu: React.VFC<TNavProps>,
+    addMenu: React.VFC<TAddProps>,
+    editBrowseMenu: React.VFC<TEditBrowseProps>,
+    editActiveMenu: React.VFC<TEditActiveProps>,
+    deleteMenu: React.VFC<TDeleteProps>): RefComponent<HTMLDivElement, LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>> {
+    const NavMenu = navMenu;
+    const AddMenu = addMenu;
+    const EditBrowseMenu = editBrowseMenu;
+    const EditActiveMenu = editActiveMenu;
+    const DeleteMenu = deleteMenu;
+    return makeRefComponent<HTMLDivElement, LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>>(displayName, ({ mode, unit, props }, ref) => {
+        const prevMode = useRef(mode);
+        const directionRef = useRef<Direction>();
 
-    return (
-        <div
-            ref={ref}
-            className={accessClassName(styles, "menuContainer")}
-        >
-            <AnimatePresence
-                initial={false}
-                custom={directionRef.current}
+        const variants = createVariants(unit);
+
+        if (mode !== prevMode.current) {
+            directionRef.current = getDirection(prevMode.current, mode);
+            prevMode.current = mode;
+        }
+
+        return (
+            <div
+                ref={ref}
+                className={accessClassName(styles, "menuContainer")}
             >
-                {allModes.filter((wvMode) => wvMode === mode).map((wvMode) => {
-                    const classes = containerClasses[wvMode];
-                    return (
-                        <motion.div
-                            key={wvMode}
-                            custom={directionRef.current}
-                            className={accessClassName(styles, ...classes)}
-                            initial="initial"
-                            animate={{ x: 0 }}
-                            exit="exit"
-                            variants={variants}
-                            transition={{ ease: [0.25, 0.1, 0.25, 1], duration: 0.5 }}
-                        >
-                            {mode === "navigate" &&
-                                <NavigateMenu {...props as NavigateMenuProps} />
-                            }
-                            {mode === "add" &&
-                                <AddMenu {...props as AddMenuProps} />
-                            }
-                            {mode === "edit.browse" &&
-                                <EditBrowseMenu />
-                            }
-                            {mode === "edit.active" &&
-                                <EditActiveMenuInterface {...props as EditActiveMenuInterfaceProps} />
-                            }
-                            {mode === "delete" &&
-                                <DeleteMenu {...props as DeleteMenuProps} />
-                            }
-                        </motion.div>
-                    );
-                })}
-            </AnimatePresence>
-        </div>
-    );
-});
+                <AnimatePresence
+                    initial={false}
+                    custom={directionRef.current}
+                >
+                    {allModes.filter((wvMode) => wvMode === mode).map((wvMode) => {
+                        const classes = containerClasses[wvMode];
+                        return (
+                            <motion.div
+                                key={wvMode}
+                                custom={directionRef.current}
+                                className={accessClassName(styles, ...classes)}
+                                initial="initial"
+                                animate={{ x: 0 }}
+                                exit="exit"
+                                variants={variants}
+                                transition={{ ease: [0.25, 0.1, 0.25, 1], duration: 0.5 }}
+                            >
+                                {mode === "navigate" &&
+                                    <NavMenu {...props}/>
+                                }
+                                {mode === "add" &&
+                                    <AddMenu {...props}/>
+                                }
+                                {mode === "edit.browse" &&
+                                    <EditBrowseMenu {...props}/>
+                                }
+                                {mode === "edit.active" &&
+                                    <EditActiveMenu {...props}/>
+                                }
+                                {mode === "delete" &&
+                                    <DeleteMenu {...props}/>
+                                }
+                            </motion.div>
+                        );
+                    })}
+                </AnimatePresence>
+            </div>
+        );
+    });
+}

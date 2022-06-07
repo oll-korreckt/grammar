@@ -2,10 +2,15 @@ import { withClassNameProp } from "@app/utils/hoc";
 import React from "react";
 import styles from "./_styles.module.scss";
 import { LabelViewNavBar, LabelViewNavBarProps } from "../LabelViewNavBar";
-import { LabelViewNavBarMenu, LabelViewNavBarMenuProps } from "../LabelViewNavBarMenu";
+import { createLabelViewNavBarMenu, LabelViewNavBarMenuProps } from "../LabelViewNavBarMenu";
 import { accessClassName, LabelFormMode } from "@app/utils";
+import { NavigateMenu, NavigateMenuProps } from "../NavigateMenu";
+import { AddMenu, AddMenuProps } from "../AddMenu";
+import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
+import { DeleteMenu, DeleteMenuProps } from "../DeleteMenu";
+import { EditActiveMenuInterface, EditActiveMenuInterfaceProps } from "../EditActiveMenuInterface";
 
-export type LabelViewNavBarAssemblyProps = LabelViewNavBarProps & Pick<LabelViewNavBarMenuProps, "props">;
+export type LabelViewNavBarAssemblyProps = LabelViewNavBarProps & Pick<LabelViewNavBarMenuProps<NavigateMenuProps, AddMenuProps, EditBrowseMenuProps, EditActiveMenuInterfaceProps, DeleteMenuProps>, "props">;
 
 export const LabelViewNavBarAssembly: React.VFC<LabelViewNavBarAssemblyProps> = ({ mode, onModeChange, props }) => {
     return (
@@ -19,4 +24,11 @@ export const LabelViewNavBarAssembly: React.VFC<LabelViewNavBarAssemblyProps> = 
     );
 };
 
-const ExtendedLabelViewNavBarMenu = withClassNameProp(LabelViewNavBarMenu);
+const ExtendedLabelViewNavBarMenu = withClassNameProp(createLabelViewNavBarMenu(
+    "LabelViewNavBarMenu",
+    NavigateMenu,
+    AddMenu,
+    EditBrowseMenu,
+    EditActiveMenuInterface,
+    DeleteMenu
+));
