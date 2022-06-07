@@ -6,12 +6,12 @@ import EditFormViewStyles from "../EditFormView/_styles.module.scss";
 import { EditFormNavBar } from "../EditFormNavBar";
 import { createEditFormViewSwitch } from "../EditFormViewSwitch";
 
-interface ExtendedInputFrameRenderProps extends InputFrameRenderProps {
+export interface ExtendedInputFrameRenderProps extends InputFrameRenderProps {
     editMode: "input";
     disableLabelMode?: boolean;
 }
 
-type ExtendedLabelFrameRenderProps = LabelFrameRenderProps & {
+export type ExtendedLabelFrameRenderProps = LabelFrameRenderProps & {
     editMode: "label";
 }
 
