@@ -30,7 +30,7 @@ export const LabelViewAssembly = makeRefComponent<HTMLDivElement, LabelViewAssem
                 className={accessClassName(styles, "labelView")}
                 {...rest}
             />
-            <div className={accessClassName(styles, mapToClass(mode))} />
+            <div className={accessClassName(styles, mapToClass(mode))}/>
         </div>
     );
 });

@@ -58,14 +58,6 @@ function createVariants(unit?: string): Variants  {
     };
 }
 
-const containerClasses: Record<LabelFormMode, string[]> = {
-    "navigate": ["navigateContainer"],
-    "add": ["addContainer"],
-    "edit.browse": ["editBrowseContainer"],
-    "edit.active": ["editActiveContainer"],
-    "delete": ["deleteContainer"]
-};
-
 export type LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps> =
 {
     unit?: string;
@@ -86,19 +78,41 @@ export type LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEd
     props: TDeleteProps;
 })
 
-export function createLabelViewNavBarMenu<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>(
-    displayName: string,
-    navMenu: React.VFC<TNavProps>,
-    addMenu: React.VFC<TAddProps>,
-    editBrowseMenu: React.VFC<TEditBrowseProps>,
-    editActiveMenu: React.VFC<TEditActiveProps>,
-    deleteMenu: React.VFC<TDeleteProps>): RefComponent<HTMLDivElement, LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>> {
-    const NavMenu = navMenu;
-    const AddMenu = addMenu;
-    const EditBrowseMenu = editBrowseMenu;
-    const EditActiveMenu = editActiveMenu;
-    const DeleteMenu = deleteMenu;
-    return makeRefComponent<HTMLDivElement, LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>>(displayName, ({ mode, unit, props }, ref) => {
+interface ArgItem<Type> {
+    sizeClass: string;
+    Component: React.VFC<Type>;
+}
+
+export interface Args<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps> {
+    navigate: ArgItem<TNavProps>;
+    add: ArgItem<TAddProps>;
+    "edit.browse": ArgItem<TEditBrowseProps>;
+    "edit.active": ArgItem<TEditActiveProps>;
+    delete: ArgItem<TDeleteProps>;
+}
+
+const containerClasses: Record<LabelFormMode, string> = {
+    "navigate": "navigateContainer",
+    "add": "addContainer",
+    "edit.browse": "editBrowseContainer",
+    "edit.active": "editActiveContainer",
+    "delete": "deleteContainer"
+};
+
+export function createLabelViewNavBarMenu<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>(args: Args<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>): RefComponent<HTMLDivElement, LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>> {
+    const NavMenu = args.navigate.Component;
+    const AddMenu = args.add.Component;
+    const EditBrowseMenu = args["edit.browse"].Component;
+    const EditActiveMenu = args["edit.active"].Component;
+    const DeleteMenu = args.delete.Component;
+    const sizeClasses: Record<LabelFormMode, string> = {
+        navigate: args.navigate.sizeClass,
+        add: args.add.sizeClass,
+        "edit.browse": args["edit.browse"].sizeClass,
+        "edit.active": args["edit.active"].sizeClass,
+        delete: args.delete.sizeClass
+    };
+    return makeRefComponent<HTMLDivElement, LabelViewNavBarMenuProps<TNavProps, TAddProps, TEditBrowseProps, TEditActiveProps, TDeleteProps>>("LabelViewNavBarMenu", ({ mode, unit, props }, ref) => {
         const prevMode = useRef(mode);
         const directionRef = useRef<Direction>();
 
@@ -119,12 +133,15 @@ export function createLabelViewNavBarMenu<TNavProps, TAddProps, TEditBrowseProps
                     custom={directionRef.current}
                 >
                     {allModes.filter((wvMode) => wvMode === mode).map((wvMode) => {
-                        const classes = containerClasses[wvMode];
+                        const containerClassName = containerClasses[wvMode];
+                        const containerClass = accessClassName(styles, containerClassName);
+                        const givenClass = sizeClasses[wvMode];
+                        const className = `${containerClass} ${givenClass}`;
                         return (
                             <motion.div
                                 key={wvMode}
                                 custom={directionRef.current}
-                                className={accessClassName(styles, ...classes)}
+                                className={className}
                                 initial="initial"
                                 animate={{ x: 0 }}
                                 exit="exit"

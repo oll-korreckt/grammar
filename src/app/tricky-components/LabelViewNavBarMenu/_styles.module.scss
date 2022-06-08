@@ -1,5 +1,5 @@
 @use "../NavigateMenu/sizes.scss" as *;
-@use "../AddMenu/sizes.scss" as *;
+@use "../AddMenuView/sizes.scss" as *;
 @use "../EditBrowseMenu/sizes.scss" as *;
 @use "../EditActiveMenu/sizes.scss" as *;
 @use "../DeleteMenu/sizes.scss" as *;
@@ -20,29 +20,4 @@
     right: 0;
     margin-left: auto;
     margin-right: auto;
-}
-
-.navigateContainer {
-    @include navigateMenuWidth;
-    @include navigateMenuHeight;
-}
-
-.addContainer {
-    @include addMenuWidth;
-    @include addMenuHeight;
-}
-
-.editBrowseContainer {
-    @include editBrowseMenuWidth;
-    @include editBrowseMenuHeight;
-}
-
-.editActiveContainer {
-    @include editActiveMenuWidth;
-    @include editActiveMenuHeight;
-}
-
-.deleteContainer {
-    @include deleteMenuWidth;
-    @include deleteMenuLeft;
 }

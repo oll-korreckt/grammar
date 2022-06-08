@@ -24,11 +24,26 @@ export const LabelViewNavBarAssembly: React.VFC<LabelViewNavBarAssemblyProps> = 
     );
 };
 
-const ExtendedLabelViewNavBarMenu = withClassNameProp(createLabelViewNavBarMenu(
-    "LabelViewNavBarMenu",
-    NavigateMenu,
-    AddMenu,
-    EditBrowseMenu,
-    EditActiveMenuInterface,
-    DeleteMenu
-));
+
+const ExtendedLabelViewNavBarMenu = withClassNameProp(createLabelViewNavBarMenu({
+    navigate: {
+        sizeClass: accessClassName(styles, "navigateContainer"),
+        Component: NavigateMenu
+    },
+    add: {
+        sizeClass: accessClassName(styles, "addContainer"),
+        Component: AddMenu
+    },
+    "edit.browse": {
+        sizeClass: accessClassName(styles, "editBrowseContainer"),
+        Component: EditBrowseMenu
+    },
+    "edit.active": {
+        sizeClass: accessClassName(styles, "editActiveContainer"),
+        Component: EditActiveMenuInterface
+    },
+    delete: {
+        sizeClass: accessClassName(styles, "deleteContainer"),
+        Component: DeleteMenu
+    }
+}));
