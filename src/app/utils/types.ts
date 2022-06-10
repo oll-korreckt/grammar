@@ -1,3 +1,5 @@
+import { LabelSettings, Lexeme } from "@app/tricky-components/LabelView";
+import { ElementCategory, ElementType } from "@domain/language";
 import { Variant } from "framer-motion";
 import React from "react";
 import {
@@ -69,3 +71,39 @@ export interface TypedRenderLeafProps<TLeaf extends SlateText = SlateText> exten
 }
 export type TypedRenderLeaf<TLeaf extends SlateText = SlateText> = (props: TypedRenderLeafProps<TLeaf>) => JSX.Element;
 export type Stage = "input" | "label";
+
+export interface InputFrameRenderState {
+    inputText?: string;
+    showErrors?: boolean;
+}
+export interface NavigateMenuState {
+    mode: "navigate";
+    category?: ElementCategory;
+    enableUpLabel?: boolean;
+}
+export interface AddMenuState {
+    mode: "add";
+    category?: "category" | "phrase" | "clause" | "coordinated" | "sentence";
+    elements?: Exclude<ElementType, "word">[];
+}
+export interface PropertyDisplayState {
+    propertyKey: string;
+    order: number;
+    required?: boolean;
+    satisfied?: boolean;
+}
+export interface EditActiveState {
+    mode: "edit.active";
+    editState: "display" | "edit";
+    allowSubmit?: boolean;
+    assigned: PropertyDisplayState[];
+    unassigned: PropertyDisplayState[];
+}
+export type LabelFrameRenderState = (
+    | NavigateMenuState
+    | AddMenuState
+    | EditActiveState
+) & {
+    labelSettings?: Record<string, LabelSettings>;
+    lexemes?: Lexeme[];
+}
