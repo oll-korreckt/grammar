@@ -1,4 +1,6 @@
+import { Strings } from "@lib/utils";
 import { NextApiRequest, NextApiResponse } from "next";
+
 
 export interface ErrorMessage {
     status: 400 | 404 | 405;
@@ -75,4 +77,21 @@ export function createApiRequestHandler(reqObj: ApiRequestHandlerObject): ApiReq
                 break;
         }
     };
+}
+
+export function validAddressChars(addressStr: string): boolean {
+    if (addressStr.length === 0) {
+        return false;
+    }
+    for (let index = 0; index < addressStr.length; index++) {
+        const char = addressStr[index];
+        if (char === "_"
+            || char === "-"
+            || Strings.isEnglishLetterChar(char)
+            || Strings.isNumericChar(char)) {
+            continue;
+        }
+        return false;
+    }
+    return true;
 }
