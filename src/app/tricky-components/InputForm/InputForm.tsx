@@ -1,5 +1,4 @@
-import { accessClassName, DecoratorRange } from "@app/utils";
-import { useUpdateDisplayState } from "@app/utils/display-state/DisplayState";
+import { accessClassName, DecoratorRange, useUpdateDisplayState } from "@app/utils";
 import { withClassNameProp } from "@app/utils/hoc";
 import React, { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createEditor, Transforms } from "slate";
