@@ -1,7 +1,7 @@
 import { LabelSettings, Lexeme } from "@app/tricky-components/LabelView";
 import { ElementCategory, ElementType } from "@domain/language";
 import React, { createContext, useContext, useEffect, useReducer, useState } from "react";
-import { AddMenuState, EditActiveState, InputFrameRenderState, LabelFrameRenderState, NavigateMenuState, PropertyDisplayState } from "../types";
+import { AddMenuState, EditActiveState, InputFrameRenderState, LabelFrameRenderState, NavigateMenuState, PropertyDisplayState } from "./types";
 
 interface UpdateInput {
     type: "input";

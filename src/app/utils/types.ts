@@ -73,13 +73,15 @@ export type TypedRenderLeaf<TLeaf extends SlateText = SlateText> = (props: Typed
 export type Stage = "input" | "label";
 
 export interface InputFrameRenderState {
+    type: "input";
+    disableLabelMode?: boolean;
     inputText?: string;
     showErrors?: boolean;
 }
 export interface NavigateMenuState {
     mode: "navigate";
     category?: ElementCategory;
-    enableUpLabel?: boolean;
+    enableUpLevel?: boolean;
 }
 export interface AddMenuState {
     mode: "add";
@@ -92,18 +94,41 @@ export interface PropertyDisplayState {
     required?: boolean;
     satisfied?: boolean;
 }
-export interface EditActiveState {
+export type EditActiveState =
+    | EditActiveDisplay
+    | EditActiveEdit
+interface EditActiveBase {
     mode: "edit.active";
-    editState: "display" | "edit";
+    elementType?: ElementType;
     allowSubmit?: boolean;
+}
+interface EditActiveDisplay extends EditActiveBase {
+    editState: "display";
     assigned: PropertyDisplayState[];
     unassigned: PropertyDisplayState[];
 }
+interface EditActiveEdit extends EditActiveBase {
+    editState: "edit";
+    property: PropertyDisplayState;
+}
+function isDisplay(value: EditActiveState): value is EditActiveDisplay {
+    return value.editState === "display";
+}
+
+function isEdit(value: EditActiveState): value is EditActiveEdit {
+    return value.editState === "edit";
+}
+
+export const EditActiveState = {
+    isDisplay,
+    isEdit
+};
 export type LabelFrameRenderState = (
     | NavigateMenuState
     | AddMenuState
     | EditActiveState
 ) & {
+    type: "label";
     labelSettings?: Record<string, LabelSettings>;
     lexemes?: Lexeme[];
 }
