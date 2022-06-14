@@ -1,3 +1,4 @@
+import { useUpdateDisplayState } from "@app/utils";
 import React, { useEffect, useRef } from "react";
 import { LabelFormView } from "../LabelFormView";
 import { ElementLexeme } from "../LabelView";
@@ -5,9 +6,11 @@ import { convertToMenuProps, createOnLabelClick, createOnModeChange } from "./ad
 import { useLabelForm } from "./reducer";
 import { LabelFormAction, LabelFormProps, LabelFormState } from "./types";
 import { LabelSettingsMode, Utils } from "./utils";
+import hash from "object-hash";
 
 export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const [state, dispatch] = useLabelForm(props);
+    const updateDisplay = useUpdateDisplayState();
     const diagramChange = useRef(false);
     const extendedDispatch: React.Dispatch<LabelFormAction> = (action) => {
         switch (action.type) {
@@ -31,6 +34,15 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
     const elementLexemes = lexemes.filter(({ type }) => type === "element") as ElementLexeme[];
     const settings = Utils.getLabelSettings(labelSettingsMode, state.diagram, elementLexemes);
     const onLabelClick = createOnLabelClick(state, extendedDispatch);
+
+    useEffect(() => {
+        updateDisplay({
+            type: "labels + lexemes",
+            labelSettings: settings,
+            lexemes
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hash(lexemes), hash(settings)]);
 
     const { onStateChange } = props;
     useEffect(() => {

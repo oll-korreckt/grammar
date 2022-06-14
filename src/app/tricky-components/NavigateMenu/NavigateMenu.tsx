@@ -1,8 +1,9 @@
 import { accessClassName } from "@app/utils";
+import { useUpdateDisplayState } from "@app/utils/display-state/DisplayState";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import { ElementCategory } from "@domain/language";
 import { AnimateSharedLayout, motion } from "framer-motion";
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useEffect } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup, FaAngleUp } from "react-icons/fa";
 import styles from "./_styles.module.scss";
@@ -16,12 +17,22 @@ export interface NavigateMenuProps {
 
 export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<NavigateMenuProps>>("NavigateMenu", ({ category, onCategoryChange, enableUpLevel, onUpLevel }, ref) => {
     const defaultCategory = ElementCategory.getDefault(category);
+    const updateDisplay = useUpdateDisplayState();
 
     function invokeCategoryChange(newCat: ElementCategory): void {
         if (onCategoryChange) {
             onCategoryChange(newCat);
         }
     }
+
+    useEffect(() => {
+        updateDisplay({
+            type: "navigate",
+            category,
+            enableUpLevel
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [category, enableUpLevel]);
 
     return (
         <div

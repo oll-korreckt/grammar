@@ -1,6 +1,7 @@
 import { accessClassName, DecoratorRange } from "@app/utils";
+import { useUpdateDisplayState } from "@app/utils/display-state/DisplayState";
 import { withClassNameProp } from "@app/utils/hoc";
-import React, { useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createEditor, Transforms } from "slate";
 import { withReact } from "slate-react";
 import { ErrorList, ErrorListItem } from "../ErrorList";
@@ -59,6 +60,7 @@ const errorDelay = 500;
 
 export const InputForm: React.VFC<InputFormProps> = ({ initialValue, onStateChange }) => {
     const [errorListAnimate, setErrorListAnimate] = useState<boolean>(false);
+    const updateDisplay = useUpdateDisplayState();
     const [state, dispatch] = useReducer(
         reducer,
         {
@@ -100,6 +102,14 @@ export const InputForm: React.VFC<InputFormProps> = ({ initialValue, onStateChan
             message: `[${lineNum}, ${colNum}]: ${message}`
         };
     });
+
+    useEffect(() => {
+        updateDisplay({
+            type: "input",
+            inputText: state.input
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.input]);
 
     return (
         <div className={accessClassName(styles, "inputForm")}>
