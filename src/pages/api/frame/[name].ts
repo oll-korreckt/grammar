@@ -1,4 +1,5 @@
 import { createApiRequestHandler } from "@utils/api";
+import { Frame } from "@utils/frame";
 import { FrameError, FrameLoader } from "@utils/frame/io";
 import { NextApiRequest, NextApiResponse } from "next";
 import nodepath from "path";
@@ -16,7 +17,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse): Promise<vo
         res.status(400).send("Invalid parameter received");
         return;
     }
-    const result = await loader.postFrame(name, body);
+    const frame: Frame = JSON.parse(body);
+    const result = await loader.postFrame(name, frame);
     if (FrameError.isFrameError(result)) {
         let errorCode: number;
         switch (result.errType) {
