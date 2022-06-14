@@ -1,6 +1,5 @@
 import { accessClassName } from "@app/utils";
 import React from "react";
-import { AddMenuProps } from "../AddMenu";
 import { DeleteMenuButtonProps } from "../DeleteMenuButton";
 import { EditActiveMenu, EditActiveMenuProps } from "../EditActiveMenu";
 import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
@@ -23,7 +22,7 @@ export type LabelFrameRenderProps = {
     navBarProps: NavigateMenuProps;
 } | {
     mode: "add";
-    navBarProps: AddMenuProps;
+    navBarProps: AddMenuViewProps;
 } | {
     mode: "edit.browse";
     navBarProps: EditBrowseMenuProps;
