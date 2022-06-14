@@ -8,7 +8,7 @@ export interface FrameAddress {
 
 export interface Frame {
     title?: string;
-    duration: number;
+    duration?: number;
     data: EditFormFrameRenderProps;
 }
 
