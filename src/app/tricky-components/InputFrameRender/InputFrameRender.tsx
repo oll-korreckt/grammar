@@ -83,7 +83,6 @@ function getTokens(text: string, errors: ScannerError[]): Token[] {
 const TextEditorRender: React.VFC<TextEditorRenderProps> = ({ children, errors }) => {
     const editorStyles = `${accessClassName(InputFormStyles, "extendedTextEditor")} ${accessClassName(TextEditorStyles, "editor")}`;
     const tokens = getTokens(children, errors);
-    console.log(tokens);
     return (
         <div className={editorStyles}>
             {tokens.map(({ type, content }, index) => {
