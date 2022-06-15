@@ -122,16 +122,14 @@ export const FramePage: React.VFC = () => {
     const post = useMutation(postFn);
 
     useEffect(() => {
-        function handleKeyDown(ev: KeyboardEvent): void {
-            if (ev.ctrlKey
-                && ev.key.toLowerCase() === "enter"
-                && assembledState !== undefined) {
+        function handleClick(): void {
+            if (assembledState !== undefined) {
                 post.mutate(assembledState);
             }
         }
 
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
+        document.addEventListener("click", handleClick);
+        return () => document.removeEventListener("click", handleClick);
     }, [assembledState, post]);
 
     return (
