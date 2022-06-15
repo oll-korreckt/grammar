@@ -1,10 +1,11 @@
-import { accessClassName, ElementDisplayInfo } from "@app/utils";
+import { accessClassName, ElementDisplayInfo, useUpdateDisplayState } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { ElementCategory, ElementType, elementTypeLists } from "@domain/language";
 import { AnimatePresence, motion } from "framer-motion";
-import React from "react";
+import React, { useEffect } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup } from "react-icons/fa";
+import hash from "object-hash";
 import styles from "./_styles.module.scss";
 
 export interface AddMenuViewProps {
@@ -105,12 +106,23 @@ function getMenuItems(elements: Exclude<ElementType, "word">[] | undefined, acti
 
 export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("AddMenuView", ({ category, onCategorySelect, onElementSelect, children }, ref) => {
     const availableCategories = getAvailableCategories(children);
+    const updateDisplay = useUpdateDisplayState();
     const activeCategory: AddMenuCategory | undefined = category !== undefined
         ? category
         : availableCategories.length > 0
             ? availableCategories[0]
             : undefined;
     const activeItems = getMenuItems(children, activeCategory);
+
+    const childrenHash = children === undefined ? "" : hash(children);
+    useEffect(() => {
+        updateDisplay({
+            type: "add",
+            elements: children,
+            category
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [category, childrenHash]);
 
     return (
         <div

@@ -1,13 +1,14 @@
-import { accessClassName, ElementDisplayInfo } from "@app/utils";
+import { accessClassName, ElementDisplayInfo, useUpdateDisplayState } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { ElementType } from "@domain/language";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { FaArrowLeft, FaTimes } from "react-icons/fa";
 import { FadeSwitch } from "../FadeSwitch";
 import { FadeTransport } from "../FadeTransport";
 import { EditActiveMenuDispatch, EditActiveMenuAction, PropertyState } from "./types";
 import { Property } from "./_Property";
 import { PropertySection } from "./_PropertySection";
+import hash from "object-hash";
 import styles from "./_styles.module.scss";
 
 
@@ -105,6 +106,7 @@ function getSubmitClass(allowSubmit: boolean | undefined): string {
 
 export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuProps>("EditActiveMenu", ({ state, elementType, dispatch, duration }, ref) => {
     const invokeDispatch = (action: EditActiveMenuAction) => dispatch && dispatch(action);
+    const updateDisplay = useUpdateDisplayState();
     const prevState = useRef(state);
     const transportId = useRef<string>();
     const displayState: EditActiveMenuDisplayState | undefined = state.type === "display" ? state : undefined;
@@ -119,6 +121,43 @@ export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuPro
         transportId.current = state.property.propertyKey;
     }
     prevState.current = state;
+
+    const displayStateHash = displayState ? hash(displayState) : "";
+
+    useEffect(() => {
+        if (displayState === undefined) {
+            return;
+        }
+        const { allowSubmit, assigned, unassigned } = displayState;
+        updateDisplay({
+            type: "edit.active",
+            editState: "display",
+            elementType,
+            allowSubmit,
+            assigned,
+            unassigned
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [displayStateHash]);
+
+    const editStateHash = editState ? hash(editState) : "";
+
+    useEffect(() => {
+        if (editState === undefined) {
+            return;
+        }
+        const { allowSubmit, property } = editState;
+        updateDisplay({
+            type: "edit.active",
+            editState: "edit",
+            elementType,
+            allowSubmit,
+            property
+        });
+        // start working here
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editStateHash]);
 
     return (
         <div
