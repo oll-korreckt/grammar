@@ -35,6 +35,7 @@ type PutFrameOutput =
 export interface FrameLoader {
     postFrame: (name: string, frame: Frame) => Promise<PostFrameOutput>;
     putFrame: (address: FrameAddress, frame: Frame) => Promise<PutFrameOutput>;
+    getFrames: (name: string) => Promise<GetFramesOutput>;
 }
 
 const FILE_IDENTIFIER = ".json";
@@ -149,10 +150,53 @@ async function postFrame(root: string, name: string, frame: Frame): Promise<Post
     }
 }
 
+type GetFramesOutput =
+    | Frame[]
+    | FrameError<"internal error">
+    | FrameError<"resource not found">
+
+async function getFrames(root: string, frameName: string): Promise<GetFramesOutput> {
+    if (!await checkAccess(root)) {
+        return _createAccessErr(root, "directory");
+    }
+    const { children } = await FileSystem.readdir(root);
+    const noResourceMsg = `No resource(s) found for '${frameName}'`;
+    if (children === undefined) {
+        return {
+            errType: "resource not found",
+            msg: noResourceMsg
+        };
+    }
+    interface PreOutput {
+        index: number;
+        frame: Frame;
+    }
+    const output: PreOutput[] = [];
+    const items = Object.values(children);
+    for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        if (item.type === "dir") {
+            continue;
+        }
+        const { name, extension, fullPath } = item;
+        const buffer = await fs.promises.readFile(fullPath);
+        const content = buffer.toString();
+        const frame: Frame = JSON.parse(content);
+        const addressStr = name.slice(0, name.length - extension.length);
+        const address = FrameAddress.fromString(addressStr);
+        output.push({
+            index: address.index,
+            frame: frame
+        });
+    }
+    return output.sort((a, b) => a.index - b.index).map(({ frame }) => frame);
+}
+
 function createLoader(root: string): FrameLoader {
     return {
         putFrame: async (address, frame) => await putFrame(root, address, frame),
-        postFrame: async (address, frame) => await postFrame(root, address, frame)
+        postFrame: async (address, frame) => await postFrame(root, address, frame),
+        getFrames: async (name) => await getFrames(root, name)
     };
 }
 
