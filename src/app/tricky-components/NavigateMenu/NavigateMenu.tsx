@@ -1,5 +1,4 @@
-import { accessClassName } from "@app/utils";
-import { useUpdateDisplayState } from "@app/utils/display-state/DisplayState";
+import { accessClassName, useUpdateDisplayState } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import { ElementCategory } from "@domain/language";
 import { AnimateSharedLayout, motion } from "framer-motion";
