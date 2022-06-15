@@ -28,14 +28,14 @@ interface UpdateAdd {
 type UpdateEditActive = {
     type: "edit.active";
     editState: "display";
-    elementType: ElementType;
+    elementType?: ElementType;
     allowSubmit?: boolean;
     assigned: PropertyDisplayState[];
     unassigned: PropertyDisplayState[];
 } | {
     type: "edit.active";
     editState: "edit";
-    elementType: ElementType;
+    elementType?: ElementType;
     allowSubmit?: boolean;
     property: PropertyDisplayState;
 }
@@ -207,20 +207,20 @@ function reducer(state: State, action: UpdateDisplayStateAction): State {
                 "labels + lexemes": action
             });
         case "navigate":
-            return withoutInput({
-                ...restOfState,
+            return {
+                "labels + lexemes": restOfState["labels + lexemes"],
                 navigate: action
-            });
+            };
         case "add":
-            return withoutInput({
-                ...restOfState,
+            return {
+                "labels + lexemes": restOfState["labels + lexemes"],
                 add: action
-            });
+            };
         case "edit.active":
-            return withoutInput({
-                ...restOfState,
+            return {
+                "labels + lexemes": restOfState["labels + lexemes"],
                 "edit.active": action
-            });
+            };
         default:
             throw `Invalid action: '${(action as any).type}'`;
     }
