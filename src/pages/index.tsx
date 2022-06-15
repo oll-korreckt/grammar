@@ -19,7 +19,7 @@ function createInputFrames(): Frame[] {
     for (let index = 0; index < sentence.length; index++) {
         const fragment = sentence.slice(0, index);
         output.push({
-            duration: 0.1,
+            duration: 0.08,
             data: {
                 editMode: "input",
                 inputText: fragment
