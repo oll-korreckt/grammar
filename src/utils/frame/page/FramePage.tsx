@@ -3,16 +3,23 @@ import { EditActiveMenuProps, EditActiveMenuState } from "@app/tricky-components
 import { EditForm } from "@app/tricky-components/EditForm";
 import { EditFormFrameRenderProps } from "@app/tricky-components/EditFormFrameRender";
 import { NavigateMenuProps } from "@app/tricky-components/NavigateMenu";
-import { accessClassName, InputFrameRenderState, LabelFrameRenderState, DisplayStateContext, useDisplayState } from "@app/utils";
+import { InputFrameRenderState, LabelFrameRenderState, DisplayStateContext, useDisplayState, ClickListenerContext } from "@app/utils";
 import { SERVER } from "config";
-import React, { useEffect } from "react";
+import React from "react";
 import { useMutation } from "react-query";
 import { Frame } from "../types";
-import styles from "./_styles.module.scss";
 
-async function postFn(renderState: InputFrameRenderState | LabelFrameRenderState): Promise<void> {
+interface PostArgs {
+    animatingElement?: string;
+    renderState: InputFrameRenderState | LabelFrameRenderState;
+}
+
+async function postFn({ renderState, animatingElement }: PostArgs): Promise<void> {
     const data = convertToFrame(renderState);
     const frame: Frame = { data };
+    if (animatingElement) {
+        frame.animatingElement = animatingElement;
+    }
     const queryStr = `${SERVER}/api/frame/player`;
     const response = await fetch(
         queryStr,
@@ -118,34 +125,26 @@ function convertToFrame(renderState: InputFrameRenderState | LabelFrameRenderSta
 }
 
 export const FramePage: React.VFC = () => {
-    const { state: actionsData, dispatch: setActionsData, assembledState } = useDisplayState();
+    const { state, dispatch, assembledState } = useDisplayState();
     const post = useMutation(postFn);
 
-    useEffect(() => {
-        function handleClick(): void {
-            if (assembledState !== undefined) {
-                post.mutate(assembledState);
-            }
+    function onElementClick(id: string | undefined): void {
+        if (id === undefined) {
+            throw "Undefined element clicked";
         }
-
-        document.addEventListener("click", handleClick);
-        return () => document.removeEventListener("click", handleClick);
-    }, [assembledState, post]);
+        if (assembledState !== undefined) {
+            post.mutate({
+                animatingElement: id,
+                renderState: assembledState
+            });
+        }
+    }
 
     return (
-        <DisplayStateContext.Provider value={{ state: actionsData, dispatch: setActionsData }}>
-            <EditForm />
-            <button
-                className={accessClassName(styles, "saveFrame")}
-                onClick={() => {
-                    console.log("state", assembledState);
-                    if (assembledState !== undefined) {
-                        post.mutate(assembledState);
-                    }
-                }}
-            >
-                Save Frame
-            </button>
-        </DisplayStateContext.Provider>
+        <ClickListenerContext.Provider value={{ onElementClick }}>
+            <DisplayStateContext.Provider value={{ state, dispatch }}>
+                <EditForm />
+            </DisplayStateContext.Provider>
+        </ClickListenerContext.Provider>
     );
 };
