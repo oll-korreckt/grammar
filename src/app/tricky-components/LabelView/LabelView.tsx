@@ -1,8 +1,8 @@
-import { accessClassName, Colors } from "@app/utils";
+import { accessClassName, ClickListenerContext, Colors } from "@app/utils";
 import { makeRefComponent, withClassNameProp, withEventProp } from "@app/utils/hoc";
 import { ElementId } from "@domain/language";
 import { Lexeme, Utils } from "./utils";
-import React from "react";
+import React, { useContext } from "react";
 import { Label } from "@app/basic-components/Label";
 import styles from "./_styles.module.scss";
 
@@ -28,6 +28,7 @@ function incrementIdCount(idCounts: Record<ElementId, number>, id: ElementId): n
 }
 
 export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("LabelView", ({ children, settings, onLabelClick }, ref) => {
+    const { onElementClick } = useContext(ClickListenerContext);
     const labels = Utils.scan(children);
     const defSettings: Record<ElementId, LabelSettings> = settings ? settings : {};
     const idCounts: Record<ElementId, number> = {};
@@ -58,7 +59,11 @@ export const LabelView = makeRefComponent<HTMLDivElement, LabelViewProps>("Label
                         header={idCnt === 0 ? header : undefined}
                         color={color}
                         fade={fade}
-                        onClick={() => onLabelClick && onLabelClick(id)}
+                        animateId={id}
+                        onClick={() => {
+                            onElementClick && onElementClick(id);
+                            onLabelClick && onLabelClick(id);
+                        }}
                         className={accessClassName(styles, ...classes)}
                     >
                         {lexemes.map(({ lexeme }) => lexeme)}

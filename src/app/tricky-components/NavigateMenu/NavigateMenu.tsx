@@ -1,8 +1,8 @@
-import { accessClassName, useUpdateDisplayState } from "@app/utils";
+import { accessClassName, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import { ElementCategory } from "@domain/language";
 import { AnimateSharedLayout, motion } from "framer-motion";
-import React, { PropsWithChildren, useEffect } from "react";
+import React, { PropsWithChildren, useContext, useEffect } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup, FaAngleUp } from "react-icons/fa";
 import styles from "./_styles.module.scss";
@@ -33,6 +33,8 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [category, enableUpLevel]);
 
+    const animateBase = "navigate-menu";
+
     return (
         <div
             ref={ref}
@@ -42,6 +44,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                 <ExtendedItem
                     icon={FaAngleUp}
                     onClick={() => onUpLevel && onUpLevel()}
+                    animateId={AnimationIdBuilderUtils.extendId(animateBase, "up-level")}
                     className={accessClassName(
                         styles,
                         ...(enableUpLevel ? [] : ["disableUpLevel"])
@@ -56,6 +59,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                     <Item
                         icon={FaLayerGroup}
                         selected={defaultCategory === "word"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateBase, "word")}
                         onClick={() => invokeCategoryChange("word")}
                     >
                         Word
@@ -63,6 +67,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                     <Item
                         icon={FaLayerGroup}
                         selected={defaultCategory === "partOfSpeech"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateBase, "category")}
                         onClick={() => invokeCategoryChange("partOfSpeech")}
                     >
                         Category
@@ -70,6 +75,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                     <Item
                         icon={FaLayerGroup}
                         selected={defaultCategory === "phrase"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateBase, "phrase")}
                         onClick={() => invokeCategoryChange("phrase")}
                     >
                         Phrase
@@ -77,6 +83,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                     <Item
                         icon={FaLayerGroup}
                         selected={defaultCategory === "clause"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateBase, "clause")}
                         onClick={() => invokeCategoryChange("clause")}
                     >
                         Clause
@@ -84,6 +91,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
                     <Item
                         icon={FaLayerGroup}
                         selected={defaultCategory === "sentence"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateBase, "sentence")}
                         onClick={() => invokeCategoryChange("sentence")}
                     >
                         Sentence
@@ -99,9 +107,14 @@ interface ItemProps {
     onClick?: () => void;
     selected?: boolean;
     children: string;
+    animateId?: string;
 }
 
-const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClick, selected, children }, ref) => {
+const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClick, selected, animateId, children }, ref) => {
+    const { onElementClick } = useContext(ClickListenerContext);
+    const { activeElement } = useContext(ControlAnimationContext);
+    const isAnimating = animateId !== undefined && activeElement === animateId;
+
     const Icon = icon;
     return (
         <div
@@ -110,7 +123,10 @@ const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClic
         >
             <div
                 className={accessClassName(styles, "itemContent")}
-                onClick={() => onClick && onClick()}
+                onClick={() => {
+                    onElementClick && onElementClick(animateId);
+                    onClick && onClick();
+                }}
             >
                 <Icon className={accessClassName(styles, "icon")} />
                 <div className={accessClassName(styles, "children")}>

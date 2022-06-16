@@ -1,6 +1,6 @@
 import { FadeTransport } from "@app/tricky-components/FadeTransport";
-import { accessClassName } from "@app/utils";
-import React from "react";
+import { accessClassName, AnimationIdBuilderContext, AnimationIdBuilderUtils } from "@app/utils";
+import React, { useContext } from "react";
 import { EditActiveMenuDispatch, PropertyState } from "../types";
 import { Property } from "../_Property";
 import styles from "./_styles.module.scss";
@@ -12,6 +12,7 @@ export interface PropertySectionProps {
 }
 
 export const PropertySection: React.VFC<PropertySectionProps> = ({ children, type, dispatch }) => {
+    const { idBase } = useContext(AnimationIdBuilderContext);
 
     return (
         <div className={accessClassName(styles, "propertySection")}>
@@ -31,6 +32,7 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
                     const displayText = prop.displayName !== undefined
                         ? prop.displayName
                         : prop.propertyKey;
+                    const animateId = AnimationIdBuilderUtils.extendId(idBase, prop.propertyKey);
                     return (
                         <FadeTransport key={prop.propertyKey} transportId={prop.propertyKey}>
                             <Property
@@ -39,6 +41,7 @@ export const PropertySection: React.VFC<PropertySectionProps> = ({ children, typ
                                     property: prop.propertyKey
                                 })}
                                 onDelete={onCancel}
+                                animateId={animateId}
                                 satisfied={prop.satisfied}
                                 required={prop.required}
                             >

@@ -1,12 +1,13 @@
-import { accessClassName, Colors } from "@app/utils";
+import { accessClassName, Colors, ControlAnimationContext, ControlAnimationUtils } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
-import React from "react";
+import React, { useContext } from "react";
 import styles from "./_styles.module.scss";
 
 export interface LabelProps {
     children: string | string[];
     color?: Colors;
     fade?: boolean | undefined;
+    animateId?: string;
     header?: string;
 }
 
@@ -16,11 +17,15 @@ function cancelHighlightDoubleClick(ev: React.MouseEvent): void {
     }
 }
 
-export const Label = makeRefComponent<HTMLSpanElement, LabelProps>("Label", ({ children, color, fade, header }, ref) => {
+export const Label = makeRefComponent<HTMLSpanElement, LabelProps>("Label", ({ children, color, fade, header, animateId }, ref) => {
+    const { activeElement } = useContext(ControlAnimationContext);
     const defChildren: string[] = Array.isArray(children) ? children : [children];
     if (defChildren.length === 0) {
         throw "Cannot have empty label";
     }
+
+    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
+
     const classes = ["label"];
     if (color !== undefined) {
         classes.push(fade ? `${color}Fade` : color);

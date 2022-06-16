@@ -1,7 +1,7 @@
-import { accessClassName, LabelFormMode } from "@app/utils";
+import { accessClassName, LabelFormMode, AnimationIdBuilderUtils, ClickListenerContext } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimateSharedLayout, motion } from "framer-motion";
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useContext } from "react";
 import { IconType } from "react-icons";
 import { FaPlus, FaSitemap, FaTrashAlt } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
@@ -26,6 +26,8 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
         }
     }
 
+    const animateIdBase = "nav-bar";
+
     return (
         <div
             ref={ref}
@@ -37,6 +39,7 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
                     <Item
                         icon={FaSitemap}
                         selected={currentMode === "navigate"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateIdBase, "navigate")}
                         onClick={() => invokeModeChange("navigate")}
                     >
                         Navigate
@@ -44,6 +47,7 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
                     <Item
                         icon={FaPlus}
                         selected={currentMode === "add"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateIdBase, "add")}
                         onClick={() => invokeModeChange("add")}
                     >
                         Add
@@ -51,6 +55,7 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
                     <Item
                         icon={RiEdit2Fill}
                         selected={currentMode === "edit.browse" || currentMode === "edit.active"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateIdBase, "edit-browse")}
                         onClick={() => invokeModeChange("edit.browse")}
                     >
                         Edit
@@ -58,6 +63,7 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
                     <Item
                         icon={FaTrashAlt}
                         selected={currentMode === "delete"}
+                        animateId={AnimationIdBuilderUtils.extendId(animateIdBase, "delete")}
                         onClick={() => invokeModeChange("delete")}
                     >
                         Delete
@@ -72,16 +78,21 @@ interface ItemProps {
     icon: IconType;
     onClick?: () => void;
     selected?: boolean;
+    animateId?: string;
     children: string;
 }
 
-const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, children }) => {
+const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, animateId, children }) => {
+    const { onElementClick } = useContext(ClickListenerContext);
     const Icon = icon;
     return (
         <div className={accessClassName(styles, "item")}>
             <div
                 className={accessClassName(styles, "itemContent")}
-                onClick={() => onClick && onClick()}
+                onClick={() => {
+                    onElementClick && onElementClick(animateId);
+                    onClick && onClick();
+                }}
             >
                 <Icon className={accessClassName(styles, "icon")} />
                 <div className={accessClassName(styles, "children")}>

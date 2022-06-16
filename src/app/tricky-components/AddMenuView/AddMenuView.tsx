@@ -1,8 +1,8 @@
-import { accessClassName, ElementDisplayInfo, useUpdateDisplayState } from "@app/utils";
+import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { ElementCategory, ElementType, elementTypeLists } from "@domain/language";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { IconType } from "react-icons";
 import { FaLayerGroup } from "react-icons/fa";
 import hash from "object-hash";
@@ -105,6 +105,7 @@ function getMenuItems(elements: Exclude<ElementType, "word">[] | undefined, acti
 }
 
 export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("AddMenuView", ({ category, onCategorySelect, onElementSelect, children }, ref) => {
+    const { onElementClick } = useContext(ClickListenerContext);
     const availableCategories = getAvailableCategories(children);
     const updateDisplay = useUpdateDisplayState();
     const activeCategory: AddMenuCategory | undefined = category !== undefined
@@ -124,6 +125,9 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [category, childrenHash]);
 
+    const animateIdBase = "add-menu";
+    const categoryIdBase = AnimationIdBuilderUtils.extendId(animateIdBase, "category");
+
     return (
         <div
             ref={ref}
@@ -134,7 +138,10 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
                     icon={FaLayerGroup}
                     active={activeCategory === "category"}
                     enabled={availableCategories.includes("category")}
-                    onClick={() => onCategorySelect && onCategorySelect("category")}
+                    onClick={() => {
+                        onElementClick && onElementClick(AnimationIdBuilderUtils.extendId(categoryIdBase, "category"));
+                        onCategorySelect && onCategorySelect("category");
+                    }}
                 >
                     Category
                 </Category>
@@ -142,7 +149,10 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
                     icon={FaLayerGroup}
                     active={activeCategory === "phrase"}
                     enabled={availableCategories.includes("phrase")}
-                    onClick={() => onCategorySelect && onCategorySelect("phrase")}
+                    onClick={() => {
+                        onElementClick && onElementClick(AnimationIdBuilderUtils.extendId(categoryIdBase, "phrase"));
+                        onCategorySelect && onCategorySelect("phrase");
+                    }}
                 >
                     Phrase
                 </Category>
@@ -150,7 +160,10 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
                     icon={FaLayerGroup}
                     active={activeCategory === "clause"}
                     enabled={availableCategories.includes("clause")}
-                    onClick={() => onCategorySelect && onCategorySelect("clause")}
+                    onClick={() => {
+                        onElementClick && onElementClick(AnimationIdBuilderUtils.extendId(categoryIdBase, "clause"));
+                        onCategorySelect && onCategorySelect("clause");
+                    }}
                 >
                     Clause
                 </Category>
@@ -158,7 +171,10 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
                     icon={FaLayerGroup}
                     active={activeCategory === "coordinated"}
                     enabled={availableCategories.includes("coordinated")}
-                    onClick={() => onCategorySelect && onCategorySelect("coordinated")}
+                    onClick={() => {
+                        onElementClick && onElementClick(AnimationIdBuilderUtils.extendId(categoryIdBase, "coordinated"));
+                        onCategorySelect && onCategorySelect("coordinated");
+                    }}
                 >
                     Coord.
                 </Category>
@@ -166,13 +182,17 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
                     icon={FaLayerGroup}
                     active={activeCategory === "sentence"}
                     enabled={availableCategories.includes("sentence")}
-                    onClick={() => onCategorySelect && onCategorySelect("sentence")}
+                    onClick={() => {
+                        onElementClick && onElementClick(AnimationIdBuilderUtils.extendId(categoryIdBase, "sentence"));
+                        onCategorySelect && onCategorySelect("sentence");
+                    }}
                 >
                     Sentence
                 </Category>
             </div>
             <div className={accessClassName(styles, "items")}>
                 {activeItems.map((item) => {
+                    const animateId = AnimationIdBuilderUtils.extendId(animateIdBase, "element", item);
                     const data = ElementDisplayInfo.getDisplayInfo(item);
                     const name = ElementDisplayInfo.getAbbreviatedName(data);
                     const header = activeCategory === "coordinated"
@@ -183,6 +203,7 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
                             key={item}
                             header={header}
                             onClick={() => onElementSelect && onElementSelect(item)}
+                            animateId={animateId}
                         >
                             {name}
                         </Item>
@@ -198,13 +219,15 @@ interface CategoryProps {
     active: boolean;
     enabled: boolean;
     onClick?: () => void;
+    animateId?: string;
     children: string;
 }
 
-const Category: React.VFC<CategoryProps> = ({ icon, active, enabled, onClick, children }) => {
+const Category: React.VFC<CategoryProps> = ({ icon, active, enabled, onClick, animateId, children }) => {
     const Icon = icon;
     return (
         <div
+            id={animateId}
             className={accessClassName(
                 styles,
                 "category",
@@ -236,14 +259,26 @@ interface ItemProps {
     selected?: boolean;
     header: string;
     children: string;
+    animateId?: string;
 }
 
-const Item: React.VFC<ItemProps> = ({ onClick, selected, header, children }) => {
+const Item: React.VFC<ItemProps> = ({ onClick, selected, header, animateId, children }) => {
+    const { activeElement } = useContext(ControlAnimationContext);
+    const { onElementClick } = useContext(ClickListenerContext);
+
+    const itemContentClasses = ["itemContent"];
+    if (animateId !== undefined && activeElement === animateId) {
+        itemContentClasses.push("itemContentAnimate");
+    }
+
     return (
         <div className={accessClassName(styles, "item")}>
             <div
-                className={accessClassName(styles, "itemContent")}
-                onClick={() => onClick && onClick()}
+                className={accessClassName(styles, ...itemContentClasses)}
+                onClick={() => {
+                    onElementClick && onElementClick(animateId);
+                    onClick && onClick();
+                }}
             >
                 <div className={accessClassName(styles, "itemSymbol")}>
                     <div className={accessClassName(styles, "itemHeader")}>
