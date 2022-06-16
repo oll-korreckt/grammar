@@ -10,3 +10,4 @@ export * from "./derivation-tree";
 export * from "./slate.d";
 export * from "./display-lexeme";
 export * from "./display-state-hooks";
+export * from "./context";
