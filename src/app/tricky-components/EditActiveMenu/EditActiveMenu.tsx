@@ -234,15 +234,22 @@ const IconButton: React.VFC<IconButtonProps> = ({ className, animateId, onClick,
     const Icon = icon;
 
     const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
+    const containerClasses = ["iconButton"];
+    if (isAnimating) {
+        containerClasses.push("iconButtonAnimate");
+    }
 
     const classes = [className];
     return (
-        <Icon
-            className={accessClassName(styles, ...classes)}
-            onClick={() => {
-                onElementClick && onElementClick(animateId);
-                onClick();
-            }}
-        />
+        <div className={accessClassName(styles, ...containerClasses)}>
+            <Icon
+                className={accessClassName(styles, ...classes)}
+                onClick={() => {
+                    onElementClick && onElementClick(animateId);
+                    onClick();
+                }}
+            />
+        </div>
+
     );
 };
