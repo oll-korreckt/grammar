@@ -142,7 +142,7 @@
 }
 
 .submitEnabledAnimate {
-    animation: pulseEnabled 0.75s linear infinite;
+    animation: pulseEnabled main.$pulse-settings;
     color: white;
     cursor: pointer;
 }
@@ -160,7 +160,7 @@
 }
 
 .submitDisabledAnimate {
-    animation: pulseDisabled 0.75s linear infinite;
+    animation: pulseDisabled main.$pulse-settings;
     color: grey;
     pointer-events: none;
 }
@@ -183,5 +183,5 @@
 }
 
 .iconButtonAnimate {
-    animation: pulse 0.75s linear infinite;
+    animation: pulse main.$pulse-settings;
 }

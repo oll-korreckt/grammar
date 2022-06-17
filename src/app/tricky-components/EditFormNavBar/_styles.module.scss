@@ -80,7 +80,7 @@
 }
 
 .animation {
-    animation: pulse 0.75s linear infinite;
+    animation: pulse main.$pulse-settings;
 }
 
 .underline {

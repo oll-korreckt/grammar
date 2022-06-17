@@ -45,7 +45,7 @@ $default: rgb(231, 231, 231);
 }
 
 .defaultAnimate {
-    animation: default 0.75s linear infinite;
+    animation: default main.$pulse-settings;
 }
 
 $satisfied: rgb(0, 107, 0);
@@ -69,7 +69,7 @@ $satisfied: rgb(0, 107, 0);
 }
 
 .satisfiedAnimate {
-    animation: satisfied 0.75s linear infinite;
+    animation: satisfied main.$pulse-settings;
 }
 
 $required: rgb(175, 76, 76);
@@ -93,7 +93,7 @@ $required: rgb(175, 76, 76);
 }
 
 .requiredAnimate {
-    animation: required 0.75s linear infinite;
+    animation: required main.$pulse-settings;
 }
 
 .propertyText, .propertyDelete {
