@@ -115,6 +115,13 @@ const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClic
     const { activeElement } = useContext(ControlAnimationContext);
     const isAnimating = animateId !== undefined && activeElement === animateId;
 
+    const iconClasses = ["icon"];
+    const childrenClasses = ["children"];
+    if (isAnimating) {
+        iconClasses.push("pulseAnimate");
+        childrenClasses.push("pulseAnimate");
+    }
+
     const Icon = icon;
     return (
         <div
@@ -128,8 +135,8 @@ const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClic
                     onClick && onClick();
                 }}
             >
-                <Icon className={accessClassName(styles, "icon")} />
-                <div className={accessClassName(styles, "children")}>
+                <Icon className={accessClassName(styles, ...iconClasses)} />
+                <div className={accessClassName(styles, ...childrenClasses)}>
                     {children}
                 </div>
                 {selected &&
