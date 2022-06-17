@@ -128,8 +128,20 @@ $dotRadius: 8px;
     padding: 5px;
 }
 
+@keyframes pulse {
+    0% {
+        background-color: white;
+    }
+    50% {
+        background-color: #eee;
+    }
+    100% {
+        background-color: white;
+    }
+}
+
 .itemContentAnimate {
-    background-color: lightgray;
+    animation: pulse 0.75s linear infinite;
 }
 
 .itemSymbol {

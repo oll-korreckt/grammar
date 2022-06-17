@@ -1,4 +1,4 @@
-import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext } from "@app/utils";
+import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { ElementCategory, ElementType, elementTypeLists } from "@domain/language";
 import { AnimatePresence, motion } from "framer-motion";
@@ -266,8 +266,9 @@ const Item: React.VFC<ItemProps> = ({ onClick, selected, header, animateId, chil
     const { activeElement } = useContext(ControlAnimationContext);
     const { onElementClick } = useContext(ClickListenerContext);
 
+    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
     const itemContentClasses = ["itemContent"];
-    if (animateId !== undefined && activeElement === animateId) {
+    if (isAnimating) {
         itemContentClasses.push("itemContentAnimate");
     }
 
