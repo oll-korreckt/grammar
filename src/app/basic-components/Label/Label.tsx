@@ -30,6 +30,9 @@ export const Label = makeRefComponent<HTMLSpanElement, LabelProps>("Label", ({ c
     if (color !== undefined) {
         classes.push(fade ? `${color}Fade` : color);
     }
+    if (isAnimating) {
+        classes.push("animation");
+    }
 
     return (
         <span
