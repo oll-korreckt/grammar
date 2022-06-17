@@ -67,6 +67,22 @@
     }
 }
 
+@keyframes pulse {
+    0% {
+        color: black;
+    }
+    50% {
+        color: #666;
+    }
+    100% {
+        color: black;
+    }
+}
+
+.animation {
+    animation: pulse 0.75s linear infinite;
+}
+
 .underline {
     position: absolute;
     bottom: -5px;

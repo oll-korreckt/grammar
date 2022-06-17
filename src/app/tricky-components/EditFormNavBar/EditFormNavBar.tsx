@@ -1,6 +1,6 @@
-import { accessClassName } from "@app/utils";
+import { accessClassName, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils } from "@app/utils";
 import { AnimateSharedLayout, motion } from "framer-motion";
-import React from "react";
+import React, { useContext } from "react";
 import { IconType } from "react-icons";
 import { FaEdit, FaTag } from "react-icons/fa";
 import styles from "./_styles.module.scss";
@@ -51,19 +51,36 @@ interface ItemProps {
 }
 
 const Item: React.VFC<ItemProps> = ({ onClick, icon, selected, transitionDuration, children, disabled }) => {
+    const { activeElement } = useContext(ControlAnimationContext);
+    const { onElementClick } = useContext(ClickListenerContext);
+
+    const animateId = AnimationIdBuilderUtils.extendId("edit-form-nav-bar", children);
+
     const Icon = icon;
     const classes = ["itemContent"];
     if (disabled) {
         classes.push("itemContentDisabled");
     }
+
+    const iconClasses = ["itemIcon"];
+    const childrenClasses = ["itemChildren"];
+    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
+    if (isAnimating) {
+        iconClasses.push("animation");
+        childrenClasses.push("animation");
+    }
+
     return (
         <div className={accessClassName(styles, "item")}>
             <div
                 className={accessClassName(styles, ...classes)}
-                onClick={() => onClick && onClick()}
+                onClick={() => {
+                    onElementClick && onElementClick(animateId);
+                    onClick && onClick();
+                }}
             >
-                <Icon className={accessClassName(styles, "itemIcon")} />
-                <div className={accessClassName(styles, "itemChildren")}>
+                <Icon className={accessClassName(styles, ...iconClasses)} />
+                <div className={accessClassName(styles, ...childrenClasses)}>
                     {children}
                 </div>
                 {selected &&
