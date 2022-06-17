@@ -129,6 +129,42 @@
     pointer-events: none;
 }
 
+@keyframes pulseEnabled {
+    0% {
+        background-color: blue;
+    }
+    50% {
+        background-color: lighten(blue, 17.5%);
+    }
+    100% {
+        background-color: blue;
+    }
+}
+
+.submitEnabledAnimate {
+    animation: pulseEnabled 0.75s linear infinite;
+    color: white;
+    cursor: pointer;
+}
+
+@keyframes pulseDisabled {
+    0% {
+        background-color: lightgrey;
+    }
+    50% {
+        background-color: lighten(lightgrey, 3%);
+    }
+    100% {
+        background-color: lightgrey;
+    }
+}
+
+.submitDisabledAnimate {
+    animation: pulseDisabled 0.75s linear infinite;
+    color: grey;
+    pointer-events: none;
+}
+
 .iconButton {
     position: relative;
     display: inline-block;

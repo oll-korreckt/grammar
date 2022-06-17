@@ -106,15 +106,6 @@ const EditBody: React.VFC<EditBodyProps> = ({ state }) => {
     );
 };
 
-function getSubmitClass(allowSubmit: boolean | undefined): string {
-    const submitEnabled = "submitEnabled";
-    const submitDisabled = "submitDisabled";
-    if (allowSubmit === undefined) {
-        return submitEnabled;
-    }
-    return allowSubmit ? submitEnabled : submitDisabled;
-}
-
 export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuProps>("EditActiveMenu", ({ state, elementType, dispatch, duration }, ref) => {
     const invokeDispatch = (action: EditActiveMenuAction) => dispatch && dispatch(action);
     const updateDisplay = useUpdateDisplayState();
@@ -208,13 +199,11 @@ export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuPro
                     </FadeSwitch>
                 </div>
                 <div className={accessClassName(styles, "bottom")}>
-                    <button
-                        className={accessClassName(styles, "submit", getSubmitClass(state.allowSubmit))}
-                        id={"edit-active.submit"}
-                        onClick={() => invokeDispatch({ type: "submit" })}
-                    >
-                        Submit
-                    </button>
+                    <SubmitButton
+                        animateId={AnimationIdBuilderUtils.extendId(idBase, "submit")}
+                        allowSubmit={state.allowSubmit}
+                        onClick={() => invokeDispatch({ type: "close" })}
+                    />
                 </div>
             </div>
         </AnimationIdBuilderContext.Provider>
@@ -251,5 +240,39 @@ const IconButton: React.VFC<IconButtonProps> = ({ className, animateId, onClick,
             />
         </div>
 
+    );
+};
+
+interface SubmitButtonProps {
+    animateId?: string;
+    allowSubmit?: boolean;
+    onClick?: () => void;
+}
+
+const SubmitButton: React.VFC<SubmitButtonProps> = ({ animateId: activeId, allowSubmit, onClick }) => {
+    const { onElementClick } = useContext(ClickListenerContext);
+    const { activeElement } = useContext(ControlAnimationContext);
+
+    const defAllowedSubmit = allowSubmit !== undefined
+        ? allowSubmit : true;
+
+    let enableClass = defAllowedSubmit ? "submitEnabled" : "submitDisabled";
+
+    const isAnimating = ControlAnimationUtils.isActive(activeId, activeElement);
+    if (isAnimating || true) {
+        enableClass += "Animate";
+    }
+    const submitClasses = ["submit", enableClass];
+
+    return (
+        <button
+            className={accessClassName(styles, ...submitClasses)}
+            onClick={() => {
+                onElementClick && onElementClick(activeId);
+                onClick && onClick();
+            }}
+        >
+            Submit
+        </button>
     );
 };
