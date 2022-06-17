@@ -32,6 +32,22 @@ $default: rgb(231, 231, 231);
     }
 }
 
+@keyframes default {
+    0% {
+        background-color: $default;
+    }
+    50% {
+        background-color: lighten($default, 10%);
+    }
+    100% {
+        background-color: $default;
+    }
+}
+
+.defaultAnimate {
+    animation: default 0.75s linear infinite;
+}
+
 $satisfied: rgb(0, 107, 0);
 .satisfied {
     background-color: $satisfied;
@@ -40,12 +56,44 @@ $satisfied: rgb(0, 107, 0);
     }
 }
 
+@keyframes satisfied {
+    0% {
+        background-color: $satisfied;
+    }
+    50% {
+        background-color: lighten($satisfied, 10%);
+    }
+    100% {
+        background-color: $satisfied;
+    }
+}
+
+.satisfiedAnimate {
+    animation: satisfied 0.75s linear infinite;
+}
+
 $required: rgb(175, 76, 76);
 .required {
     background-color: $required;
     &:hover {
         background-color: lighten($required, 10%);
     }
+}
+
+@keyframes required {
+    0% {
+        background-color: $required;
+    }
+    50% {
+        background-color: lighten($required, 10%);
+    }
+    100% {
+        background-color: $required;
+    }
+}
+
+.requiredAnimate {
+    animation: required 0.75s linear infinite;
 }
 
 .propertyText, .propertyDelete {

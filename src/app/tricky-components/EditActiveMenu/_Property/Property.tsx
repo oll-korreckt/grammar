@@ -22,13 +22,17 @@ export const Property: React.VFC<PropertyProps> = ({ onSelect, onDelete, childre
     const hasDelete = onDelete !== undefined;
 
     const bodyClasses = ["property"];
+    type BackgroundClass = "satisfied" | "required" | "default"
+    let backgroundClass: BackgroundClass;
     if (satisfied) {
-        bodyClasses.push("satisfied");
+        backgroundClass = "satisfied";
     } else if (required) {
-        bodyClasses.push("required");
+        backgroundClass = "required";
     } else {
-        bodyClasses.push("default");
+        backgroundClass = "default";
     }
+    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
+    bodyClasses.push(isAnimating ? backgroundClass + "Animate" : backgroundClass);
 
     const textClasses = ["propertyText"];
     if (hasSelect) {
@@ -39,8 +43,6 @@ export const Property: React.VFC<PropertyProps> = ({ onSelect, onDelete, childre
     } else {
         textClasses.push("noDelete");
     }
-
-    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
 
     return (
         <div
