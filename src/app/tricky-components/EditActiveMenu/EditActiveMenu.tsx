@@ -259,7 +259,7 @@ const SubmitButton: React.VFC<SubmitButtonProps> = ({ animateId: activeId, allow
     let enableClass = defAllowedSubmit ? "submitEnabled" : "submitDisabled";
 
     const isAnimating = ControlAnimationUtils.isActive(activeId, activeElement);
-    if (isAnimating || true) {
+    if (isAnimating) {
         enableClass += "Animate";
     }
     const submitClasses = ["submit", enableClass];
