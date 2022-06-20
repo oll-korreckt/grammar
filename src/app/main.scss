@@ -24,7 +24,7 @@ $sm-dim: 400px;
 $md-dim: 900px;
 $offset: 1px;
 
-$pulse-settings: 0.20s linear infinite;
+$pulse-settings: 0.5s linear infinite;
 
 @mixin smScreen {
     @media (orientation: landscape) and (max-height: #{$sm-dim - $offset}),
