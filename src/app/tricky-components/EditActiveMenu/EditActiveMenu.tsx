@@ -202,7 +202,7 @@ export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuPro
                     <SubmitButton
                         animateId={AnimationIdBuilderUtils.extendId(idBase, "submit")}
                         allowSubmit={state.allowSubmit}
-                        onClick={() => invokeDispatch({ type: "close" })}
+                        onClick={() => invokeDispatch({ type: "submit" })}
                     />
                 </div>
             </div>
