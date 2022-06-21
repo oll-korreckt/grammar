@@ -11,26 +11,3 @@
     width: min(800px, calc(100% - 10px));
     margin-bottom: 100px;
 }
-
-.player {
-    position: relative;
-    border: 1px solid black;
-    box-shadow: 2px 2px 4px gray;
-    @include main.smScreen {
-        height: 400px;
-    }
-    @include main.mdScreen {
-        height: 500px;
-    }
-    @include main.lgScreen {
-        height: 700px;
-    }
-    &::after {
-        content: '';
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-}
