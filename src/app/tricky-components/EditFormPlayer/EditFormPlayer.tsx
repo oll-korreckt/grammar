@@ -1,4 +1,4 @@
-import { accessClassName, ControlAnimationContext } from "@app/utils";
+import { accessClassName, ControlAnimationContext, DisplayModeContext } from "@app/utils";
 import { Frame } from "@utils/frame";
 import React, { useEffect, useState } from "react";
 import { EditFormFrameRender } from "../EditFormFrameRender";
@@ -95,8 +95,10 @@ const FrameRunner: React.VFC<FrameRunnerProps> = ({ children }) => {
     const { data, animatingElement } = children[index];
 
     return (
-        <ControlAnimationContext.Provider value={{ activeElement: animatingElement }}>
-            <EditFormFrameRender {...data}/>
-        </ControlAnimationContext.Provider>
+        <DisplayModeContext.Provider value={{ displayMode: "partial" }}>
+            <ControlAnimationContext.Provider value={{ activeElement: animatingElement }}>
+                <EditFormFrameRender {...data}/>
+            </ControlAnimationContext.Provider>
+        </DisplayModeContext.Provider>
     );
 };
