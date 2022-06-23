@@ -1,12 +1,44 @@
 @use "main";
 @use "./sizes.scss" as *;
 
-.navigateMenu {
-    @include navigateMenuHeight;
+@mixin navigateMenuBase {
     display: grid;
     grid-template-columns: auto 1fr;
     border: 1px solid black;
     border-radius: 3px;
+}
+
+.navigateMenu {
+    @include navigateMenuHeight;
+    @include navigateMenuBase;
+}
+
+.navigateMenuPartial {
+    @include navigateMenuHeightPartial;
+    @include navigateMenuBase;
+
+    & .icon {
+        @include main.smScreen {
+            font-size: 18px;
+        }
+        @include main.mdScreen {
+            font-size: 22px;
+        }
+        @include main.lgScreen {
+            font-size: 26px;
+        }
+    }
+    & .children {
+        @include main.smScreen {
+            font-size: 10px;
+        }
+        @include main.mdScreen {
+            font-size: 12px;
+        }
+        @include main.lgScreen {
+            font-size: 16px;
+        }
+    }
 }
 
 .upContainer {

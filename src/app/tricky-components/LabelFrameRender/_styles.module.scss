@@ -16,7 +16,7 @@
 
 .navigateContainerPartial {
     @include navigateMenuWidth;
-    @include navigateMenuHeight;
+    @include navigateMenuHeightPartial;
 }
 
 .addContainer {

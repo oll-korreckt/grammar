@@ -1,4 +1,4 @@
-import { accessClassName, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext } from "@app/utils";
+import { accessClassName, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, DisplayModeContext } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import { ElementCategory } from "@domain/language";
 import { AnimateSharedLayout, motion } from "framer-motion";
@@ -15,6 +15,7 @@ export interface NavigateMenuProps {
 }
 
 export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<NavigateMenuProps>>("NavigateMenu", ({ category, onCategoryChange, enableUpLevel, onUpLevel }, ref) => {
+    const { displayMode } = useContext(DisplayModeContext);
     const defaultCategory = ElementCategory.getDefault(category);
     const updateDisplay = useUpdateDisplayState();
 
@@ -38,7 +39,7 @@ export const NavigateMenu = makeRefComponent<HTMLDivElement, PropsWithChildren<N
     return (
         <div
             ref={ref}
-            className={accessClassName(styles, "navigateMenu")}
+            className={accessClassName(styles, displayMode === "full screen" ? "navigateMenu" : "navigateMenuPartial")}
         >
             <div className={accessClassName(styles, "upContainer")}>
                 <ExtendedItem
