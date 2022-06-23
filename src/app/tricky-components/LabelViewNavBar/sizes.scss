@@ -8,3 +8,15 @@
         height: 90px;
     }
 }
+
+@mixin labelViewNavBarHeightPartial {
+    @include main.smScreen {
+        height: 45px;
+    }
+    @include main.mdScreen {
+        height: 55px;
+    }
+    @include main.lgScreen {
+        height: 65px;
+    }
+}

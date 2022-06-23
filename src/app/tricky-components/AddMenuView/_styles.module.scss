@@ -1,10 +1,66 @@
 @use "main";
 @use "./sizes.scss" as *;
 
-.addMenu {
-    @include addMenuHeight;
+@mixin addMenuBase {
     display: grid;
     grid-template-columns: auto 1fr;
+}
+
+.addMenu {
+    @include addMenuHeight;
+    @include addMenuBase;
+}
+
+.addMenuPartial {
+    @include addMenuHeightPartial;
+    @include addMenuBase;
+
+    & .categories {
+        gap: 3px;
+    }
+    & .categoryIcon {
+        @include main.smMdScreen {
+            font-size: 12px;
+        }
+        @include main.lgScreen {
+            font-size: 18px;
+        }
+    }
+    & .categoryChildren {
+        @include main.smMdScreen {
+            font-size: 10px;
+        }
+        @include main.lgScreen {
+            font-size: 14px;
+        }
+    }
+    & .items {
+        @include main.smScreen {
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+        }
+        @include main.mdScreen {
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        }
+        @include main.lgScreen {
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        }
+    }
+    & .itemHeader {
+        @include main.smScreen {
+            font-size: 18px;
+        }
+        @include main.mdScreen {
+            font-size: 20px;
+        }
+    }
+    & .itemChildren {
+        @include main.smScreen {
+            font-size: 10px;
+        }
+        @include main.mdScreen {
+            font-size: 12px;
+        }
+    }
 }
 
 .categories {

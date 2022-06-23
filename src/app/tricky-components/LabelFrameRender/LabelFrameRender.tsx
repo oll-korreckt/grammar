@@ -1,5 +1,5 @@
-import { accessClassName } from "@app/utils";
-import React from "react";
+import { accessClassName, DisplayModeContext } from "@app/utils";
+import React, { useContext } from "react";
 import { DeleteMenuButtonProps } from "../DeleteMenuButton";
 import { EditActiveMenu, EditActiveMenuProps } from "../EditActiveMenu";
 import { EditBrowseMenu, EditBrowseMenuProps } from "../EditBrowseMenu";
@@ -35,6 +35,9 @@ export type LabelFrameRenderProps = {
 })
 
 export const LabelFrameRender: React.VFC<LabelFrameRenderProps> = ({ mode, navBarProps, settings, children }) => {
+    const { displayMode } = useContext(DisplayModeContext);
+    const className = accessClassName(styles, "labelViewNavBarMenuPosition");
+
     return (
         <div className={accessClassName(LabelFormViewStyles, "labelForm")}>
             <LabelViewAssembly
@@ -44,15 +47,47 @@ export const LabelFrameRender: React.VFC<LabelFrameRenderProps> = ({ mode, navBa
                 {children}
             </LabelViewAssembly>
             <LabelViewNavBar mode={mode}>
-                <ExtendedLabelViewNavBarMenu
-                    className={accessClassName(styles, "labelViewNavBarMenuPosition")}
-                    mode={mode as any}
-                    props={navBarProps}
-                />
+                {displayMode === "full screen" &&
+                    <ExtendedLabelViewNavBarMenu
+                        className={className}
+                        mode={mode as any}
+                        props={navBarProps}
+                    />
+                }
+                {displayMode === "partial" &&
+                    <ExtendedLabelViewNavBarMenuPartial
+                        className={className}
+                        mode={mode as any}
+                        props={navBarProps}
+                    />
+                }
             </LabelViewNavBar>
         </div>
     );
 };
+
+const ExtendedLabelViewNavBarMenuPartial = withClassNameProp(createLabelViewNavBarMenu<NavigateMenuProps, AddMenuViewProps, EditBrowseMenuProps, EditActiveMenuProps, DeleteMenuProps>({
+    navigate: {
+        sizeClass: accessClassName(styles, "navigateContainerPartial"),
+        Component: NavigateMenu as React.VFC<NavigateMenuProps>
+    },
+    add: {
+        sizeClass: accessClassName(styles, "addContainerPartial"),
+        Component: AddMenuView
+    },
+    "edit.browse": {
+        sizeClass: accessClassName(styles, "editBrowseContainer"),
+        Component: EditBrowseMenu
+    },
+    "edit.active": {
+        sizeClass: accessClassName(styles, "editActiveContainerPartial"),
+        Component: EditActiveMenu
+    },
+    delete: {
+        sizeClass: accessClassName(styles, "deleteContainer"),
+        Component: DeleteMenu
+    }
+}));
 
 const ExtendedLabelViewNavBarMenu = withClassNameProp(createLabelViewNavBarMenu<NavigateMenuProps, AddMenuViewProps, EditBrowseMenuProps, EditActiveMenuProps, DeleteMenuProps>({
     navigate: {

@@ -1,4 +1,4 @@
-import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils } from "@app/utils";
+import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils, DisplayModeContext } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { ElementCategory, ElementType, elementTypeLists } from "@domain/language";
 import { AnimatePresence, motion } from "framer-motion";
@@ -105,6 +105,7 @@ function getMenuItems(elements: Exclude<ElementType, "word">[] | undefined, acti
 }
 
 export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("AddMenuView", ({ category, onCategorySelect, onElementSelect, children }, ref) => {
+    const { displayMode } = useContext(DisplayModeContext);
     const { onElementClick } = useContext(ClickListenerContext);
     const availableCategories = getAvailableCategories(children);
     const updateDisplay = useUpdateDisplayState();
@@ -131,7 +132,7 @@ export const AddMenuView = makeRefComponent<HTMLDivElement, AddMenuViewProps>("A
     return (
         <div
             ref={ref}
-            className={accessClassName(styles, "addMenu")}
+            className={accessClassName(styles, displayMode === "full screen" ? "addMenu" : "addMenuPartial")}
         >
             <div className={accessClassName(styles, "categories")}>
                 <Category

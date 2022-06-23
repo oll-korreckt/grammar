@@ -4,7 +4,17 @@
     border-bottom: 1px solid black;
 }
 
+@mixin navBarContentBase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: min(800px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .navBarContent {
+    @include navBarContentBase;
+
     @include main.smScreen {
         height: 60px;
     }
@@ -14,11 +24,47 @@
     @include main.lgScreen {
         height: 80px;
     }
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: min(800px, 100%);
-    margin-left: auto;
-    margin-right: auto;
+}
+
+.navBarContentPartial {
+    @include navBarContentBase;
+
+    @include main.smScreen {
+        height: 45px;
+    }
+    @include main.mdScreen {
+        height: 60px;
+    }
+    @include main.lgScreen {
+        height: 70px;
+    }
+
+    & .itemIcon {
+        @include main.smScreen {
+            font-size: 20px;
+        }
+        @include main.mdScreen {
+            font-size: 24px;
+        }
+        @include main.lgScreen {
+            font-size: 26px;
+        }
+    }
+    & .itemChildren {
+        @include main.smScreen {
+            font-size: 10px;
+        }
+        @include main.mdScreen {
+            font-size: 14px;
+        }
+        @include main.lgScreen {
+            font-size: 16px;
+        }
+    }
+    & .underline {
+        bottom: -3px;
+        height: 3px;
+    }
 }
 
 .item {

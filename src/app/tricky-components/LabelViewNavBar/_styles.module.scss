@@ -1,11 +1,53 @@
 @use "main";
 @use "./sizes.scss" as *;
 
-.labelViewNavBar {
+@mixin labelViewNavBarBase {
     @include main.center-content;
-    @include labelViewNavBarHeight;
     position: relative;
     border-top: 1px solid black;
+}
+
+.labelViewNavBar {
+    @include labelViewNavBarBase;
+    @include labelViewNavBarHeight;
+}
+
+.labelViewNavBarPartial {
+    @include labelViewNavBarBase;
+    @include labelViewNavBarHeightPartial;
+
+    & .icon {
+        @include main.smScreen {
+            font-size: 20px;
+        }
+        @include main.mdScreen {
+            font-size: 25px;
+        }
+        @include main.lgScreen {
+            font-size: 30px;
+        }
+    }
+    & .children {
+        @include main.smScreen {
+            font-size: 10px;
+        }
+        @include main.mdScreen {
+            font-size: 12px;
+        }
+        @include main.lgScreen {
+            font-size: 18px;
+        }
+    }
+    & .underline {
+        @include main.smScreen {
+            bottom: -3px;
+            height: 3px;
+        }
+        @include main.mdScreen {
+            bottom: -4px;
+            height: 4px;
+        }
+    }
 }
 
 .itemContainer {

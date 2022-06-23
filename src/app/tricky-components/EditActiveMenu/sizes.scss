@@ -17,3 +17,12 @@
         height: 300px;
     }
 }
+
+@mixin editActiveMenuHeightPartial {
+    @include main.smMdScreen {
+        height: 150px;
+    }
+    @include main.lgScreen {
+        height: 250px;
+    }
+}

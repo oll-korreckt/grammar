@@ -1,4 +1,4 @@
-import { accessClassName, LabelFormMode, AnimationIdBuilderUtils, ClickListenerContext } from "@app/utils";
+import { accessClassName, LabelFormMode, AnimationIdBuilderUtils, ClickListenerContext, DisplayModeContext } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { PropsWithChildren, useContext } from "react";
@@ -18,6 +18,7 @@ interface Item {
 }
 
 export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildren<LabelViewNavBarProps>>("LabelViewNavBar", ({ mode, onModeChange, children }, ref) => {
+    const { displayMode } = useContext(DisplayModeContext);
     const currentMode = LabelFormMode.getDefault(mode);
 
     function invokeModeChange(newMode: LabelFormMode): void {
@@ -31,7 +32,7 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
     return (
         <div
             ref={ref}
-            className={accessClassName(styles, "labelViewNavBar")}
+            className={accessClassName(styles, displayMode === "full screen" ? "labelViewNavBar" : "labelViewNavBarPartial")}
         >
             {children}
             <div className={accessClassName(styles, "itemContainer")}>

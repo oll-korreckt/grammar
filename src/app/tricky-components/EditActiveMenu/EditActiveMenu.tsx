@@ -1,4 +1,4 @@
-import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderContext, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils } from "@app/utils";
+import { accessClassName, ElementDisplayInfo, useUpdateDisplayState, AnimationIdBuilderContext, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils, DisplayModeContext } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { ElementType } from "@domain/language";
 import React, { useContext, useEffect, useRef } from "react";
@@ -107,6 +107,7 @@ const EditBody: React.VFC<EditBodyProps> = ({ state }) => {
 };
 
 export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuProps>("EditActiveMenu", ({ state, elementType, dispatch, duration }, ref) => {
+    const { displayMode } = useContext(DisplayModeContext);
     const invokeDispatch = (action: EditActiveMenuAction) => dispatch && dispatch(action);
     const updateDisplay = useUpdateDisplayState();
     const prevState = useRef(state);
@@ -156,8 +157,6 @@ export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuPro
             allowSubmit,
             property
         });
-        // start working here
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [editStateHash]);
 
@@ -167,7 +166,7 @@ export const EditActiveMenu = makeRefComponent<HTMLDivElement, EditActiveMenuPro
         <AnimationIdBuilderContext.Provider value={{ idBase }}>
             <div
                 ref={ref}
-                className={accessClassName(styles, "editActiveMenu")}
+                className={accessClassName(styles, displayMode === "full screen" ? "editActiveMenu" : "editActiveMenuPartial")}
             >
                 <div className={accessClassName(styles, "bar")}>
                     <IconButton

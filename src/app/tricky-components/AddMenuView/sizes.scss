@@ -12,3 +12,15 @@
         height: 400px;
     }
 }
+
+@mixin addMenuHeightPartial {
+    @include main.smScreen {
+        height: 160px;
+    }
+    @include main.mdScreen {
+        height: 180px;
+    }
+    @include main.lgScreen {
+        height: 300px;
+    }
+}

@@ -1,4 +1,4 @@
-import { accessClassName, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils } from "@app/utils";
+import { accessClassName, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, ControlAnimationUtils, DisplayModeContext } from "@app/utils";
 import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { useContext } from "react";
 import { IconType } from "react-icons";
@@ -13,10 +13,12 @@ export interface EditFormNavBarProps {
 }
 
 export const EditFormNavBar: React.VFC<EditFormNavBarProps> = ({ mode, transitionDuration, onModeSwitch, disableLabelMode }) => {
+    const { displayMode } = useContext(DisplayModeContext);
     const defMode = mode !== undefined ? mode : "input";
+
     return (
         <div className={accessClassName(styles, "navBar")}>
-            <div className={accessClassName(styles, "navBarContent")}>
+            <div className={accessClassName(styles, displayMode === "full screen" ? "navBarContent" : "navBarContentPartial")}>
                 <AnimateSharedLayout type="crossfade">
                     <Item
                         icon={FaEdit}

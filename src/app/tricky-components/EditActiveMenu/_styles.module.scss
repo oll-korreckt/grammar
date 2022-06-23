@@ -1,20 +1,33 @@
 @use "main";
 @use "./sizes.scss" as *;
 
-.editActiveMenu {
+@mixin editActiveMenuBase {
     @include editActiveMenuWidth;
-    @include editActiveMenuHeight;
-    position: relative;
-    display: grid;
     @include main.smMdScreen {
         grid-template-rows: 20px auto 30px;
     }
     @include main.lgScreen {
         grid-template-rows: 30px auto 50px;
     }
+    position: relative;
+    display: grid;
     border: 1px solid grey;
-    box-shadow: 0 0 3px grey;
+    box-shadow: 0 0 3px gray;
     user-select: none;
+}
+
+.editActiveMenu {
+    @include editActiveMenuBase;
+    @include editActiveMenuHeight;
+}
+
+.editActiveMenuPartial {
+    @include editActiveMenuBase;
+    @include editActiveMenuHeightPartial;
+
+    & .display {
+        padding: 5px 25px;
+    }
 }
 
 .header {
