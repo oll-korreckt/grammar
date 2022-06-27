@@ -68,6 +68,6 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse): Promise<voi
 
 const requestHandler = createApiRequestHandler({
     postRequest: { handler: handlePost, devOnly: true },
-    getRequest: { handler: handleGet, devOnly: true }
+    getRequest: { handler: handleGet }
 });
 export default requestHandler;
