@@ -1,4 +1,4 @@
-import { accessClassName, LabelFormMode, AnimationIdBuilderUtils, ClickListenerContext, DisplayModeContext } from "@app/utils";
+import { accessClassName, LabelFormMode, AnimationIdBuilderUtils, ClickListenerContext, DisplayModeContext, ControlAnimationUtils, ControlAnimationContext } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimateSharedLayout, motion } from "framer-motion";
 import React, { PropsWithChildren, useContext } from "react";
@@ -84,8 +84,18 @@ interface ItemProps {
 }
 
 const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, animateId, children }) => {
+    const { activeElement } = useContext(ControlAnimationContext);
     const { onElementClick } = useContext(ClickListenerContext);
     const Icon = icon;
+
+    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
+    const iconClasses = ["icon"];
+    const childrenClasses = ["children"];
+    if (isAnimating) {
+        iconClasses.push("iconAnimate");
+        childrenClasses.push("childrenAnimate");
+    }
+
     return (
         <div className={accessClassName(styles, "item")}>
             <div
@@ -95,8 +105,8 @@ const Item: React.VFC<ItemProps> = ({ icon, onClick, selected, animateId, childr
                     onClick && onClick();
                 }}
             >
-                <Icon className={accessClassName(styles, "icon")} />
-                <div className={accessClassName(styles, "children")}>
+                <Icon className={accessClassName(styles, ...iconClasses)} />
+                <div className={accessClassName(styles, ...childrenClasses)}>
                     {children}
                 </div>
                 {selected &&

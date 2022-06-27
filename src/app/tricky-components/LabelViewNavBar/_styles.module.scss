@@ -85,6 +85,22 @@
     }
 }
 
+@keyframes animate {
+    0% {
+        color: black;
+    }
+    50% {
+        color: #0000;
+    }
+    100% {
+        color: black;
+    }
+}
+
+.iconAnimate {
+    animation: animate main.$pulse-settings;
+}
+
 .children {
     @include main.smMdScreen {
         font-size: 12px;
@@ -92,6 +108,10 @@
     @include main.lgScreen {
         font-size: 18px;
     }
+}
+
+.childrenAnimate {
+    animation: animate main.$pulse-settings;
 }
 
 .underline {
