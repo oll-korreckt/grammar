@@ -1,4 +1,4 @@
-import { accessClassName, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, DisplayModeContext } from "@app/utils";
+import { accessClassName, useUpdateDisplayState, AnimationIdBuilderUtils, ClickListenerContext, ControlAnimationContext, DisplayModeContext, ControlAnimationUtils } from "@app/utils";
 import { makeRefComponent, withClassNameProp } from "@app/utils/hoc";
 import { ElementCategory } from "@domain/language";
 import { AnimateSharedLayout, motion } from "framer-motion";
@@ -114,7 +114,8 @@ interface ItemProps {
 const Item = makeRefComponent<HTMLDivElement, ItemProps>("Item", ({ icon, onClick, selected, animateId, children }, ref) => {
     const { onElementClick } = useContext(ClickListenerContext);
     const { activeElement } = useContext(ControlAnimationContext);
-    const isAnimating = animateId !== undefined && activeElement === animateId;
+
+    const isAnimating = ControlAnimationUtils.isActive(animateId, activeElement);
 
     const iconClasses = ["icon"];
     const childrenClasses = ["children"];
