@@ -11,10 +11,10 @@ const ModelPage: NextPage = () => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-    if (process.env.NODE_ENV !== "development") {
-        throw "Cannot access this page outside of development mode";
-    }
-    return { props: {} };
+    return {
+        props: {},
+        notFound: process.env.NODE_ENV !== "development"
+    };
 };
 
 export default ModelPage;
