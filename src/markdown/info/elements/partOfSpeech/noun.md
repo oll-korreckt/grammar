@@ -1,7 +1,7 @@
 # Noun
 <!-- +elementInfo -->
 <!-- !noun -->
-When one asks: "what is a noun?" the answer typically received is "a person, place, or thing." In practice, most nouns are composed of a single word but it is possible to have nouns that are composed of two or more words.
+When one asks: "what is a noun?" the answer typically received is "a person, place, or thing."
 <!-- !noun -->
 
 ## Properties

@@ -1,7 +1,7 @@
 # Pronouns
 <!-- +elementInfo -->
 <!-- !pronoun -->
-Pronouns are words (or sometimes groups of words) that typically reference a [noun](/element/noun). The noun being referenced typically resides somewhere within the same sentence or an adjacent sentence but it depends on the context. However, as is the case with *dummy pronouns*, it is possible for a pronoun not to reference a noun at all. 
+Pronouns are words (or sometimes groups of words) that typically reference a [noun](/element/noun). The noun being referenced typically resides somewhere within the same sentence or an adjacent sentence but it depends on the context. However, as is the case with *dummy pronouns*, it is possible for a pronoun not to reference a noun at all.
 <!-- !pronoun -->
 
 ## Properties

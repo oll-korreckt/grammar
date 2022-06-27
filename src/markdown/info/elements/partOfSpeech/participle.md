@@ -1,13 +1,13 @@
 # Participles
 <!-- +elementInfo -->
 <!-- !participle -->
-Participles are derived from verbs. In English, there exists two types of participles: present and past. While often thought of in the context of a certain verb tenses that use participles (such as *progressive* and *perfect* verb tenses), participles can be used separately from verbs in order to function as adjectives and to form [participle phrase](/element/participle-phrase) which likewise function as adjectives.
+Participles are derived from verbs. In English, there exist two types of participles: present and past. While often thought of in the context of a certain verb tenses that use participles (such as *progressive* and *perfect* verb tenses), participles can be used separately from verbs in order to function as adjectives and to form [participle phrase](/element/participle-phrase) which likewise function as adjectives.
 
 ### Present
 Present participles are created by adding a *-ing* to the end of a verb (or, in the case of certain verbs, replacing part of the verb's ending with *-ing*).
 
 ### Past
-While often derived verbs via a *-ed* or *-d* ending, it is worth noting that there are certain irregular verbs that do not follow this pattern.
+The past participle is often derived from verbs via the addition of a *-ed* or *-d* ending. It is also worth noting that there are certain irregular verbs that do not follow this pattern such as *get* becoming *gotten* or *sink* becoming *sunk*.
 <!-- !participle -->
 
 ## Properties
@@ -28,7 +28,7 @@ Verb. Here, *running* functions as the main verb of the present continuous tense
 <!-- *participle.identification_present-participle2 -->
 > The *running* dog is breathing heavily.
 <!-- .caption -->
-Participle. Here, *running* describes *dog*. You could remove *running* from the sentence and it would not destroy the clause nor the semantic meaning. On the other hand, removing *breathing* would break the sentence since it is the main verb.
+Participle. Here, *running* describes *dog*. You could remove *running* from the sentence and it would not destroy the clause or the semantic meaning. On the other hand, removing *breathing* would break the sentence since it is the main verb.
 
 #### Past Participle
 <!-- *participle.identification_past-participle1 -->
