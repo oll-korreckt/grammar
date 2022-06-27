@@ -36,7 +36,8 @@
         "markdown": "next-remote-watch src/markdown",
         "open-browser": "node open",
         "test": "jest",
-        "start": "webpack serve --open"
+        "build": "next build",
+        "start": "next start"
     },
     "dependencies": {
         "@types/object-hash": "^2.2.1",
