@@ -14,6 +14,8 @@ function _getCategoryList(category: Exclude<ElementCategory, "word">): HTMLUnord
         case "clause":
             items = elementTypeLists.clause;
             break;
+        case "sentence":
+            items = ["sentence"];
     }
     return {
         type: "ul",
