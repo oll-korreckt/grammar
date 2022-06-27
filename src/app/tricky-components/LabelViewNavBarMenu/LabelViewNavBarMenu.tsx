@@ -149,19 +149,19 @@ export function createLabelViewNavBarMenu<TNavProps, TAddProps, TEditBrowseProps
                                 transition={{ ease: [0.25, 0.1, 0.25, 1], duration: 0.5 }}
                             >
                                 {mode === "navigate" &&
-                                    <NavMenu {...props}/>
+                                    <NavMenu {...props as any}/>
                                 }
                                 {mode === "add" &&
-                                    <AddMenu {...props}/>
+                                    <AddMenu {...props as any}/>
                                 }
                                 {mode === "edit.browse" &&
-                                    <EditBrowseMenu {...props}/>
+                                    <EditBrowseMenu {...props as any}/>
                                 }
                                 {mode === "edit.active" &&
-                                    <EditActiveMenu {...props}/>
+                                    <EditActiveMenu {...props as any}/>
                                 }
                                 {mode === "delete" &&
-                                    <DeleteMenu {...props}/>
+                                    <DeleteMenu {...props as any}/>
                                 }
                             </motion.div>
                         );
