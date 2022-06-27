@@ -37,7 +37,7 @@ $default: rgb(231, 231, 231);
         background-color: $default;
     }
     50% {
-        background-color: lighten($default, 10%);
+        background-color: white;
     }
     100% {
         background-color: $default;
@@ -61,7 +61,7 @@ $satisfied: rgb(0, 107, 0);
         background-color: $satisfied;
     }
     50% {
-        background-color: lighten($satisfied, 10%);
+        background-color: lighten($satisfied,  20%);
     }
     100% {
         background-color: $satisfied;
@@ -85,7 +85,7 @@ $required: rgb(175, 76, 76);
         background-color: $required;
     }
     50% {
-        background-color: lighten($required, 10%);
+        background-color: lighten($required, 30%);
     }
     100% {
         background-color: $required;
