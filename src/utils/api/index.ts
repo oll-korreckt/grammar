@@ -1,5 +1,6 @@
 import { Strings } from "@lib/utils";
 import { NextApiRequest, NextApiResponse } from "next";
+import catchAll from "pages/api/[[...404]]";
 
 
 export interface ErrorMessage {
@@ -39,7 +40,7 @@ export function sendError(res: NextApiResponse, errorOrStatus: ErrorMessage | nu
 
 async function execute(data: ApiRequestHandlerData | ApiRequestHandler | undefined, req: NextApiRequest, res: NextApiResponse): Promise<void> {
     if (data === undefined) {
-        sendError(res, 400, "Bad Request");
+        await catchAll(req, res);
         return;
     }
     if (typeof data === "function") {
@@ -48,7 +49,7 @@ async function execute(data: ApiRequestHandlerData | ApiRequestHandler | undefin
     }
     const { devOnly, handler } = data;
     if (devOnly && process.env.NODE_ENV !== "development") {
-        sendError(res, 400, "Bad Request");
+        await catchAll(req, res);
         return;
     }
     await handler(req, res);
