@@ -19,7 +19,7 @@ export const LabelForm: React.VFC<LabelFormProps> = (props) => {
             case "navigate: expanded":
             case "navigate: up":
             case "delete: element":
-            case "delete: all":
+            case "delete: delete all yes":
                 diagramChange.current = true;
                 break;
         }

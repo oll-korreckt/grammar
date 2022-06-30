@@ -17,3 +17,8 @@
     right: 0;
     bottom: 0;
 }
+
+.deleteMenuButtonDisable {
+    color: gray;
+    pointer-events: none;
+}

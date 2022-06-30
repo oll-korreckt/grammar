@@ -114,8 +114,13 @@ export function convertToMenuProps(state: State, dispatch: React.Dispatch<LabelF
             return output;
         }
         case "delete": {
+            const { showPrompt, allowDeleteAll } = state;
             const output: DeleteMenuProps = {
-                onDeleteAll: () => dispatch({ type: "delete: all" })
+                showPrompt,
+                allowDeleteAll,
+                onDeleteAll: () => dispatch({ type: "delete: enter delete all" }),
+                onDeleteAllYes: () => dispatch({ type: "delete: delete all yes" }),
+                onDeleteAllCancel: () => dispatch({ type: "delete: delete all cancel" })
             };
             return output;
         }

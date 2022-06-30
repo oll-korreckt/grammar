@@ -32,10 +32,10 @@ function switchMode(state: State, target: Exclude<LabelFormMode, "edit.active">)
                 mode: "edit.browse"
             };
         case "delete":
-            return {
+            return setAllowDeleteAll({
                 ...mixin,
                 mode: "delete"
-            };
+            });
     }
 }
 
@@ -119,6 +119,17 @@ function getUpExpanded(diagram: DiagramState, display: DisplaySettings): Element
     const categoryFilter = ElementCategory.getLayerFilter(category);
     const parentCategory = ElementCategory.getElementCategory(parentItem.type);
     return categoryFilter(parentCategory) ? expandedItem.ref : undefined;
+}
+
+function setAllowDeleteAll(state: DeleteState): DeleteState {
+    const output: DeleteState = { ...state };
+    const allowDeleteAll = DiagramStateFunctions.getLabelCount(output.diagram) > 0;
+    if (allowDeleteAll) {
+        output.allowDeleteAll = true;
+    } else {
+        delete output.allowDeleteAll;
+    }
+    return output;
 }
 
 function reducer(state: State, action: LabelFormAction): State {
@@ -262,19 +273,34 @@ function reducer(state: State, action: LabelFormAction): State {
             return editActiveSwitchMode(editActive, action.target);
         }
         case "delete: element": {
+            const deleteState = castState("delete", state);
             const newDiagram = DiagramStateFunctions.deleteItem(state.diagram, action.id);
-            return {
-                ...state,
+            return setAllowDeleteAll({
+                ...deleteState,
                 diagram: newDiagram
-            };
+            });
         }
-        case "delete: all": {
+        case "delete: enter delete all": {
+            const deleteState = castState("delete", state);
+            return setAllowDeleteAll({
+                ...deleteState,
+                showPrompt: true
+            });
+        }
+        case "delete: delete all cancel": {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { showPrompt, ...deleteState } = castState("delete", state);
+            return setAllowDeleteAll({ ...deleteState });
+        }
+        case "delete: delete all yes": {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { showPrompt, ...deleteState } = castState("delete", state);
             const newDiagram = DiagramStateFunctions.deleteAll(state.diagram);
-            return {
-                ...state,
+            return setAllowDeleteAll({
+                ...deleteState,
                 diagram: newDiagram,
                 display: {}
-            };
+            });
         }
     }
 }

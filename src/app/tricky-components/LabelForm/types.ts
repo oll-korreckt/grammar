@@ -40,6 +40,8 @@ export interface EditActiveState extends StateBase {
 
 export interface DeleteState extends StateBase {
     mode: typeof deleteMode;
+    showPrompt?: boolean;
+    allowDeleteAll?: boolean;
 }
 
 
@@ -104,5 +106,9 @@ export type LabelFormAction = {
     type: "delete: element";
     id: ElementId;
 } | {
-    type: "delete: all";
+    type: "delete: enter delete all";
+} | {
+    type: "delete: delete all yes";
+} | {
+    type: "delete: delete all cancel";
 }
