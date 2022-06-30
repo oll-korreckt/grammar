@@ -296,13 +296,18 @@ function deleteAll(state: DiagramState): DiagramState {
     };
 }
 
+function getLabelCount({ elements }: DiagramState): number {
+    return Object.keys(elements).length;
+}
+
 export const DiagramStateFunctions = {
     addItem: addItem,
     deleteItem: deleteItem,
     deleteProperty: deleteProperty,
     addReference: addReference,
     deleteReference: deleteReference,
-    deleteAll: deleteAll
+    deleteAll: deleteAll,
+    getLabelCount: getLabelCount
 };
 
 export const Private = {
