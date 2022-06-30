@@ -1,6 +1,6 @@
 import { accessClassName, ControlAnimationContext, DisplayModeContext } from "@app/utils";
 import { Frame } from "@utils/frame";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import { EditFormFrameRender } from "../EditFormFrameRender";
 import { QueryFunctionContext, useQuery } from "react-query";
 import { SERVER } from "config";
@@ -80,23 +80,78 @@ interface FrameRunnerProps {
     children: Frame[];
 }
 
+interface State {
+    index: number;
+    showAnimatingElement: boolean;
+}
+
+type Action = {
+    type: "increment";
+    numFrames: number;
+    showAnimatingElement: boolean;
+} | {
+    type: "update animating element";
+    showAnimatingElement: boolean;
+}
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case "increment": {
+            const newIndex = state.index === action.numFrames - 1
+                ? 0
+                : state.index + 1;
+            return {
+                index: newIndex,
+                showAnimatingElement: action.showAnimatingElement
+            };
+        }
+        case "update animating element": {
+            return {
+                index: state.index,
+                showAnimatingElement: action.showAnimatingElement
+            };
+        }
+    }
+}
+
 const FrameRunner: React.VFC<FrameRunnerProps> = ({ children }) => {
-    const [index, setIndex] = useState(0);
+    const [{ index, showAnimatingElement }, dispatch] = useReducer(reducer, { index: 0, showAnimatingElement: false });
 
     useEffect(() => {
-        const { duration } = children[index];
+        const { duration, animatingElement } = children[index];
         const defDuration = duration ? duration : 2;
-        const nextIndex = index === children.length - 1
-            ? 0
-            : index + 1;
-        setTimeout(() => setIndex(nextIndex), defDuration * 1000);
+        if (animatingElement) {
+            const waitTime = 1.0;
+            setTimeout(() => {
+                dispatch({
+                    type: "update animating element",
+                    showAnimatingElement: true
+                });
+                setTimeout(() => {
+                    dispatch({
+                        type: "increment",
+                        numFrames: children.length,
+                        showAnimatingElement: false
+                    });
+                }, (defDuration - waitTime) * 1000);
+            }, waitTime * 1000);
+        } else {
+            setTimeout(() => {
+                dispatch({
+                    type: "increment",
+                    numFrames: children.length,
+                    showAnimatingElement: false
+                });
+            }, defDuration * 1000);
+        }
     }, [index, children]);
 
     const { data, animatingElement } = children[index];
+    const activeElement = showAnimatingElement ? animatingElement : undefined;
 
     return (
         <DisplayModeContext.Provider value={{ displayMode: "partial" }}>
-            <ControlAnimationContext.Provider value={{ activeElement: animatingElement }}>
+            <ControlAnimationContext.Provider value={{ activeElement }}>
                 <EditFormFrameRender {...data}/>
             </ControlAnimationContext.Provider>
         </DisplayModeContext.Provider>
