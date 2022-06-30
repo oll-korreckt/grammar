@@ -297,7 +297,13 @@ function deleteAll(state: DiagramState): DiagramState {
 }
 
 function getLabelCount({ elements }: DiagramState): number {
-    return Object.keys(elements).length;
+    let cnt = 0;
+    Object.values(elements).forEach(({ type }) => {
+        if (type !== "word") {
+            cnt++;
+        }
+    });
+    return cnt;
 }
 
 export const DiagramStateFunctions = {
