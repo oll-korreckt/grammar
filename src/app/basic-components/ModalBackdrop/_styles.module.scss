@@ -2,10 +2,11 @@
 
 .modalBackdrop {
     @include main.center-content;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     background-color: #0002;
+    z-index: 1;
 }
