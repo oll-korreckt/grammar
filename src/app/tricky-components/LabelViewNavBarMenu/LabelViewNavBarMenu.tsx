@@ -143,7 +143,16 @@ export function createLabelViewNavBarMenu<TNavProps, TAddProps, TEditBrowseProps
                                 custom={directionRef.current}
                                 className={className}
                                 initial="initial"
-                                animate={{ x: 0 }}
+                                animate={{
+                                    x: 0,
+                                    /*
+                                        Need this here as it's the only way to get
+                                        framer to remove the transform from the div's
+                                        style after the animation is over
+                                    */
+                                    transitionEnd: { x: 0 }
+                                }}
+                                style={{ transform: "none !important" }}
                                 exit="exit"
                                 variants={variants}
                                 transition={{ ease: [0.25, 0.1, 0.25, 1], duration: 0.5 }}
