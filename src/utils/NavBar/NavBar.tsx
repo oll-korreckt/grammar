@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import styles from "./_styles.module.scss";
 import { accessClassName } from "@app/utils";
-import { FaHome, FaTree, FaQuestion, FaInfoCircle } from "react-icons/fa";
+import { FaHome, FaTree, FaQuestion } from "react-icons/fa";
 import { IconType } from "react-icons";
 
 export const NavBar: React.VFC = () => {
@@ -31,14 +31,6 @@ export const NavBar: React.VFC = () => {
                         icon={FaQuestion}
                     >
                         Elements
-                    </NavBarItem>
-                </li>
-                <li>
-                    <NavBarItem
-                        href="/about"
-                        icon={FaInfoCircle}
-                    >
-                        About
                     </NavBarItem>
                 </li>
             </ul>
