@@ -19,7 +19,7 @@ function convertToInputProps(inputState: InputFormInternalState, dispatch: React
 
 function convertToLabelProps(labelState: LabelFormInternalState, dispatch: React.Dispatch<Action>): LabelFormProps {
     return {
-        initialDiagram: labelState.initialDiagram,
+        initialDiagram: labelState.currentDiagram,
         onStateChange: ({ diagram, category, expanded }) => {
             dispatch({
                 type: "label: update state",
