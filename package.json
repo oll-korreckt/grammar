@@ -39,6 +39,7 @@
         "open-browser": "node open",
         "test": "jest",
         "build": "next build",
+        "type-check": "tsc --project ./tsconfig.json",
         "start": "next start",
         "deadcode": "ts-prune"
     },
