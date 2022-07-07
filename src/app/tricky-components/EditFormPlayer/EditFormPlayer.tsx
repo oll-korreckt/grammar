@@ -120,14 +120,15 @@ const FrameRunner: React.VFC<FrameRunnerProps> = ({ children }) => {
     useEffect(() => {
         const { duration, animatingElement } = children[index];
         const defDuration = duration ? duration : 2;
+        let timeoutId: any | undefined = undefined;
         if (animatingElement) {
             const waitTime = 1.0;
-            setTimeout(() => {
+            timeoutId = setTimeout(() => {
                 dispatch({
                     type: "update animating element",
                     showAnimatingElement: true
                 });
-                setTimeout(() => {
+                timeoutId = setTimeout(() => {
                     dispatch({
                         type: "increment",
                         numFrames: children.length,
@@ -136,7 +137,7 @@ const FrameRunner: React.VFC<FrameRunnerProps> = ({ children }) => {
                 }, (defDuration - waitTime) * 1000);
             }, waitTime * 1000);
         } else {
-            setTimeout(() => {
+            timeoutId = setTimeout(() => {
                 dispatch({
                     type: "increment",
                     numFrames: children.length,
@@ -144,6 +145,11 @@ const FrameRunner: React.VFC<FrameRunnerProps> = ({ children }) => {
                 });
             }, defDuration * 1000);
         }
+        return () => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+        };
     }, [index, children]);
 
     const { data, animatingElement } = children[index];
