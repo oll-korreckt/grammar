@@ -186,19 +186,21 @@ export function reducer(state: EditFormInternalState, action: Action): EditFormI
             if (state.stage === "input") {
                 const { inputState } = state;
                 const proceed = allowProceed(inputState.initialValue, inputState.currentValue);
+                let output: EditFormInternalState;
                 switch (proceed) {
                     case "ask to update": {
-                        return {
+                        output = {
                             ...state,
                             inputState: {
                                 ...inputState,
                                 askReplace: true
                             }
                         };
+                        break;
                     }
                     case "go w/ update": {
                         const newDiagram = DiagramState.fromText(inputState.currentValue);
-                        return {
+                        output = {
                             ...state,
                             stage: "label",
                             inputState: {
@@ -210,9 +212,10 @@ export function reducer(state: EditFormInternalState, action: Action): EditFormI
                                 currentDiagram: newDiagram
                             }
                         };
+                        break;
                     }
                     case "go w/o update": {
-                        return {
+                        output = {
                             ...state,
                             stage: "label",
                             inputState: {
@@ -220,13 +223,16 @@ export function reducer(state: EditFormInternalState, action: Action): EditFormI
                                 initialValue: inputState.currentValue
                             }
                         };
+                        break;
                     }
                 }
+                return output;
             }
-            return {
+            const output: EditFormInternalState = {
                 ...state,
                 stage: "input"
             };
+            return output;
         }
         case "input: update state": {
             const { inputState } = state;
