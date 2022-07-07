@@ -1,7 +1,7 @@
 import { ElementDisplayInfo } from "@app/utils";
 import { ElementCategory } from "@domain/language";
 import { ClauseList, ElementType, PartOfSpeechList, PhraseList } from "@domain/language/_types/utils";
-import { HTMLAnchorObject, Strings } from "@lib/utils";
+import { HTMLAnchorObject, HTMLCodeObject, Strings } from "@lib/utils";
 
 export type ElementPageType =
     | "coordinated"
@@ -133,7 +133,15 @@ function isElementCategory(value: string): value is ElementPageType_ElementCateg
     return elementCategorySet.has(value as any);
 }
 
-function createTypeLink(type: ElementPageType, plural?: boolean): HTMLAnchorObject {
+function createTypeLink(type: ElementPageType, plural?: boolean): HTMLAnchorObject | HTMLCodeObject {
+    if (type === "word") {
+        console.log("word link created");
+        return {
+            type: "code",
+            className: "typeLink",
+            content: "Word"
+        };
+    }
     const fullName = _getFullName(type, plural);
     return {
         type: "a",

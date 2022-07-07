@@ -73,7 +73,6 @@ function _getFullCategoryList(): HTMLUnorderedListObject {
     return {
         type: "ul",
         items: [
-            { type: "li", content: ElementPage.createTypeLink("word") },
             {
                 type: "li",
                 content: [

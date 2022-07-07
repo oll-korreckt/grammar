@@ -9,7 +9,7 @@ interface PathData extends ParsedUrlQuery {
 
 export const getStaticPaths: GetStaticPaths<PathData> = async () => {
     return {
-        paths: ElementPage.getAllPageIds().map((id) => {
+        paths: ElementPage.getAllPageIds().filter((id) => id !== "word").map((id) => {
             return { params: { elementPageId: id } };
         }),
         fallback: false
