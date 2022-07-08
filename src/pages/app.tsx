@@ -1,9 +1,12 @@
+import { MessageBoxButton } from "@app/basic-components/MessageBox";
+import { MessageBoxModal, MessageBoxModalResponse } from "@app/basic-components/MessageBoxModal";
 import { EditForm } from "@app/tricky-components/EditForm";
 import { EditFormState } from "@app/tricky-components/EditForm/reducer";
 import { useClientSide } from "@app/utils";
 import { SimpleObject } from "@lib/utils";
 import { NextPage, GetStaticProps } from "next";
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { QueryFunctionContext, useMutation, useQuery } from "react-query";
 
 const AppPage: NextPage = () => {
@@ -69,10 +72,38 @@ const EditFormComponent: React.VFC = () => {
     const [state, update] = storage;
 
     return (
-        <EditForm
-            initialState={state}
-            saveState={update}
-        />
+        <ErrorBoundary
+            FallbackComponent={FallbackComponent}
+        >
+            <EditForm
+                initialState={state}
+                saveState={update}
+            />
+        </ErrorBoundary>
+    );
+};
+
+const FallbackComponent: React.VFC = () => {
+    function onResponse(response: MessageBoxModalResponse): void {
+        if (response.type === "button" && response.text === "Reset") {
+            const key: QueryKey[1] = "app";
+            localStorage.removeItem(key);
+            location.reload();
+        }
+    }
+
+    const buttons: MessageBoxButton[] = [{
+        text: "Reset",
+        alignment: "right"
+    }];
+
+    return (
+        <MessageBoxModal
+            buttons={buttons}
+            onResponse={onResponse}
+        >
+            An error has occurred. Your state must be reset in order to fix it.
+        </MessageBoxModal>
     );
 };
 
