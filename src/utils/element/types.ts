@@ -135,7 +135,6 @@ function isElementCategory(value: string): value is ElementPageType_ElementCateg
 
 function createTypeLink(type: ElementPageType, plural?: boolean): HTMLAnchorObject | HTMLCodeObject {
     if (type === "word") {
-        console.log("word link created");
         return {
             type: "code",
             className: "typeLink",
