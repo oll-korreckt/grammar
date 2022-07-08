@@ -40,7 +40,9 @@ export const EditForm: React.VFC<EditFormProps> = ({ initialState, saveState }) 
     const [state, dispatch] = useEditForm(initialState);
     const updateRef = useRef(false);
     const extendedDispatch: typeof dispatch = (action) => {
-        updateRef.current = true;
+        if (action.type !== "input: update state") {
+            updateRef.current = true;
+        }
         dispatch(action);
     };
     const { stage, inputState, labelState } = state;
