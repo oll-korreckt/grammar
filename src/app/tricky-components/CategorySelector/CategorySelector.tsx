@@ -64,7 +64,6 @@ function isClipped({ left, right }: DOMRect, edge: number): boolean {
 
 function callScroll(container: HTMLElement, setArrowState: SetArrowState, scroll: number): void {
     const newScroll = scroll < 0 ? 0 : scroll;
-    console.log(newScroll);
     container.scrollTo({
         behavior: "smooth",
         left: newScroll
