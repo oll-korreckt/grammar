@@ -38,7 +38,7 @@ export const EditNavBar = makeRefComponent<HTMLDivElement, EditNavBarProps>("Edi
                 <FaArrowLeft />
             </div>
             <div className={accessClassName(styles, "stageContainer")}>
-                <AnimateSharedLayout>
+                <AnimateSharedLayout type="crossfade">
                     {items.map((item) => {
                         return (
                             <Item

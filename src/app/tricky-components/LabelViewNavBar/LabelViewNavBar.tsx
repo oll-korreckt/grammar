@@ -36,7 +36,7 @@ export const LabelViewNavBar = makeRefComponent<HTMLDivElement, PropsWithChildre
         >
             {children}
             <div className={accessClassName(styles, "itemContainer")}>
-                <AnimateSharedLayout>
+                <AnimateSharedLayout type="crossfade">
                     <Item
                         icon={FaSitemap}
                         selected={currentMode === "navigate"}
