@@ -3,7 +3,6 @@ import { Frame } from "@utils/frame";
 import React, { useEffect, useReducer } from "react";
 import { EditFormFrameRender } from "../EditFormFrameRender";
 import { QueryFunctionContext, useQuery } from "react-query";
-import { SERVER } from "config";
 import { HeapReducer } from "@lib/utils";
 import styles from "./_styles.module.scss";
 
@@ -32,7 +31,7 @@ function createInputFrames(): Frame[] {
 }
 
 async function queryFn({}: QueryFunctionContext<EditFormPlayerKey>): Promise<Frame[]> {
-    const queryStr = `${SERVER}/api/frame/player`;
+    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/frame/player`;
     const response = await fetch(queryStr);
     if (!response.ok) {
         let errorMsg = "error occurred while loading frames for 'player'";

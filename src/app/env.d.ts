@@ -3,3 +3,9 @@ declare module "*.scss" {
     export default classes;
 }
 declare module "*.png";
+
+declare namespace NodeJS {
+    interface ProcessEnv {
+        readonly NEXT_PUBLIC_URL: string;
+    }
+}

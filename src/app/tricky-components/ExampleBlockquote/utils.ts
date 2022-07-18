@@ -2,7 +2,6 @@ import { DiagramState } from "@app/utils";
 import { HTMLBlockquoteObject, HTMLContent, HTMLObject } from "@lib/utils";
 import { ElementPageId } from "@utils/element";
 import { ElementModelAddress, Model } from "@utils/model";
-import { SERVER } from "config";
 import { useEffect, useState } from "react";
 import { QueryFunctionContext, useQuery } from "react-query";
 
@@ -32,7 +31,7 @@ type InternalState = {
 }
 
 async function availableQueryFn(): Promise<Set<string>> {
-    const response = await fetch(`${SERVER}/api/model`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/model`);
     if (!response.ok) {
         let errMsg = "Unable to fetch addresses";
         try {
@@ -50,7 +49,7 @@ async function textQueryFn({ queryKey }: QueryFunctionContext<CheckModelKey>): P
         throw "No valid address provided";
     }
     const [,, page, name] = queryKey;
-    const response = await fetch(`${SERVER}/api/model/${page}/${name}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`);
     if (!response.ok) {
         let errMsg = `error during query for '${page}.${name}'`;
         try {

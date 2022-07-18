@@ -2,7 +2,6 @@ import { EditForm } from "@app/tricky-components/EditForm";
 import { EditFormState } from "@app/tricky-components/EditForm/reducer";
 import { accessClassName, DiagramState } from "@app/utils";
 import { ElementModelAddress, Model } from "@utils/model/types";
-import { SERVER } from "config";
 import React, { useRef } from "react";
 import { useMutation } from "react-query";
 import Link from "next/link";
@@ -20,7 +19,7 @@ interface UpdateArg {
 
 async function updateFn({ address, model }: UpdateArg): Promise<void> {
     const { page, name } = address;
-    const queryStr = `${SERVER}/api/model/${page}/${name}`;
+    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`;
     const response = await fetch(
         queryStr,
         {
@@ -113,7 +112,7 @@ const EditModelPageView: React.VFC<EditModelPageViewProps> = ({ initialModel, sa
                 >
                     Save
                 </button>
-                <Link href={`${SERVER}/model`}>
+                <Link href={`${process.env.NEXT_PUBLIC_URL}/model`}>
                     <button>
                         Exit
                     </button>

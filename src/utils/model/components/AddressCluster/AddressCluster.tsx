@@ -6,7 +6,6 @@ import styles from "./_styles.module.scss";
 import { ElementModelAddress } from "@utils/model";
 import { ElementPageId } from "@utils/element";
 import Link from "next/link";
-import { SERVER } from "config";
 
 export interface AddressCluster {
     page: ElementPageId;
@@ -161,7 +160,7 @@ const ModelItem: React.VFC<ModelItemProps> = ({ children }) => {
                     >
                         {name}
                     </span>
-                    <Link href={`${SERVER}/model/${page}/${name}`}>
+                    <Link href={`${process.env.NEXT_PUBLIC_URL}/model/${page}/${name}`}>
                         <a>
                             <FaEdit className={accessClassName(styles, "icon")}/>
                         </a>

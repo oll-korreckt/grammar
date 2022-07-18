@@ -4,7 +4,6 @@ import { EditForm } from "@app/tricky-components/EditForm";
 import { EditFormFrameRenderProps } from "@app/tricky-components/EditFormFrameRender";
 import { NavigateMenuProps } from "@app/tricky-components/NavigateMenu";
 import { InputFrameRenderState, LabelFrameRenderState, DisplayStateContext, useDisplayState, ClickListenerContext } from "@app/utils";
-import { SERVER } from "config";
 import React from "react";
 import { useMutation } from "react-query";
 import { Frame } from "../types";
@@ -20,7 +19,7 @@ async function postFn({ renderState, animatingElement }: PostArgs): Promise<void
     if (animatingElement) {
         frame.animatingElement = animatingElement;
     }
-    const queryStr = `${SERVER}/api/frame/player`;
+    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/frame/player`;
     const response = await fetch(
         queryStr,
         {

@@ -1,7 +1,6 @@
 import { useClientSide } from "@app/utils";
 import { ElementModelAddress, Model } from "@utils/model";
 import { EditModelPage } from "@utils/model/components";
-import { SERVER } from "config";
 import { GetServerSideProps, NextPage } from "next";
 import React from "react";
 
@@ -33,7 +32,7 @@ export const getServerSideProps: GetServerSideProps<ModelPageProps, ModelPagePar
         };
     }
     const [page, name] = modelAddress;
-    const queryUrl = `${SERVER}/api/model/${page}/${name}`;
+    const queryUrl = `${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`;
     const response = await fetch(queryUrl);
     if (!response.ok) {
         let errMsg = `An error occurred while trying to fetch data for '${page}.${name}'`;

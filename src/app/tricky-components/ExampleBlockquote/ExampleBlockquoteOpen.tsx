@@ -3,7 +3,6 @@ import { accessClassName } from "@app/utils";
 import { HTMLBlockquoteObject } from "@lib/utils";
 import { ElementPageId } from "@utils/element";
 import { ElementModelAddress, Model } from "@utils/model";
-import { SERVER } from "config";
 import React from "react";
 import { IconType } from "react-icons";
 import { FaPlusCircle, FaRedo, FaTimes } from "react-icons/fa";
@@ -28,7 +27,7 @@ function getKey({ custom }: HTMLBlockquoteObject): ExampleBlockquoteKey {
 
 async function queryFn({ queryKey }: QueryFunctionContext<ExampleBlockquoteKey>): Promise<Model> {
     const [, page, name] = queryKey;
-    const queryStr = `${SERVER}/api/model/${page}/${name}`;
+    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`;
     const response = await fetch(queryStr);
     if (!response.ok) {
         let errorMsg = "error occurred while loading data";
