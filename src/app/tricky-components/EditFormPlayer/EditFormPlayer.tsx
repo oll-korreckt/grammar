@@ -31,7 +31,7 @@ function createInputFrames(): Frame[] {
 }
 
 async function queryFn({}: QueryFunctionContext<EditFormPlayerKey>): Promise<Frame[]> {
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/frame/player`;
+    const queryStr = "/api/frame/player";
     const response = await fetch(queryStr);
     if (!response.ok) {
         let errorMsg = "error occurred while loading frames for 'player'";

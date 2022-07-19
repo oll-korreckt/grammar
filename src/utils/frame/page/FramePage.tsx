@@ -19,7 +19,7 @@ async function postFn({ renderState, animatingElement }: PostArgs): Promise<void
     if (animatingElement) {
         frame.animatingElement = animatingElement;
     }
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/frame/player`;
+    const queryStr = "/api/frame/player";
     const response = await fetch(
         queryStr,
         {

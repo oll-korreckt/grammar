@@ -27,7 +27,7 @@ function getKey({ custom }: HTMLBlockquoteObject): ExampleBlockquoteKey {
 
 async function queryFn({ queryKey }: QueryFunctionContext<ExampleBlockquoteKey>): Promise<Model> {
     const [, page, name] = queryKey;
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`;
+    const queryStr = `/api/model/${page}/${name}`;
     const response = await fetch(queryStr);
     if (!response.ok) {
         let errorMsg = "error occurred while loading data";

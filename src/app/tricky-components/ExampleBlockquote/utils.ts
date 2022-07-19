@@ -31,7 +31,7 @@ type InternalState = {
 }
 
 async function availableQueryFn(): Promise<Set<string>> {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/model`);
+    const response = await fetch("/api/model");
     if (!response.ok) {
         let errMsg = "Unable to fetch addresses";
         try {
@@ -49,7 +49,7 @@ async function textQueryFn({ queryKey }: QueryFunctionContext<CheckModelKey>): P
         throw "No valid address provided";
     }
     const [,, page, name] = queryKey;
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`);
+    const response = await fetch(`/api/model/${page}/${name}`);
     if (!response.ok) {
         let errMsg = `error during query for '${page}.${name}'`;
         try {

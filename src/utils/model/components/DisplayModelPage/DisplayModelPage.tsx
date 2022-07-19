@@ -8,7 +8,7 @@ import { ModelPageContext } from "../types";
 import styles from "./_styles.module.scss";
 
 async function addressQueryFn(): Promise<ElementModelAddress[]> {
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model`;
+    const queryStr = "/api/model";
     const response = await fetch(queryStr);
     if (!response.ok) {
         throw "error occurred while loading data";
@@ -18,7 +18,7 @@ async function addressQueryFn(): Promise<ElementModelAddress[]> {
 }
 
 async function deleteFn(address: ElementModelAddress): Promise<void> {
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${address.page}/${address.name}`;
+    const queryStr = `/api/model/${address.page}/${address.name}`;
     const response = await fetch(queryStr, { method: "DELETE" });
     if (!response.ok) {
         throw "error occurred while deleting data";
@@ -31,7 +31,7 @@ interface RenameArg {
 }
 
 async function renameFn({ address, newAddress }: RenameArg): Promise<void> {
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${address.page}/${address.name}`;
+    const queryStr = `/api/model/${address.page}/${address.name}`;
     const response = await fetch(
         queryStr,
         {
@@ -50,7 +50,7 @@ interface AddArg {
 }
 
 async function addFn({ address, model }: AddArg): Promise<void> {
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${address.page}/${address.name}`;
+    const queryStr = `/api/model/${address.page}/${address.name}`;
     const options: RequestInit = { method: "POST" };
     if (model) {
         options.body = JSON.stringify(model);

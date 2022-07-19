@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps<ModelPageProps, ModelPagePar
         };
     }
     const [page, name] = modelAddress;
-    const queryUrl = `${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`;
+    const queryUrl = `http://localhost:3000/api/model/${page}/${name}`;
     const response = await fetch(queryUrl);
     if (!response.ok) {
         let errMsg = `An error occurred while trying to fetch data for '${page}.${name}'`;

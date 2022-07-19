@@ -160,7 +160,7 @@ const ModelItem: React.VFC<ModelItemProps> = ({ children }) => {
                     >
                         {name}
                     </span>
-                    <Link href={`${process.env.NEXT_PUBLIC_URL}/model/${page}/${name}`}>
+                    <Link href={`/model/${page}/${name}`}>
                         <a>
                             <FaEdit className={accessClassName(styles, "icon")}/>
                         </a>

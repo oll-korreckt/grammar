@@ -19,7 +19,7 @@ interface UpdateArg {
 
 async function updateFn({ address, model }: UpdateArg): Promise<void> {
     const { page, name } = address;
-    const queryStr = `${process.env.NEXT_PUBLIC_URL}/api/model/${page}/${name}`;
+    const queryStr = `/api/model/${page}/${name}`;
     const response = await fetch(
         queryStr,
         {
@@ -112,7 +112,7 @@ const EditModelPageView: React.VFC<EditModelPageViewProps> = ({ initialModel, sa
                 >
                     Save
                 </button>
-                <Link href={`${process.env.NEXT_PUBLIC_URL}/model`}>
+                <Link href="/model">
                     <button>
                         Exit
                     </button>
