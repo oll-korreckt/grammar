@@ -1,4 +1,4 @@
-import { checkAccess } from "@utils/api/io";
+import { checkAccess, checkReadAccess } from "@utils/api/io";
 import { FileSystem } from "@utils/io";
 import { Frame, FrameAddress } from "../types";
 import fs from "fs";
@@ -156,7 +156,7 @@ type GetFramesOutput =
     | FrameError<"resource not found">
 
 async function getFrames(root: string, frameName: string): Promise<GetFramesOutput> {
-    if (!await checkAccess(root)) {
+    if (!await checkReadAccess(root)) {
         return _createAccessErr(root, "directory");
     }
     const { children } = await FileSystem.readdir(root);
