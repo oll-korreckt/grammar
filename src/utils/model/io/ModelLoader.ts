@@ -5,6 +5,7 @@ import { constants } from "fs";
 import { FileItem, FileSystem } from "@utils/io";
 import nodepath from "path";
 import { DiagramState } from "@app/utils";
+import { checkReadAccess } from "@utils/api/io";
 
 const FILE_IDENTIFIER = ".json";
 
@@ -138,12 +139,12 @@ async function getModelAddresses(root: string, page?: ElementPageId): Promise<Ge
 }
 
 async function getModel(root: string, address: ElementModelAddress): Promise<GetModelOutput> {
-    if (!await checkAccess(root)) {
+    if (!await checkReadAccess(root)) {
         return _createAccessErr(root);
     }
     const filename = _addressToFilename(address);
     const path = nodepath.resolve(root, filename);
-    if (!await checkAccess(path)) {
+    if (!await checkReadAccess(path)) {
         return {
             errType: "resource not found",
             msg: `No model for '${ElementModelAddress.toString(address)}'`
