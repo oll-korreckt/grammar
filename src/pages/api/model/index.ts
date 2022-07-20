@@ -3,7 +3,7 @@ import { isModelLoaderError, ModelLoader } from "@utils/model/io";
 import { NextApiRequest, NextApiResponse } from "next";
 import nodepath from "path";
 
-const loader = ModelLoader.createLoader(nodepath.join(process.cwd(), "public", "data", "element"));
+const loader = ModelLoader.createLoader(nodepath.join(process.cwd(), "json", "element"));
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse): Promise<void> {
     const output = await loader.getModelAddresses();
