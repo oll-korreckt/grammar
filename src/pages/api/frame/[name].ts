@@ -4,7 +4,7 @@ import { FrameError, FrameLoader } from "@utils/frame/io";
 import { NextApiRequest, NextApiResponse } from "next";
 import nodepath from "path";
 
-const loader = FrameLoader.createLoader(nodepath.resolve("src", "data", "frame"));
+const loader = FrameLoader.createLoader(nodepath.join(process.cwd(), "src", "data", "frame"));
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse): Promise<void> {
     const { query, body } = req;

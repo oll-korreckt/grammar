@@ -44,7 +44,7 @@ function getRouteData(path: string | string[] | undefined): ElementModelAddress 
     }
 }
 
-const loader = ModelLoader.createLoader(nodepath.resolve("src", "data", "element"));
+const loader = ModelLoader.createLoader(nodepath.join(process.cwd(), "src", "data", "element"));
 
 async function handleGet(address: ElementModelAddress | ElementPageId, res: NextApiResponse): Promise<void> {
     if (typeof address === "string") {
