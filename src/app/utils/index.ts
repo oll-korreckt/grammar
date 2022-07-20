@@ -7,7 +7,6 @@ export { DiagramStateFunctions } from "./diagram-state-functions";
 export * from "./history-state";
 export * from "./element-display-info";
 export * from "./derivation-tree";
-export * from "./slate.d";
 export * from "./display-lexeme";
 export * from "./display-state-hooks";
 export * from "./context";

@@ -1,10 +1,13 @@
-import { accessClassName, ErrorToken } from "@app/utils";
+import { accessClassName } from "@app/utils";
 import { makeRefComponent } from "@app/utils/hoc";
 import { AnimatePresence, AnimateSharedLayout, motion, Variants } from "framer-motion";
 import React, { useLayoutEffect, useState } from "react";
 import styles from "./_styles.module.scss";
 
-export type ErrorListItem = Pick<ErrorToken, "key" | "message">;
+export interface ErrorListItem {
+    key: string;
+    message: string;
+}
 
 export interface ErrorListProps {
     children?: ErrorListItem | ErrorListItem[];

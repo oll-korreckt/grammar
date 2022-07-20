@@ -2,11 +2,6 @@ import { LabelSettings, Lexeme } from "@app/tricky-components/LabelView";
 import { ElementCategory, ElementType } from "@domain/language";
 import { Variant } from "framer-motion";
 import React from "react";
-import {
-    Element as SlateElement,
-    Text as SlateText
-} from "slate";
-import { EditableProps, RenderElementProps, RenderLeafProps } from "slate-react/dist/components/editable";
 
 export type ElementFilterType = "word" | "partOfSpeech" | "phrase" | "clause" | "sentence";
 export type SimpleComponentProps = { children: string; }
@@ -58,18 +53,6 @@ export const EVENTS = {
     exit: "exit"
 };
 
-type EditableProp<Key extends keyof EditableProps> = Exclude<EditableProps[Key], undefined>;
-export type RenderElement = EditableProp<"renderElement">;
-export type RenderLeaf = EditableProp<"renderLeaf">;
-export type Decorate = EditableProp<"decorate">;
-export interface TypedRenderElementProps<TElement extends SlateElement = SlateElement> extends RenderElementProps {
-    element: TElement;
-}
-export type TypedRenderElement<TElement extends SlateElement = SlateElement> = (props: TypedRenderElementProps<TElement>) => JSX.Element;
-export interface TypedRenderLeafProps<TLeaf extends SlateText = SlateText> extends RenderLeafProps {
-    leaf: TLeaf;
-}
-export type TypedRenderLeaf<TLeaf extends SlateText = SlateText> = (props: TypedRenderLeafProps<TLeaf>) => JSX.Element;
 export type Stage = "input" | "label";
 
 export interface InputFrameRenderState {
