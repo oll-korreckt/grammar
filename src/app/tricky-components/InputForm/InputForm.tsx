@@ -1,8 +1,7 @@
-import { accessClassName, DecoratorRange, useUpdateDisplayState } from "@app/utils";
-import { withClassNameProp } from "@app/utils/hoc";
-import React, { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
-import { createEditor, Transforms } from "slate";
-import { withReact } from "slate-react";
+import { accessClassName } from "@app/utils";
+import { withClassName, withClassNameProp } from "@app/utils/hoc";
+import { scan } from "@domain/language";
+import React, { useEffect, useLayoutEffect, useReducer, useRef, useState } from "react";
 import { ErrorList, ErrorListItem } from "../ErrorList";
 import { TextEditor } from "../TextEditor";
 import styles from "./_styles.module.scss";
@@ -19,136 +18,119 @@ export interface InputFormState {
 
 export type InputFormErrorState = "none" | "errors" | "calculating";
 
+interface Error {
+    position: [line: number, column: number];
+    msg: string;
+}
+
 interface State {
     input: string;
-    errors: DecoratorRange[];
+    errors: Error[];
     lastChange?: "input" | "error";
 }
 
 type Action = {
     type: "update input";
     input: string;
-} | {
-    type: "update errors";
-    errors: DecoratorRange[];
+}
+
+function getErrors(input: string): Error[] {
+    const output: Error[] = [];
+    const lines = input.split("\n");
+    lines.forEach((line, lineNum) => {
+        const scanResult = scan(line);
+        if (scanResult.type === "errors") {
+            scanResult.data.forEach(({ message, start }) => {
+                output.push({
+                    position: [lineNum, start],
+                    msg: message
+                });
+            });
+        }
+    });
+    return output;
 }
 
 function reducer(state: State, action: Action): State {
-    switch (action.type) {
-        case "update input":
-            return {
-                input: action.input,
-                errors: state.errors,
-                lastChange: "input"
-            };
-        case "update errors":
-            return {
-                input: state.input,
-                errors: action.errors,
-                lastChange: "error"
-            };
-    }
-    throw "unhandled action";
+    const errors = getErrors(action.input);
+    return {
+        input: action.input,
+        errors
+    };
 }
 
-function extractInput(children: string | undefined): string {
-    return children !== undefined ? children : "";
+function initializer(initialValue: string | undefined): State {
+    const defInitialValue = initialValue !== undefined ? initialValue : "";
+    const errors = getErrors(defInitialValue);
+    return {
+        input: defInitialValue,
+        errors
+    };
 }
 
-const errorDelay = 500;
+function cursorToKey([line, col]: [number, number]): string {
+    return `${line}.${col}`;
+}
+
+function keyToCursor(key: string): [number, number] {
+    const [line, col] = key.split(".");
+    return [parseInt(line), parseInt(col)];
+}
 
 export const InputForm: React.VFC<InputFormProps> = ({ initialValue, onStateChange }) => {
-    const [errorListAnimate, setErrorListAnimate] = useState<boolean>(false);
-    const updateDisplay = useUpdateDisplayState();
-    const [state, dispatch] = useReducer(
-        reducer,
-        {
-            input: extractInput(initialValue),
-            errors: []
-        }
-    );
-    const editor = useMemo(() => withReact(createEditor()), []);
-    const editorRef = useRef<HTMLDivElement>(null);
-    const [selectedErr, setSelectedErr] = useState<string>();
-    const currentInputRef = useRef<string>();
+    const [state, dispatch] = useReducer(reducer, initialValue, initializer);
+    const stateChangeRef = useRef(false);
+    const [errorListAnimate, setErrorListAnimate] = useState(false);
+    const [cursorPos, setCursorPos] = useState<[number, number]>();
 
-    function invokeOnStateChange(newState: InputFormState): void {
-        if (onStateChange) {
-            onStateChange(newState);
-        }
-    }
-
-    function setCursor(errKey: string): void {
-        if (editorRef.current === null) {
-            return;
-        }
-        const index = state.errors.findIndex((err) => err.key === errKey);
-        if (index !== -1) {
-            const { anchor } = state.errors[index];
-            Transforms.select(editor, anchor);
-            setSelectedErr(errKey);
-            editorRef.current.focus();
-        }
-    }
+    const extendedDispatch: React.Dispatch<Action> = (action) => {
+        stateChangeRef.current = true;
+        dispatch(action);
+    };
 
     useLayoutEffect(() => setErrorListAnimate(true), []);
 
-    const errListItems: ErrorListItem[] = state.errors.map(({ key, message, anchor }) => {
-        const lineNum = anchor.path[0] + 1;
-        const colNum = anchor.offset + 1;
+    const errListItems: ErrorListItem[] = state.errors.map(({ msg, position }) => {
+        const [line, col] = position;
         return {
-            key,
-            message: `[${lineNum}, ${colNum}]: ${message}`
+            key: cursorToKey(position),
+            message: `[${line + 1}, ${col + 1}]: ${msg}`
         };
     });
 
     useEffect(() => {
-        updateDisplay({
-            type: "input",
-            inputText: state.input
-        });
+        // clear cursorPos each time it gets set
+        if (cursorPos !== undefined) {
+            setCursorPos(undefined);
+        }
+    }, [cursorPos]);
+
+    useEffect(() => {
+        if (!stateChangeRef.current) {
+            return;
+        }
+        stateChangeRef.current = false;
+        if (onStateChange) {
+            onStateChange({
+                value: state.input,
+                errorState: state.errors.length > 0 ? "errors" : "none"
+            });
+        }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.input]);
+    }, [stateChangeRef.current, onStateChange, state.input, state.errors.length]);
 
     return (
         <div className={accessClassName(styles, "inputForm")}>
             <ExtendedTextEditor
-                editor={editor}
-                editorRef={editorRef}
-                onErrorChange={(newErrors) => {
-                    const input: string = currentInputRef.current !== undefined
-                        ? currentInputRef.current
-                        : state.input;
-                    invokeOnStateChange({
-                        value: input,
-                        errorState: newErrors.length === 0 ? "none" : "errors"
-                    });
-                    dispatch({
-                        type: "update errors",
-                        errors: newErrors
-                    });
-                }}
-                className={accessClassName(styles, "extendedTextEditor")}
-                onInputChange={(newInput) => {
-                    invokeOnStateChange({
-                        value: newInput,
-                        errorState: "calculating"
-                    });
-                    currentInputRef.current = newInput;
-                    dispatch({
-                        type: "update input",
-                        input: newInput
-                    });
-                }}
-                errorChangeInvoke="always"
-                errorDelay={errorDelay}
+                onInputChange={(input) => extendedDispatch({ type: "update input", input })}
+                errors={state.errors.length > 0}
+                cursorPosition={cursorPos}
             >
                 {state.input}
             </ExtendedTextEditor>
             <ExtendedErrorList
-                onItemSelect={setCursor}
-                selectedKey={selectedErr}
                 className={accessClassName(styles, "extendedErrorList")}
+                onItemSelect={(key) => setCursorPos(keyToCursor(key))}
                 showAnimation={errorListAnimate}
             >
                 {errListItems}
@@ -157,5 +139,5 @@ export const InputForm: React.VFC<InputFormProps> = ({ initialValue, onStateChan
     );
 };
 
-const ExtendedTextEditor = withClassNameProp(TextEditor);
+const ExtendedTextEditor = withClassName(TextEditor, accessClassName(styles, "extendedTextEditor"));
 const ExtendedErrorList = withClassNameProp(ErrorList);
